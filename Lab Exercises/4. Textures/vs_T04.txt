@@ -1,0 +1,20 @@
+#version 330 core
+
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 color;
+layout (location = 2) in vec2 texCoord;
+
+out vec3 aColor;
+out vec2 aTexCoord;
+out vec2 movingTexCoord1, movingTexCoord2, movingTexCoord3;
+
+uniform vec2 offset1, offset2, offset3;
+
+void main() {
+  gl_Position = vec4(position.x, position.y, position.z, 1.0);
+  aColor = color;
+  aTexCoord = texCoord;
+  movingTexCoord1 = texCoord + offset1;
+  movingTexCoord2 = texCoord + offset2;
+  movingTexCoord3 = texCoord + offset3;
+}
