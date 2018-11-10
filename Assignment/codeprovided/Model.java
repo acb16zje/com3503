@@ -3,6 +3,11 @@ package codeprovided;
 import com.jogamp.opengl.*;
 import gmaths.*;
 
+/**
+ * Model class adapted from tutorial 7
+ *
+ * @author Dr. Steve Maddock
+ */
 public class Model {
 
   private Mesh mesh;

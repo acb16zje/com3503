@@ -2,6 +2,11 @@ package codeprovided;
 
 import gmaths.*;
 
+/**
+ * TransformNode class adapted from tutorial 7
+ *
+ * @author Dr. Steve Maddock
+ */
 public class TransformNode extends SGNode {
 
   private Mat4 transform;

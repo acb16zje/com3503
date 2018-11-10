@@ -4,6 +4,12 @@ import com.jogamp.opengl.*;
 import gmaths.*;
 import java.util.*;
 
+
+/**
+ * SGNode class adapted from tutorial 7
+ *
+ * @author Dr. Steve Maddock
+ */
 public class SGNode {
 
   protected String name;

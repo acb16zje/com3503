@@ -5,6 +5,11 @@ import com.jogamp.opengl.*;
 import gmaths.*;
 import java.nio.*;
 
+/**
+ * Light class adapted from tutorial 7
+ *
+ * @author Dr. Steve Maddock
+ */
 public class Light {
 
   private Material material;

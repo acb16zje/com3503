@@ -1,7 +1,7 @@
 package codeprovided;
 
 /**
- * Cube class
+ * Cube class adapted from tutorial 7
  *
  * @author Dr. Steve Maddock
  */

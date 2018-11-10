@@ -4,6 +4,11 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.texture.spi.*;
 import java.io.*;
 
+/**
+ * TextureLibrary class adapted from tutorial 7
+ *
+ * @author Dr. Steve Maddock
+ */
 public final class TextureLibrary {
 
   // only deals with rgb jpg files

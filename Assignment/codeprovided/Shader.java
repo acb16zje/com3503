@@ -7,6 +7,11 @@ import java.io.*;
 import java.nio.charset.*;
 import java.nio.file.*;
 
+/**
+ * Shader class adapted from tutorial 7
+ *
+ * @author Dr. Steve Maddock
+ */
 public class Shader {
 
   private static final boolean DISPLAY_SHADERS = false;

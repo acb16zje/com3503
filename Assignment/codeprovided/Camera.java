@@ -3,7 +3,7 @@ package codeprovided;
 import gmaths.*;
 
 /**
- * Camera class
+ * Camera class adapted from tutorial 7
  *
  * @author Dr. Steve Maddock
  */

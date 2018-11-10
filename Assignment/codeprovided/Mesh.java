@@ -4,6 +4,11 @@ import com.jogamp.common.nio.*;
 import com.jogamp.opengl.*;
 import java.nio.*;
 
+/**
+ * Mesh class adapted from tutorial 7
+ *
+ * @author Dr. Steve Maddock
+ */
 public class Mesh {
 
   private float[] vertices;

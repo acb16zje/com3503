@@ -1,5 +1,10 @@
 package codeprovided;
 
+/**
+ * Sphere class adapted from tutorial 7
+ *
+ * @author Dr. Steve Maddock
+ */
 public final class Sphere {
 
   // ***************************************************

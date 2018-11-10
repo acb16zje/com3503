@@ -2,6 +2,11 @@ package codeprovided;
 
 import com.jogamp.opengl.*;
 
+/**
+ * ModelNode class adapted from tutorial 7
+ *
+ * @author Dr. Steve Maddock
+ */
 public class ModelNode extends SGNode {
 
   protected Model model;

@@ -1,13 +1,4 @@
-import codeprovided.Camera;
-import codeprovided.Light;
-import codeprovided.Material;
-import codeprovided.Mesh;
-import codeprovided.Model;
-import codeprovided.SGNode;
-import codeprovided.Shader;
-import codeprovided.TextureLibrary;
-import codeprovided.TransformNode;
-import codeprovided.TwoTriangles;
+import codeprovided.*;
 import com.jogamp.opengl.*;
 import gmaths.*;
 import java.util.*;
@@ -17,7 +8,6 @@ import java.util.*;
  *
  * @author Zer Jun Eng
  */
-
 public class Anilamp_GLEventListener implements GLEventListener {
 
   private static final boolean DISPLAY_SHADERS = false;
@@ -105,7 +95,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
 
   private Camera camera;
   private Light light;
-  private Model floor, topWall, bottomWall, leftWall, rightWall;
+  private Model floor, topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;
   private List<Model> modelList = new ArrayList<>();
 
   private RoomFrame roomFrame;
@@ -116,18 +106,19 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private void initialise(GL3 gl) {
     // Add all models to list for easier disposal management
     modelList.add(floor);
-    modelList.add(leftWall);
-    modelList.add(rightWall);
-    modelList.add(topWall);
-    modelList.add(bottomWall);
+    modelList.add(leftWallpaper);
+    modelList.add(rightWallpaper);
+    modelList.add(topWallpaper);
+    modelList.add(bottomWallpaper);
 
     light = new Light(gl);
     light.setCamera(camera);
 
     // Pass components into room frame for positioning and rendering
     modelFloor(gl);
-    modelWall(gl);
-    roomFrame = new RoomFrame(ROOM_DIMENSION, floor, topWall, bottomWall, leftWall, rightWall);
+    modelWallpaper(gl);
+    roomFrame = new RoomFrame(
+        ROOM_DIMENSION, floor, topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper);
   }
 
   private void render(GL3 gl) {
@@ -148,20 +139,21 @@ public class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Model the floor
+   * Model the floor with diffuse and specular map
    *
    * @param gl OpenGL object, for drawing
    */
   private void modelFloor(GL3 gl) {
-    final int[] TEXTURE = TextureLibrary.loadTexture(gl, "textures/floor.jpg");
+    final int[] DIFFUSE = TextureLibrary.loadTexture(gl, "textures/floor.jpg");
+    final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/floor_specular.jpg");
 
-    Mesh mesh = new Mesh(gl, TwoTriangles.vertices.clone(), TwoTriangles.indices.clone());
-    Shader shader = new Shader(gl, "shaders/vs_tt.txt", "shaders/fs_tt.txt");
+    Mesh mesh = new Mesh(gl, Cube.vertices.clone(), Cube.indices.clone());
+    Shader shader = new Shader(gl, "shaders/vs_cube.txt", "shaders/fs_cube.txt");
     Material material = new Material(
-        new Vec3(1f, 1f, 1f),
-        new Vec3(1f, 1f, 1f),
-        new Vec3(0.0f, 0.0f, 0.0f), 32.0f);
-    floor = new Model(gl, camera, light, shader, material, new Mat4(), mesh, TEXTURE);
+        new Vec3(1, 1, 1),
+        new Vec3(1, 1, 1),
+        new Vec3(0.6f, 0.6f, 0.6f), 30f);
+    floor = new Model(gl, camera, light, shader, material, new Mat4(), mesh, DIFFUSE, SPECULAR);
   }
 
   /**
@@ -169,41 +161,43 @@ public class Anilamp_GLEventListener implements GLEventListener {
    *
    * @param gl OpenGL object, for drawing
    */
-  private void modelWall(GL3 gl) {
-    final int[] TEXTURE = TextureLibrary.loadTexture(gl, "textures/wall.jpg");
+  private void modelWallpaper(GL3 gl) {
+    final int[] TEXTURE = TextureLibrary.loadTexture(gl, "textures/wallpaper.jpg");
 
-    Mesh mesh = new Mesh(gl, TwoTriangles.vertices.clone(), TwoTriangles.indices.clone());
+    float[] topTexCoords = {
+        Window.RAIIO.x, 1, Window.RAIIO.x,                    // top left
+        Window.Y_POS + Window.RAIIO.y,                        // bottom left
+        1 - Window.RAIIO.x, Window.Y_POS + Window.RAIIO.y,    // bottom right
+        1 - Window.RAIIO.x, 1                                 // top right
+    };
+
+    float[] bottomTexCoords = {
+        Window.RAIIO.x, Window.Y_POS,                         // top left
+        Window.RAIIO.x, 0,                                    // bottom left
+        1 - Window.RAIIO.x, 0,                                // bottom right
+        1 - Window.RAIIO.x, Window.Y_POS                      // top right
+    };
+
+    float[] leftTexCoords = {0, 1, 0, 0, Window.RAIIO.x, 0, Window.RAIIO.x, 1};
+    float[] rightTexCoords = {1 - Window.RAIIO.x, 1, 1 - Window.RAIIO.x, 0, 1, 0, 1, 1};
+
+    TwoTriangles top = new TwoTriangles(topTexCoords);
+    TwoTriangles bottom = new TwoTriangles(bottomTexCoords);
+    TwoTriangles left = new TwoTriangles(leftTexCoords);
+    TwoTriangles right = new TwoTriangles(rightTexCoords);
+
+    Mesh topMesh = new Mesh(gl, top.vertices.clone(), top.indices.clone());
+    Mesh bottomMesh = new Mesh(gl, bottom.vertices.clone(), bottom.indices.clone());
+    Mesh leftMesh = new Mesh(gl, left.vertices.clone(), left.indices.clone());
+    Mesh rightMesh = new Mesh(gl, right.vertices.clone(), right.indices.clone());
+
     Shader shader = new Shader(gl, "shaders/vs_tt.txt", "shaders/fs_tt.txt");
-    Material material = new Material(
-        new Vec3(1f, 1f, 1f),
-        new Vec3(1f, 1f, 1f),
-        new Vec3(0.0f, 0.0f, 0.0f), 32.0f);
-    topWall = new Model(gl, camera, light, shader, material, new Mat4(), mesh, TEXTURE);
-    bottomWall = new Model(gl, camera, light, shader, material, new Mat4(), mesh, TEXTURE);
-    leftWall = new Model(gl, camera, light, shader, material, new Mat4(), mesh, TEXTURE);
-    rightWall = new Model(gl, camera, light, shader, material, new Mat4(), mesh, TEXTURE);
+    Material material = new Material(new Vec3(1f, 1f, 1f), new Vec3(1f, 1f, 1f),
+        new Vec3(0.0f, 0.0f, 0.0f), 32f);
+
+    topWallpaper = new Model(gl, camera, light, shader, material, new Mat4(), topMesh, TEXTURE);
+    bottomWallpaper = new Model(gl, camera, light, shader, material, new Mat4(), bottomMesh, TEXTURE);
+    leftWallpaper = new Model(gl, camera, light, shader, material, new Mat4(), leftMesh, TEXTURE);
+    rightWallpaper = new Model(gl, camera, light, shader, material, new Mat4(), rightMesh, TEXTURE);
   }
-//
-//  private void drawWall(GL3 gl) {
-//    final float SIZE = 16f;
-//    final int[] TEXTURE = TextureLibrary.loadTexture(gl, "textures/wood.jpg");
-//
-//    Mesh mesh = new Mesh(gl, TwoTriangles.vertices.clone(), TwoTriangles.indices.clone());
-//    Shader shader = new Shader(gl, "shaders/vs_tt.txt", "shaders/fs_tt.txt");
-//    Material material = new Material(
-//        new Vec3(0.0f, 0.5f, 0.81f),
-//        new Vec3(0.0f, 0.5f, 0.81f),
-//        new Vec3(0.3f, 0.3f, 0.3f), 32.0f);
-//    Mat4 modelMatrix = Mat4Transform.scale(6, 1f, SIZE);
-//    modelMatrix = Mat4.multiply(Mat4Transform.rotateAroundX(90), modelMatrix);
-//    modelMatrix = Mat4
-//        .multiply(Mat4Transform.translate(-8, SIZE * 0.5f, -SIZE * 0.5f), modelMatrix);
-//    leftWall = new Model(gl, camera, light, shader, material, modelMatrix, mesh, TEXTURE);
-//
-//    modelMatrix = new Mat4(1);
-//    modelMatrix = Mat4.multiply(Mat4Transform.scale(10, 1f, 1), modelMatrix);
-//    modelMatrix = Mat4.multiply(Mat4Transform.rotateAroundX(90), modelMatrix);
-//    modelMatrix = Mat4.multiply(Mat4Transform.translate(0, SIZE * 1f, -SIZE * 0.5f), modelMatrix);
-//    rightWall = new Model(gl, camera, light, shader, material, modelMatrix, mesh, TEXTURE);
-//  }
 }

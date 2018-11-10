@@ -1,0 +1,7 @@
+The following textures are downloaded from the given link for personal use (non-profit)
+Images are resized in http://resizeimage.net/
+Images are compressed in https://tinypng.com/
+Specular maps are created in http://cpetry.github.io/NormalMap-Online/
+
+floor.jpg - https://www.flickr.com/photos/alandelmas/6285936917
+wallpaper.jpg - https://www.freepik.com/free-vector/animals-seamless-background_710230.htm
