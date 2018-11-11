@@ -24,9 +24,6 @@ public final class TwoTriangles {
       0, 2, 3
   };
 
-  // I created the methods below to modify the texture coordinates
-
-
   /**
    * Constructor for TwoTriangles
    *
@@ -42,10 +39,9 @@ public final class TwoTriangles {
    * @param texCoords The texture coordinates for four vertices
    */
   private void setTexCoords(float[] texCoords) {
-    for (int i=0;i<4;i++) {
-      for (int j=0;j<2;j++) {
-        vertices[(i*8)+6+j] = texCoords[(i*2)+j];
-      }
+    // Replace 6,7 for top left, 14,15 for bottom left, 22,23 for bototm right, 30,31 for top right
+    for (int i = 0; i < texCoords.length / 2; i++) {
+      System.arraycopy(texCoords, (i * 2), vertices, (i * 8) + 6, 2);
     }
   }
 }

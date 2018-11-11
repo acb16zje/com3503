@@ -9,9 +9,6 @@ import java.util.*;
  * @author Zer Jun Eng
  */
 public class Anilamp_GLEventListener implements GLEventListener {
-
-  private static final boolean DISPLAY_SHADERS = false;
-
   Anilamp_GLEventListener(Camera camera) {
     this.camera = camera;
     this.camera.setPosition(new Vec3(0, 10f, 22f));
@@ -90,58 +87,92 @@ public class Anilamp_GLEventListener implements GLEventListener {
   // ***************************************************
   /* THE SCENE
    * Now define all the methods to handle the scene.
-   * This will be added to in later examples.
    */
 
   private Camera camera;
   private Light light;
-  private Model floor, topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;
+  private Model floor;                                                         // Floor
+  private Model topWall, bottomWall, leftWall, rightWall;                      // Wall
+  private Model topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;  // Wallpaper
+  private Model windowFrame;                                                   // Window frame
+  private Model tableFrame;                                                    // Table
   private List<Model> modelList = new ArrayList<>();
 
-  private RoomFrame roomFrame;
+  private Room room;
+  private Window window;
+  private Table table;
+
+  // Empty matrix
+  private final Mat4 M = new Mat4();
 
   // Room dimension (width, height, depth)
   private final Vec3 ROOM_DIMENSION = new Vec3(20f, 20f, 20f);
 
   private void initialise(GL3 gl) {
-    // Add all models to list for easier disposal management
+    light = new Light(gl);
+    light.setCamera(camera);
+
+    // Create the required models first
+    modelFloor(gl);
+    modelWall(gl);
+    modelWallpaper(gl);
+    modelWindow(gl);
+    modelTable(gl);
+
+    // Room
+    room = new Room(ROOM_DIMENSION, floor);
+    room.new Wall(topWall, bottomWall, leftWall, rightWall);
+    room.new Wallpaper(topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper);
+
+    // Window
+    window = new Window(ROOM_DIMENSION, windowFrame);
+    window.sceneGraph(gl);
+
+    // Table
+    table = new Table(ROOM_DIMENSION, tableFrame);
+    table.sceneGraph(gl);
+
+    // Add all models to list for disposal management
     modelList.add(floor);
     modelList.add(leftWallpaper);
     modelList.add(rightWallpaper);
     modelList.add(topWallpaper);
     modelList.add(bottomWallpaper);
-
-    light = new Light(gl);
-    light.setCamera(camera);
-
-    // Pass components into room frame for positioning and rendering
-    modelFloor(gl);
-    modelWallpaper(gl);
-    roomFrame = new RoomFrame(
-        ROOM_DIMENSION, floor, topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper);
+    modelList.add(windowFrame);
+    modelList.add(tableFrame);
   }
 
+  /**
+   * Render all scenes
+   *
+   * @param gl OpenGL object, for rendering
+   */
   private void render(GL3 gl) {
     gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
     light.setPosition(getLightPosition());  // changing light position each frame
     light.render(gl);
-    roomFrame.render(gl);
+    room.render(gl);
+    window.render(gl);
   }
 
-  // The light's postion is continually being changed, so needs to be calculated for each frame.
+  /**
+   * Calculate the light's position each frame
+   *
+   * @return A 3D vector representing the light position
+   */
   private Vec3 getLightPosition() {
     double elapsedTime = getSeconds() - startTime;
     float x = 5.0f * (float) (Math.sin(Math.toRadians(elapsedTime * 50)));
-    float y = 2.7f;
+    float y = 12.7f;
     float z = 5.0f * (float) (Math.cos(Math.toRadians(elapsedTime * 50)));
     return new Vec3(x, y, z);
-//    return new Vec3(5f,3.4f,5f);
+    // return new Vec3(5f, 3.4f, 5f);
   }
 
   /**
    * Model the floor with diffuse and specular map
    *
-   * @param gl OpenGL object, for drawing
+   * @param gl OpenGL object, for modelling
    */
   private void modelFloor(GL3 gl) {
     final int[] DIFFUSE = TextureLibrary.loadTexture(gl, "textures/floor.jpg");
@@ -150,36 +181,70 @@ public class Anilamp_GLEventListener implements GLEventListener {
     Mesh mesh = new Mesh(gl, Cube.vertices.clone(), Cube.indices.clone());
     Shader shader = new Shader(gl, "shaders/vs_cube.txt", "shaders/fs_cube.txt");
     Material material = new Material(
-        new Vec3(1, 1, 1),
-        new Vec3(1, 1, 1),
-        new Vec3(0.6f, 0.6f, 0.6f), 30f);
-    floor = new Model(gl, camera, light, shader, material, new Mat4(), mesh, DIFFUSE, SPECULAR);
+        new Vec3(0, 0, 0),
+        new Vec3(0, 0, 0),
+        new Vec3(0.3f, 0.3f, 0.3f), 30f);
+    floor = new Model(gl, camera, light, shader, material, M, mesh, DIFFUSE, SPECULAR);
   }
 
   /**
-   * Model the floor
+   * Model the wall
    *
-   * @param gl OpenGL object, for drawing
+   * @param gl OpenGL object, for modelling
+   */
+  private void modelWall(GL3 gl) {
+    final int[] DIFFUSE = TextureLibrary.loadTexture(gl, "textures/wall.jpg");
+    final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/wall_specular.jpg");
+
+    Mesh mesh = new Mesh(gl, Cube.vertices.clone(), Cube.indices.clone());
+    Shader shader = new Shader(gl, "shaders/vs_cube.txt", "shaders/fs_cube.txt");
+    Material material = new Material(
+        new Vec3(0, 0, 0),
+        new Vec3(0, 0, 0),
+        new Vec3(0.3f, 0.3f, 0.3f), 30f);
+    topWall = new Model(gl, camera, light, shader, material, M, mesh, DIFFUSE, SPECULAR);
+    bottomWall = new Model(gl, camera, light, shader, material, M, mesh, DIFFUSE, SPECULAR);
+    leftWall = new Model(gl, camera, light, shader, material, M, mesh, DIFFUSE, SPECULAR);
+    rightWall = new Model(gl, camera, light, shader, material, M, mesh, DIFFUSE, SPECULAR);
+  }
+
+  /**
+   * Model the wallpaper
+   *
+   * @param gl OpenGL object, for modelling
    */
   private void modelWallpaper(GL3 gl) {
-    final int[] TEXTURE = TextureLibrary.loadTexture(gl, "textures/wallpaper.jpg");
+    final int[] DIFFUSE = TextureLibrary.loadTexture(gl, "textures/wallpaper.jpg");
+    final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/wallpaper_specular.jpg");
 
-    float[] topTexCoords = {
-        Window.RAIIO.x, 1, Window.RAIIO.x,                    // top left
-        Window.Y_POS + Window.RAIIO.y,                        // bottom left
-        1 - Window.RAIIO.x, Window.Y_POS + Window.RAIIO.y,    // bottom right
-        1 - Window.RAIIO.x, 1                                 // top right
+    // Texture coordinates for wall and wallpaper
+    final float[] topTexCoords = {
+        Window.RATIO.x, 1, Window.RATIO.x,                    // top left
+        Window.Y_POS + Window.RATIO.y,                        // bottom left
+        1 - Window.RATIO.x, Window.Y_POS + Window.RATIO.y,    // bottom right
+        1 - Window.RATIO.x, 1                                 // top right
     };
 
-    float[] bottomTexCoords = {
-        Window.RAIIO.x, Window.Y_POS,                         // top left
-        Window.RAIIO.x, 0,                                    // bottom left
-        1 - Window.RAIIO.x, 0,                                // bottom right
-        1 - Window.RAIIO.x, Window.Y_POS                      // top right
+    final float[] bottomTexCoords = {
+        Window.RATIO.x, Window.Y_POS,                         // top left
+        Window.RATIO.x, 0,                                    // bottom left
+        1 - Window.RATIO.x, 0,                                // bottom right
+        1 - Window.RATIO.x, Window.Y_POS                      // top right
     };
 
-    float[] leftTexCoords = {0, 1, 0, 0, Window.RAIIO.x, 0, Window.RAIIO.x, 1};
-    float[] rightTexCoords = {1 - Window.RAIIO.x, 1, 1 - Window.RAIIO.x, 0, 1, 0, 1, 1};
+    final float[] leftTexCoords = {
+        0, 1,                                                 // top left
+        0, 0,                                                 // bottom left
+        Window.RATIO.x, 0,                                    // bottom right
+        Window.RATIO.x, 1                                     // top right
+    };
+
+    final float[] rightTexCoords = {
+        1 - Window.RATIO.x, 1,                                // top left
+        1 - Window.RATIO.x, 0,                                // bottom left
+        1, 0,                                                 // bottom right
+        1, 1                                                  // top right
+    };
 
     TwoTriangles top = new TwoTriangles(topTexCoords);
     TwoTriangles bottom = new TwoTriangles(bottomTexCoords);
@@ -192,12 +257,50 @@ public class Anilamp_GLEventListener implements GLEventListener {
     Mesh rightMesh = new Mesh(gl, right.vertices.clone(), right.indices.clone());
 
     Shader shader = new Shader(gl, "shaders/vs_tt.txt", "shaders/fs_tt.txt");
-    Material material = new Material(new Vec3(1f, 1f, 1f), new Vec3(1f, 1f, 1f),
+    Material material = new Material(
+        new Vec3(1f, 1f, 1f),
+        new Vec3(1f, 1f, 1f),
         new Vec3(0.0f, 0.0f, 0.0f), 32f);
 
-    topWallpaper = new Model(gl, camera, light, shader, material, new Mat4(), topMesh, TEXTURE);
-    bottomWallpaper = new Model(gl, camera, light, shader, material, new Mat4(), bottomMesh, TEXTURE);
-    leftWallpaper = new Model(gl, camera, light, shader, material, new Mat4(), leftMesh, TEXTURE);
-    rightWallpaper = new Model(gl, camera, light, shader, material, new Mat4(), rightMesh, TEXTURE);
+    topWallpaper = new Model(gl, camera, light, shader, material, M, topMesh, DIFFUSE, SPECULAR);
+    bottomWallpaper = new Model(gl, camera, light, shader, material, M, bottomMesh, DIFFUSE, SPECULAR);
+    leftWallpaper = new Model(gl, camera, light, shader, material, M, leftMesh, DIFFUSE, SPECULAR);
+    rightWallpaper = new Model(gl, camera, light, shader, material, M, rightMesh, DIFFUSE, SPECULAR);
+  }
+
+  /**
+   * Model the window
+   *
+   * @param gl OpenGL object, for modelling
+   */
+  private void modelWindow(GL3 gl) {
+    final int[] DIFFUSE = TextureLibrary.loadTexture(gl, "textures/window_frame.jpg");
+    final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/window_frame_specular.jpg");
+
+    Mesh mesh = new Mesh(gl, Cube.vertices.clone(), Cube.indices.clone());
+    Shader shader = new Shader(gl, "shaders/vs_cube.txt", "shaders/fs_cube.txt");
+    Material material = new Material(
+        new Vec3(0, 0, 0),
+        new Vec3(0, 0, 0),
+        new Vec3(0.3f, 0.3f, 0.3f), 30f);
+    windowFrame = new Model(gl, camera, light, shader, material, M, mesh, DIFFUSE, SPECULAR);
+  }
+
+  /**
+   * Model the table
+   *
+   * @param gl OpenGL object, for modelling
+   */
+  private void modelTable(GL3 gl) {
+    final int[] DIFFUSE = TextureLibrary.loadTexture(gl, "textures/table.jpg");
+    final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/table_specular.jpg");
+
+    Mesh mesh = new Mesh(gl, Cube.vertices.clone(), Cube.indices.clone());
+    Shader shader = new Shader(gl, "shaders/vs_cube.txt", "shaders/fs_cube.txt");
+    Material material = new Material(
+        new Vec3(0, 0, 0),
+        new Vec3(0, 0, 0),
+        new Vec3(0.3f, 0.3f, 0.3f), 30f);
+    tableFrame = new Model(gl, camera, light, shader, material, M, mesh, DIFFUSE, SPECULAR);
   }
 }

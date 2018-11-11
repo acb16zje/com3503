@@ -8,7 +8,7 @@ import java.nio.*;
 /**
  * Light class adapted from tutorial 7
  *
- * @author Dr. Steve Maddock
+ * @author Dr. Steve Maddock and Zer Jun Eng
  */
 public class Light {
 

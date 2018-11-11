@@ -4,4 +4,5 @@ Images are compressed in https://tinypng.com/
 Specular maps are created in http://cpetry.github.io/NormalMap-Online/
 
 floor.jpg - https://www.flickr.com/photos/alandelmas/6285936917
-wallpaper.jpg - https://www.freepik.com/free-vector/animals-seamless-background_710230.htm
+wallpaper.jpg - https://wallpapersite.com/creative-graphics/firewatch-green-forest-mountains-minimal-4k-14771.html
+window_frame.jpg - http://www.discovertextures.com/2015/11/11/wood-0024/

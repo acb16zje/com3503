@@ -1,4 +1,9 @@
+import codeprovided.*;
+import com.jogamp.opengl.*;
 import gmaths.*;
+import java.rmi.dgc.*;
+import javax.xml.crypto.dsig.*;
+import javax.xml.crypto.dsig.spec.*;
 
 /**
  * I declare that this code is my own work
@@ -6,9 +11,120 @@ import gmaths.*;
  *
  * @author Zer Jun Eng
  */
+class Window {
 
-public class Window {
+  private Model windowFrame;
+  private SGNode frameRoot;
+
+  private float roomWidth, roomHeight, roomDepth;
+  private float horizontalWidth, verticalHeight;
+  private float POS_Z;
+  private final float FRAME_DIM = Cube.THICKNESS / 2;
+
   // Dimension ratio of window with respect to room dimension
-  public static final Vec3 RAIIO = new Vec3(0.39f, 0.39f, 0);
-  public static final float Y_POS = RAIIO.y + 0.1f;
+  static final Vec3 RATIO = new Vec3(0.45f, 0.39f, 0);
+  static final float Y_POS = RATIO.y + 0.1f;
+
+  /**
+   * Window constructor
+   *
+   * @param roomDimension The room dimension in width, height, depth
+   */
+  Window(Vec3 roomDimension, Model windowFrame) {
+    this.roomWidth = roomDimension.x;
+    this.roomHeight = roomDimension.y;
+    this.roomDepth = roomDimension.z;
+    this.windowFrame = windowFrame;
+
+    POS_Z = -(roomDepth + Cube.THICKNESS) * 0.5f;
+    horizontalWidth = roomWidth * RATIO.x;
+    verticalHeight = roomHeight * RATIO.y - 2 * FRAME_DIM; // 2 * FRAME_DIM for top and bot bar
+  }
+
+  /**
+   * Construct scene graph
+   *
+   * @param gl OpenGL object
+   */
+  void sceneGraph(GL3 gl) {
+    final Mat4 H_MAT = Mat4Transform.scale(horizontalWidth, FRAME_DIM, FRAME_DIM); // Horizontal mat
+    final Mat4 V_MAT = Mat4Transform.scale(FRAME_DIM, verticalHeight, FRAME_DIM);  // Vertical mat
+    final float V_BAR_POS_Y = FRAME_DIM + verticalHeight / 2;
+
+    // Root
+    frameRoot = new NameNode("Window frame structure");
+    TransformNode rootTranslate =
+        new TransformNode("Root translate",
+            Mat4Transform.translate(0, roomHeight * Y_POS, POS_Z));
+
+    // Bottom horizontal bar
+    NameNode botH = new NameNode("Bottom horizontal bar");
+    Mat4 m = Mat4.multiply(Mat4Transform.translate(0, FRAME_DIM / 2, 0), H_MAT);
+    TransformNode botHTransform = new TransformNode("botH Transform", m);
+    ModelNode botHModel = new ModelNode("botH Model", windowFrame);
+
+    // Left vertical bar - child of bottom horizontal bar
+    NameNode leftV = new NameNode("Left vertical bar");
+    m = Mat4.multiply(
+        Mat4Transform.translate(-(horizontalWidth - FRAME_DIM) / 2, V_BAR_POS_Y, 0), V_MAT);
+    TransformNode leftVTransform = new TransformNode("leftV Transform", m);
+    ModelNode leftVModel = new ModelNode("leftV Model", windowFrame);
+
+    // Mid vertical bar - child of bottom horizontal bar
+    NameNode midV = new NameNode("Mid vertical bar");
+    m = Mat4.multiply(Mat4Transform.translate(0, V_BAR_POS_Y, 0), V_MAT);
+    TransformNode midVTransform = new TransformNode("midV Transform", m);
+    ModelNode midVModel = new ModelNode("midV Model", windowFrame);
+
+    // Right vertical bar - child of bottom horizontal bar
+    NameNode rightV = new NameNode("Right vertical bar");
+    m = Mat4.multiply(
+        Mat4Transform.translate((horizontalWidth - FRAME_DIM) / 2, V_BAR_POS_Y, 0), V_MAT);
+    TransformNode rightVTransform = new TransformNode("rightV Transform", m);
+    ModelNode rightVModel = new ModelNode("rightV Model", windowFrame);
+
+    // Mid horizontal bar
+    NameNode midH = new NameNode("Mid horizontal bar");
+    m = Mat4.multiply(Mat4Transform.translate(0, RATIO.y * roomHeight / 2, 0), H_MAT);
+    TransformNode midHTransform = new TransformNode("midH Transform", m);
+    ModelNode midHModel = new ModelNode("midH Model", windowFrame);
+
+    // Top horizontal bar
+    NameNode topH = new NameNode("Top horizontal bar");
+    m = Mat4.multiply(Mat4Transform.translate(0, RATIO.y * roomHeight - FRAME_DIM / 2, 0), H_MAT);
+    TransformNode topHTransform = new TransformNode("topH Transform", m);
+    ModelNode topHModel = new ModelNode("topH Model", windowFrame);
+
+    // Scene graph
+    frameRoot.addChild(rootTranslate);
+      rootTranslate.addChild(botH);
+        botH.addChild(botHTransform);
+          botHTransform.addChild(botHModel);
+        botH.addChild(leftV);
+          leftV.addChild(leftVTransform);
+            leftVTransform.addChild(leftVModel);
+        botH.addChild(midV);
+          midV.addChild(midVTransform);
+            midVTransform.addChild(midVModel);
+        botH.addChild(rightV);
+          rightV.addChild(rightVTransform);
+            rightVTransform.addChild(rightVModel);
+      rootTranslate.addChild(midH);
+        midH.addChild(midHTransform);
+          midHTransform.addChild(midHModel);
+      rootTranslate.addChild(topH);
+        topH.addChild(topHTransform);
+          topHTransform.addChild(topHModel);
+
+    frameRoot.update();
+  }
+
+  /**
+   * Renders window
+   *
+   * @param gl OpenGL object, for rendering
+   */
+  void render(GL3 gl) {
+    frameRoot.draw(gl);
+  }
 }

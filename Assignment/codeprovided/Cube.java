@@ -55,4 +55,6 @@ public final class Cube {
       23, 22, 18, // y +ve
       18, 19, 23  // y +ve
   };
+
+  public static final float THICKNESS = 1.01f;
 }
