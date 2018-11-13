@@ -1,4 +1,4 @@
-package codeprovided;
+package lib;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.texture.spi.*;

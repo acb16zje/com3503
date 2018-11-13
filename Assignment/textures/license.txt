@@ -3,6 +3,9 @@ Images are resized in http://resizeimage.net/
 Images are compressed in https://tinypng.com/
 Specular maps are created in http://cpetry.github.io/NormalMap-Online/
 
+drawer_handle.jpg - https://www.deviantart.com/sweetsoulsister/art/Brushed-Metal-Silver-Texture-145936387
 floor.jpg - https://www.flickr.com/photos/alandelmas/6285936917
+table.jpg - http://www.texturise.club/2014/05/seamless-natural-wood-texture-maps.html
+wall.jpg - https://imgkid.com/white-paint-texture-seamless.shtml
 wallpaper.jpg - https://wallpapersite.com/creative-graphics/firewatch-green-forest-mountains-minimal-4k-14771.html
 window_frame.jpg - http://www.discovertextures.com/2015/11/11/wood-0024/

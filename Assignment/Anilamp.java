@@ -1,4 +1,3 @@
-import codeprovided.*;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.*;
 import com.jogamp.opengl.util.*;
@@ -6,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.GroupLayout.*;
+import lib.*;
 
 /**
  * I declare that this code is my own work.

@@ -1,4 +1,4 @@
-package codeprovided;
+package lib;
 
 /**
  * TwoTriangles class adapted from tutorial 7

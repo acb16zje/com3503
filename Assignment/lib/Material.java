@@ -1,4 +1,4 @@
-package codeprovided;
+package lib;
 
 import gmaths.*;
 

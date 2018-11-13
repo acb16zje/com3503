@@ -1,4 +1,4 @@
-package codeprovided;
+package lib;
 
 /**
  * NameNode class adapted from tutorial 7

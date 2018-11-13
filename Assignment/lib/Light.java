@@ -1,4 +1,4 @@
-package codeprovided;
+package lib;
 
 import com.jogamp.common.nio.*;
 import com.jogamp.opengl.*;
@@ -7,6 +7,7 @@ import java.nio.*;
 
 /**
  * Light class adapted from tutorial 7
+ * A new constructor has been added to allow different shapes of light
  *
  * @author Dr. Steve Maddock and Zer Jun Eng
  */
@@ -18,13 +19,26 @@ public class Light {
   private Camera camera;
 
   public Light(GL3 gl) {
+    this(gl, vertices, indices);
+  }
+
+  /**
+   * Constructor for light that allows different shape
+   *
+   * @param gl OpenGL object
+   * @param vertices Custom vertices
+   * @param indices Custom indices
+   */
+  public Light(GL3 gl, float[] vertices, int[] indices) {
     material = new Material();
     material.setAmbient(0.5f, 0.5f, 0.5f);
     material.setDiffuse(0.8f, 0.8f, 0.8f);
     material.setSpecular(0.8f, 0.8f, 0.8f);
     position = new Vec3(3f, 2f, 1f);
-    Mat4 model = new Mat4(1);
     shader = new Shader(gl, "shaders/vs_light.txt", "shaders/fs_light.txt");
+    vertexStride = Light.vertices == vertices ? 3 : 8; // Only change to 8 stride for different shape
+    Light.vertices = vertices;
+    Light.indices = indices;
     fillBuffers(gl);
   }
 
@@ -83,7 +97,7 @@ public class Light {
    */
   // anticlockwise/counterclockwise ordering
 
-  private float[] vertices = new float[]{  // x,y,z
+  private static float[] vertices = new float[]{  // x,y,z
       -0.5f, -0.5f, -0.5f,  // 0
       -0.5f, -0.5f, 0.5f,  // 1
       -0.5f, 0.5f, -0.5f,  // 2
@@ -94,8 +108,8 @@ public class Light {
       0.5f, 0.5f, 0.5f   // 7
   };
 
-  private int[] indices = new int[]{
-      0, 1, 3, // x -ve
+  private static int[] indices = new int[]{
+      0, 1, 4, // x -ve
       3, 2, 0, // x -ve
       4, 6, 7, // x +ve
       7, 5, 4, // x +ve

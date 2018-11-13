@@ -1,7 +1,7 @@
-import codeprovided.*;
 import com.jogamp.opengl.*;
 import gmaths.*;
 import java.util.*;
+import lib.*;
 
 /**
  * I declare that this code is my own work.
@@ -11,7 +11,6 @@ import java.util.*;
 public class Anilamp_GLEventListener implements GLEventListener {
   Anilamp_GLEventListener(Camera camera) {
     this.camera = camera;
-    this.camera.setPosition(new Vec3(0, 10f, 22f));
   }
 
   // ***************************************************
@@ -95,7 +94,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private Model topWall, bottomWall, leftWall, rightWall;                      // Wall
   private Model topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;  // Wallpaper
   private Model windowFrame;                                                   // Window frame
-  private Model tableFrame;                                                    // Table
+  private Model tableFrame, drawerGaps, drawerHandle;                          // Table
   private List<Model> modelList = new ArrayList<>();
 
   private Room room;
@@ -109,7 +108,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private final Vec3 ROOM_DIMENSION = new Vec3(20f, 20f, 20f);
 
   private void initialise(GL3 gl) {
-    light = new Light(gl);
+    light = new Light(gl, Sphere.vertices.clone(), Sphere.indices.clone());
     light.setCamera(camera);
 
     // Create the required models first
@@ -126,11 +125,9 @@ public class Anilamp_GLEventListener implements GLEventListener {
 
     // Window
     window = new Window(ROOM_DIMENSION, windowFrame);
-    window.sceneGraph(gl);
 
     // Table
-    table = new Table(ROOM_DIMENSION, tableFrame);
-    table.sceneGraph(gl);
+    table = new Table(ROOM_DIMENSION, tableFrame, drawerGaps, drawerHandle);
 
     // Add all models to list for disposal management
     modelList.add(floor);
@@ -153,6 +150,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
     light.render(gl);
     room.render(gl);
     window.render(gl);
+    table.render(gl);
   }
 
   /**
@@ -294,6 +292,9 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private void modelTable(GL3 gl) {
     final int[] DIFFUSE = TextureLibrary.loadTexture(gl, "textures/table.jpg");
     final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/table_specular.jpg");
+    final int[] GAPS = TextureLibrary.loadTexture(gl, "textures/gaps.jpg");
+    final int[] HANDLE_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/drawer_handle.jpg");
+    final int[] HANDLE_SPECULAR = TextureLibrary.loadTexture(gl, "textures/drawer_handle_specular.jpg");
 
     Mesh mesh = new Mesh(gl, Cube.vertices.clone(), Cube.indices.clone());
     Shader shader = new Shader(gl, "shaders/vs_cube.txt", "shaders/fs_cube.txt");
@@ -302,5 +303,9 @@ public class Anilamp_GLEventListener implements GLEventListener {
         new Vec3(0, 0, 0),
         new Vec3(0.3f, 0.3f, 0.3f), 30f);
     tableFrame = new Model(gl, camera, light, shader, material, M, mesh, DIFFUSE, SPECULAR);
+    drawerGaps = new Model(gl, camera, light, shader, material, M, mesh, GAPS);
+
+    mesh = new Mesh(gl, Cylinder.vertices.clone(), Cylinder.indices.clone());
+    drawerHandle = new Model(gl, camera, light, shader, material, M, mesh, HANDLE_DIFFUSE, HANDLE_SPECULAR);
   }
 }

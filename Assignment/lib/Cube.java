@@ -1,4 +1,4 @@
-package codeprovided;
+package lib;
 
 /**
  * Cube class adapted from tutorial 7

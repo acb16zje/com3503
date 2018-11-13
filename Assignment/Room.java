@@ -1,6 +1,6 @@
-import codeprovided.*;
 import com.jogamp.opengl.*;
 import gmaths.*;
+import lib.*;
 
 /**
  * I declare that this code is my own work.
@@ -79,12 +79,12 @@ class Room {
   private Mat4 getMatForTopWall(boolean isWallpaper) {
     final float WIDTH = Window.RATIO.x * roomWidth;
     final float HEIGHT = roomHeight - (Window.Y_POS + Window.RATIO.y) * roomHeight;
-    final float POS_Y = roomHeight * (Window.Y_POS + Window.RATIO.y) + HEIGHT * 0.5f;
+    final float POS_Y = roomHeight * (Window.Y_POS + Window.RATIO.y) + HEIGHT / 2;
 
     if (isWallpaper) {
-      POS_Z = -roomDepth * 0.5f;
+      POS_Z = -roomDepth / 2;
     } else {
-      POS_Z = -(roomDepth + Cube.THICKNESS) * 0.5f;
+      POS_Z = -(roomDepth + Cube.THICKNESS) / 2;
     }
 
     Mat4 modelMatrix = Mat4Transform.scale(WIDTH, 1, HEIGHT);
@@ -107,13 +107,13 @@ class Room {
 
     if (isWallpaper) {
       HEIGHT = roomHeight * Window.Y_POS;
-      POS_Y = HEIGHT * 0.5f;
-      POS_Z = -roomDepth * 0.5f;
+      POS_Y = HEIGHT / 2;
+      POS_Z = -roomDepth / 2;
     } else {
       // Make the bottom wall reaches the bottom level of the floor
       HEIGHT = (roomHeight + Cube.THICKNESS) * Window.Y_POS;
-      POS_Y = (HEIGHT - Cube.THICKNESS) * 0.5f;
-      POS_Z = -(roomDepth + Cube.THICKNESS) * 0.5f;
+      POS_Y = (HEIGHT - Cube.THICKNESS) / 2;
+      POS_Z = -(roomDepth + Cube.THICKNESS) / 2;
     }
 
     Mat4 modelMatrix = Mat4Transform.scale(WIDTH, 1, HEIGHT);
@@ -138,13 +138,13 @@ class Room {
 
     if (isWallpaper) {
       HEIGHT = roomHeight;
-      POS_Y = HEIGHT * 0.5f;
-      POS_Z = -roomDepth * 0.5f;
+      POS_Y = HEIGHT / 2;
+      POS_Z = -roomDepth / 2;
     } else {
       // Make the left wall reaches the bottom level of the floor
       HEIGHT = roomHeight + Cube.THICKNESS / 2;
-      POS_Y = (HEIGHT - Cube.THICKNESS) * 0.5f;
-      POS_Z = -(roomDepth + Cube.THICKNESS) * 0.5f;
+      POS_Y = (HEIGHT - Cube.THICKNESS) / 2;
+      POS_Z = -(roomDepth + Cube.THICKNESS) / 2;
     }
 
     if (isLeft) {

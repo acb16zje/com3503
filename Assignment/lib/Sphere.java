@@ -1,4 +1,4 @@
-package codeprovided;
+package lib;
 
 /**
  * Sphere class adapted from tutorial 7
@@ -21,15 +21,15 @@ public final class Sphere {
   private static float[] createVertices() {
     double r = 0.5;
     int step = 8;
-    //float[] 
     float[] vertices = new float[XLONG * YLAT * step];
+
     for (int j = 0; j < YLAT; ++j) {
       double b = Math.toRadians(-90 + 180 * (double) (j) / (YLAT - 1));
       for (int i = 0; i < XLONG; ++i) {
         double a = Math.toRadians(360 * (double) (i) / (XLONG - 1));
-        double z = Math.cos(b) * Math.cos(a);
         double x = Math.cos(b) * Math.sin(a);
         double y = Math.sin(b);
+        double z = Math.cos(b) * Math.cos(a);
         int base = j * XLONG * step;
         vertices[base + i * step + 0] = (float) (r * x);
         vertices[base + i * step + 1] = (float) (r * y);
