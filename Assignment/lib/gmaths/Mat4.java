@@ -1,4 +1,4 @@
-package gmaths;
+package lib.gmaths;
 
 public class Mat4 {   // row column formulation
 

@@ -1,4 +1,4 @@
-package gmaths;
+package lib.gmaths;
 
 /**
  * A static class for a set of methods to create transformation matrices.

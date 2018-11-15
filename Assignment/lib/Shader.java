@@ -2,10 +2,10 @@ package lib;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.glsl.*;
-import gmaths.*;
 import java.io.*;
 import java.nio.charset.*;
 import java.nio.file.*;
+import lib.gmaths.*;
 
 /**
  * Shader class adapted from tutorial 7

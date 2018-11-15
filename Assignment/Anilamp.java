@@ -17,6 +17,40 @@ public class Anilamp extends JFrame implements ActionListener {
 
   private GLCanvas canvas;
   private Camera camera;
+  Anilamp_GLEventListener glEventListener;
+
+  /**
+   * The main method for Anilamp
+   *
+   * @param args Command line arguments  (not used)
+   */
+  public static void main(String[] args) { new Anilamp(); }
+
+  /**
+   * Constructor for the Anilamp frame
+   */
+  private Anilamp() {
+    final Container contentPane = getContentPane();
+
+    // Creates a control panel on the left side
+    final JPanel buttonPanel = createControlPanel();
+    contentPane.add(buttonPanel, BorderLayout.WEST);
+
+    // Canvas on center
+    GLCapabilities glcapabilities = new GLCapabilities(GLProfile.get(GLProfile.GL3));
+    canvas = new GLCanvas(glcapabilities);
+    camera = new Camera(Camera.DEFAULT_POSITION, Camera.DEFAULT_TARGET, Camera.DEFAULT_UP);
+    glEventListener = new Anilamp_GLEventListener(camera);
+    canvas.addGLEventListener(glEventListener);
+    canvas.addMouseMotionListener(new MyMouseInput(camera));
+    canvas.addKeyListener(new MyKeyboardInput(camera));
+    contentPane.add(canvas, BorderLayout.CENTER);
+
+    FPSAnimator animator = new FPSAnimator(canvas, 60);
+    animator.start();
+
+    setFrameProperties();
+  }
 
   /**
    * Sets the frame properties
@@ -43,64 +77,127 @@ public class Anilamp extends JFrame implements ActionListener {
    *
    * @return A JPanel containing the control buttons
    */
-  private JPanel createButtonPanel() {
+  private JPanel createControlPanel() {
     JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(0, 1, 0, 0));
+    panel.add(createCameraSubpanel());
+    panel.add(createLightSubpanel());
+    panel.add(createLampSubpanel());
 
-    // Camera panel
+    return panel;
+  }
+
+  /**
+   * Creates a subpanel for camera control
+   *
+   * @return Camera subpanel
+   */
+  private JPanel createCameraSubpanel() {
     JPanel cameraPanel = new JPanel();
     cameraPanel.setBorder(BorderFactory.createTitledBorder("Camera"));
-    panel.add(cameraPanel);
 
-    final JButton cameraX = new JButton("Camera X");
-    final JButton cameraZ = new JButton("Camera Z");
-    cameraX.addActionListener(this);
-    cameraZ.addActionListener(this);
+    final JButton frontView = new JButton("Front view");
+    final JButton leftView = new JButton("Left view");
+    final JButton rightView = new JButton("Right view");
+    frontView.addActionListener(this);
+    leftView.addActionListener(this);
+    rightView.addActionListener(this);
 
     GroupLayout cameraGroup = new GroupLayout(cameraPanel);
     cameraGroup.setAutoCreateGaps(true);
     cameraGroup.setAutoCreateContainerGaps(true);
-    cameraGroup.setHorizontalGroup(
-        cameraGroup.createParallelGroup(Alignment.LEADING)
-            .addComponent(cameraX)
-            .addComponent(cameraZ)
+    cameraGroup.setHorizontalGroup(cameraGroup.createParallelGroup(Alignment.LEADING)
+      .addComponent(frontView)
+      .addComponent(leftView)
+      .addComponent(rightView)
     );
-    cameraGroup.setVerticalGroup(
-        cameraGroup.createParallelGroup(Alignment.LEADING)
-            .addGroup(cameraGroup.createSequentialGroup()
-                .addComponent(cameraX)
-                .addComponent(cameraZ))
+    cameraGroup.setVerticalGroup(cameraGroup.createParallelGroup(Alignment.LEADING)
+      .addGroup(cameraGroup.createSequentialGroup()
+        .addComponent(frontView)
+        .addComponent(leftView)
+        .addComponent(rightView))
     );
     cameraPanel.setLayout(cameraGroup);
 
-    // World light panel
+    return cameraPanel;
+  }
+
+  /**
+   * Creates a subpanel for light control
+   *
+   * @return Light subpanel
+   */
+  private JPanel createLightSubpanel() {
     JPanel lightPanel = new JPanel();
     lightPanel.setBorder(BorderFactory.createTitledBorder("World Lights"));
-    panel.add(lightPanel);
 
-    JButton btnNewButton_1 = new JButton("light 1");
+    JButton onOrOff = new JButton("Turn OFF");
 
-    JButton btnNewButton_3 = new JButton("light 2");
+    // Generated using Eclipse GUI Builder
+    JPanel intensityPanel = new JPanel();
     GroupLayout lightGroup = new GroupLayout(lightPanel);
-    lightGroup.setAutoCreateGaps(true);
     lightGroup.setAutoCreateContainerGaps(true);
+    lightGroup.setAutoCreateGaps(true);
     lightGroup.setHorizontalGroup(
         lightGroup.createParallelGroup(Alignment.LEADING)
-            .addComponent(btnNewButton_1)
-            .addComponent(btnNewButton_3)
+            .addGroup(lightGroup.createSequentialGroup()
+                .addGroup(lightGroup.createParallelGroup(Alignment.LEADING)
+                    .addComponent(onOrOff)
+                    .addComponent(intensityPanel)))
     );
     lightGroup.setVerticalGroup(
         lightGroup.createParallelGroup(Alignment.LEADING)
             .addGroup(lightGroup.createSequentialGroup()
-                .addComponent(btnNewButton_1)
-                .addComponent(btnNewButton_3))
+                .addComponent(onOrOff)
+                .addComponent(intensityPanel)
+                .addGap(130))
     );
+
+    GridBagLayout gbl_intensityPanel = new GridBagLayout();
+    gbl_intensityPanel.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
+    intensityPanel.setLayout(gbl_intensityPanel);
+
+    JLabel intensityLabel = new JLabel("Intensity");
+    GridBagConstraints gbc_intensityLabel = new GridBagConstraints();
+    gbc_intensityLabel.fill = GridBagConstraints.BOTH;
+    gbc_intensityLabel.insets = new Insets(0, 0, 0, 5);
+    intensityPanel.add(intensityLabel, gbc_intensityLabel);
+
+    SpinnerNumberModel model = new SpinnerNumberModel(0.8, 0, 1, 0.1);
+    JSpinner intensity = new JSpinner(model);
+    intensity.setEditor(new JSpinner.DefaultEditor(intensity));
+    GridBagConstraints gbc_intensity = new GridBagConstraints();
+    gbc_intensity.fill = GridBagConstraints.BOTH;
+    intensityPanel.add(intensity, gbc_intensity);
     lightPanel.setLayout(lightGroup);
 
-    // Lamp panel
+    onOrOff.addActionListener(e -> {
+      if (glEventListener.lightIsOn) {
+        onOrOff.setText("Turn ON");
+        intensity.setValue(0.0);
+      } else {
+        onOrOff.setText("Turn OFF");
+        intensity.setValue(0.8);
+      }
+      glEventListener.setOnOff();
+    });
+
+    intensity.addChangeListener(e -> {
+      float val = ((Double) intensity.getValue()).floatValue();
+      glEventListener.setIntensity(val);
+    });
+
+    return lightPanel;
+  }
+
+  /**
+   * Creates subpanel for lamp controls
+   *
+   * @return Lamp subpanel
+   */
+  private JPanel createLampSubpanel() {
     JPanel lampPanel = new JPanel();
     lampPanel.setBorder(BorderFactory.createTitledBorder("Lamp"));
-    panel.add(lampPanel);
 
     JButton resetLamp = new JButton("Reset");
     JButton jump = new JButton("Jump");
@@ -108,143 +205,116 @@ public class Anilamp extends JFrame implements ActionListener {
     GroupLayout lampGroup = new GroupLayout(lampPanel);
     lampGroup.setAutoCreateGaps(true);
     lampGroup.setAutoCreateContainerGaps(true);
-    lampGroup.setHorizontalGroup(
-        lampGroup.createParallelGroup(Alignment.LEADING)
-            .addComponent(resetLamp)
-            .addComponent(jump)
+    lampGroup.setHorizontalGroup(lampGroup.createParallelGroup(Alignment.LEADING)
+      .addComponent(resetLamp)
+      .addComponent(jump)
     );
-    lampGroup.setVerticalGroup(
-        lampGroup.createParallelGroup(Alignment.LEADING)
-            .addGroup(lampGroup.createSequentialGroup()
-                .addComponent(resetLamp)
-                .addComponent(jump))
+    lampGroup.setVerticalGroup(lampGroup.createParallelGroup(Alignment.LEADING)
+      .addGroup(lampGroup.createSequentialGroup()
+        .addComponent(resetLamp)
+        .addComponent(jump))
     );
     lampPanel.setLayout(lampGroup);
 
-    return panel;
+    return lampPanel;
   }
 
   /**
-   * Constructor for the Anilamp frame
+   * Invoked when an action occurs.
+   *
+   * @param e the event to be processed
    */
-  private Anilamp() {
-    final Container contentPane = getContentPane();
-
-    // Creates a button panel on the left side
-    final JPanel buttonPanel = createButtonPanel();
-    contentPane.add(buttonPanel, BorderLayout.WEST);
-
-    // Canvas on center
-    GLCapabilities glcapabilities = new GLCapabilities(GLProfile.get(GLProfile.GL3));
-    canvas = new GLCanvas(glcapabilities);
-    camera = new Camera(Camera.DEFAULT_POSITION, Camera.DEFAULT_TARGET, Camera.DEFAULT_UP);
-    Anilamp_GLEventListener glEventListener = new Anilamp_GLEventListener(camera);
-    canvas.addGLEventListener(glEventListener);
-    canvas.addMouseMotionListener(new MyMouseInput(camera));
-    canvas.addKeyListener(new MyKeyboardInput(camera));
-    contentPane.add(canvas, BorderLayout.CENTER);
-
-    FPSAnimator animator = new FPSAnimator(canvas, 60);
-    animator.start();
-
-    setFrameProperties();
-  }
-
+  @Override
   public void actionPerformed(ActionEvent e) {
-    if (e.getActionCommand().equalsIgnoreCase("camera X")) {
-      camera.setCamera(Camera.CameraType.X);
-      canvas.requestFocusInWindow();
-    } else if (e.getActionCommand().equalsIgnoreCase("camera Z")) {
-      camera.setCamera(Camera.CameraType.Z);
-      canvas.requestFocusInWindow();
+    switch (e.getActionCommand()) {
+      case "Front view":
+        camera.setCamera(Camera.CameraType.X);
+        canvas.requestFocusInWindow(); break;
+      case "Left view":
+        camera.setCamera(Camera.CameraType.NZ);
+        canvas.requestFocusInWindow(); break;
+      case "Right view":
+        camera.setCamera(Camera.CameraType.Z);
+        canvas.requestFocusInWindow(); break;
     }
   }
 
   /**
-   * The main method for Anilamp
+   * A class for handling keyboard input. Code provided by Dr. Steve Maddock
    *
-   * @param args Command line arguments  (not used)
+   * @author Dr. Steve Maddock
    */
-  public static void main(String[] args) {
-    new Anilamp();
-  }
-}
+  private class MyKeyboardInput extends KeyAdapter {
 
-/**
- * A class for handling keyboard input. Code provided by Dr. Steve Maddock
- *
- * @author Dr. Steve Maddock
- */
-class MyKeyboardInput extends KeyAdapter {
+    private Camera camera;
 
-  private Camera camera;
-
-  MyKeyboardInput(Camera camera) {
-    this.camera = camera;
-  }
-
-  public void keyPressed(KeyEvent e) {
-    Camera.Movement m = Camera.Movement.NO_MOVEMENT;
-    switch (e.getKeyCode()) {
-      case KeyEvent.VK_LEFT:
-        m = Camera.Movement.LEFT;
-        break;
-      case KeyEvent.VK_RIGHT:
-        m = Camera.Movement.RIGHT;
-        break;
-      case KeyEvent.VK_UP:
-        m = Camera.Movement.UP;
-        break;
-      case KeyEvent.VK_DOWN:
-        m = Camera.Movement.DOWN;
-        break;
-      case KeyEvent.VK_A:
-        m = Camera.Movement.FORWARD;
-        break;
-      case KeyEvent.VK_Z:
-        m = Camera.Movement.BACK;
-        break;
+    MyKeyboardInput(Camera camera) {
+      this.camera = camera;
     }
-    camera.keyboardInput(m);
-  }
-}
 
-/**
- * A class for handling mouse movement. Code provided by Dr. Steve Maddock.
- *
- * @author Dr. Steve Maddock
- */
-class MyMouseInput extends MouseMotionAdapter {
-
-  private Point lastpoint;
-  private Camera camera;
-
-  MyMouseInput(Camera camera) {
-    this.camera = camera;
+    public void keyPressed(KeyEvent e) {
+      Camera.Movement m = Camera.Movement.NO_MOVEMENT;
+      switch (e.getKeyCode()) {
+        case KeyEvent.VK_LEFT:
+          m = Camera.Movement.LEFT;
+          break;
+        case KeyEvent.VK_RIGHT:
+          m = Camera.Movement.RIGHT;
+          break;
+        case KeyEvent.VK_UP:
+          m = Camera.Movement.UP;
+          break;
+        case KeyEvent.VK_DOWN:
+          m = Camera.Movement.DOWN;
+          break;
+        case KeyEvent.VK_A:
+          m = Camera.Movement.FORWARD;
+          break;
+        case KeyEvent.VK_Z:
+          m = Camera.Movement.BACK;
+          break;
+      }
+      camera.keyboardInput(m);
+    }
   }
 
   /**
-   * mouse is used to control camera position
+   * A class for handling mouse movement. Code provided by Dr. Steve Maddock.
    *
-   * @param e instance of MouseEvent
+   * @author Dr. Steve Maddock
    */
-  public void mouseDragged(MouseEvent e) {
-    Point ms = e.getPoint();
-    float sensitivity = 0.001f;
-    float dx = (float) (ms.x - lastpoint.x) * sensitivity;
-    float dy = (float) (ms.y - lastpoint.y) * sensitivity;
-    if (e.getModifiers() == MouseEvent.BUTTON1_MASK) {
-      camera.updateYawPitch(dx, -dy);
-    }
-    lastpoint = ms;
-  }
+  private class MyMouseInput extends MouseMotionAdapter {
 
-  /**
-   * mouse is used to control camera position
-   *
-   * @param e instance of MouseEvent
-   */
-  public void mouseMoved(MouseEvent e) {
-    lastpoint = e.getPoint();
+    private Point lastpoint;
+    private Camera camera;
+
+    MyMouseInput(Camera camera) {
+      this.camera = camera;
+    }
+
+    /**
+     * mouse is used to control camera position
+     *
+     * @param e instance of MouseEvent
+     */
+    public void mouseDragged(MouseEvent e) {
+      Point ms = e.getPoint();
+      float sensitivity = 0.001f;
+      float dx = (float) (ms.x - lastpoint.x) * sensitivity;
+      float dy = (float) (ms.y - lastpoint.y) * sensitivity;
+      if (e.getModifiers() == MouseEvent.BUTTON1_MASK) {
+        camera.updateYawPitch(dx, -dy);
+      }
+      lastpoint = ms;
+    }
+
+    /**
+     * mouse is used to control camera position
+     *
+     * @param e instance of MouseEvent
+     */
+    public void mouseMoved(MouseEvent e) {
+      lastpoint = e.getPoint();
+    }
   }
 }

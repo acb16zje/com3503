@@ -1,6 +1,6 @@
 package lib;
 
-import gmaths.*;
+import lib.gmaths.*;
 
 /**
  * TransformNode class adapted from tutorial 7

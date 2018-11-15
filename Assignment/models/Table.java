@@ -1,6 +1,9 @@
+package models;
+
 import com.jogamp.opengl.*;
-import gmaths.*;
 import lib.*;
+import lib.gmaths.*;
+import shapes.*;
 
 /**
  * I declare that this code is my own work
@@ -8,10 +11,9 @@ import lib.*;
  *
  * @author Zer Jun Eng
  */
-class Table {
+public class Table {
 
   private Model tableFrame, drawerGaps, drawerHandle;
-  private SGNode frameRoot;
 
   private float roomWidth, roomHeight, roomDepth;
   public float tableWidth, tableHeight, tableDepth;
@@ -27,13 +29,13 @@ class Table {
   private final float TOP_DRAWER_HEIGHT_RATIO = 0.4f;
 
   // Width ratio of drawer handles width
-  private final float HANDLE_HEIGHT_RATIO = 2f;        // with respect to draweer
+  private final float HANDLE_HEIGHT_RATIO = 2f;      // with respect to draweer
   private final float SUPPORT_HEIGHT_RATIO = 0.15f;  // with respect to handle
 
   private final float GAPS_HEIGHT = 0.03f;
   private final float FRAME_DIM = Cube.THICKNESS / 4;
 
-  Table(Vec3 roomDimension, Model tableFrame, Model drawerGaps, Model drawerHandle) {
+  public Table(Vec3 roomDimension, Model tableFrame, Model drawerGaps, Model drawerHandle) {
     this.roomWidth = roomDimension.x;
     this.roomHeight = roomDimension.y;
     this.roomDepth = roomDimension.z;
@@ -62,30 +64,32 @@ class Table {
     // Gaps
     gapsWidth = drawerWidth - GAPS_HEIGHT;
     gapsDepth = drawerDepth - GAPS_HEIGHT;
-
-    sceneGraph();
   }
 
   /**
-   * Construct the main scene graph
+   * Constructs the scene graph of table and renders it
+   *
+   * @param gl OpenGL object, for rendering
    */
-  private void sceneGraph() {
+  public void render(GL3 gl) {
     final float POS_Z = -(roomDepth - tableDepth) / 2;
 
     // Root
-    frameRoot = new NameNode("Table structure");
+    SGNode tableRoot = new NameNode("Table structure");
     TransformNode rootTranslate = new TransformNode("Root translate",
         Mat4Transform.translate(0, (tableHeight + Cube.THICKNESS) / 2 , POS_Z));
 
     // Scene graph
-    frameRoot.addChild(rootTranslate);
+    tableRoot.addChild(rootTranslate);
     createLegs(rootTranslate);
 
-    frameRoot.update();
+    tableRoot.update();
+
+    tableRoot.draw(gl);
   }
 
   /**
-   * Create left and right legs of table
+   * Creates left and right legs of table
    *
    * @param parent Parent node
    */
@@ -107,14 +111,14 @@ class Table {
     parent.addChild(leftLeg);
       leftLeg.addChild(leftLegTransform);
         leftLegTransform.addChild(leftLegModel);
-      createTableTop(leftLeg);                           // Table top
+      createTableTop(leftLeg);                         // Table top
     parent.addChild(rightLeg);
       rightLeg.addChild(rightLegTransform);
         rightLegTransform.addChild(rightLegModel);
   }
 
   /**
-   * Create a table top
+   * Creates a table top
    *
    * @param parent Parent node
    */
@@ -134,7 +138,7 @@ class Table {
   }
 
   /**
-   * Create a back support behind the drawers
+   * Creates a back support behind the drawers
    *
    * @param parent Parent node
    */
@@ -155,7 +159,7 @@ class Table {
   }
 
   /**
-   * Create a top drawer
+   * Creates a top drawer
    *
    * @param parent Parent node
    */
@@ -181,7 +185,7 @@ class Table {
   }
 
   /**
-   * Create a left and right support for top drawer handle
+   * Creates a left and right support for top drawer handle
    *
    * @param parent Parent node
    */
@@ -219,7 +223,7 @@ class Table {
   }
 
   /**
-   * Create a top drawer handle
+   * Creates a top drawer handle
    *
    * @param parent Parent node
    */
@@ -240,7 +244,7 @@ class Table {
   }
 
   /**
-   * Create a gaps between top and bottom drawer
+   * Creates a gaps between top and bottom drawer
    *
    * @param parent Parent node
    */
@@ -260,7 +264,7 @@ class Table {
   }
 
   /**
-   * Create a bottom drawer
+   * Creates a bottom drawer
    *
    * @param parent Parent node
    */
@@ -282,7 +286,7 @@ class Table {
   }
 
   /**
-   * Create a left and right support for bottom drawer handle
+   * Creates a left and right support for bottom drawer handle
    *
    * @param parent Parent node
    */
@@ -322,7 +326,7 @@ class Table {
   }
 
   /**
-   * Create a top drawer handle
+   * Creates a top drawer handle
    *
    * @param parent Parent node
    */
@@ -340,14 +344,5 @@ class Table {
     parent.addChild(botHandle);
       botHandle.addChild(botHandleTransform);
         botHandleTransform.addChild(botHandleModel);
-  }
-
-  /**
-   * Renders table
-   *
-   * @param gl OpenGL object, for rendering
-   */
-  void render(GL3 gl) {
-    frameRoot.draw(gl);
   }
 }

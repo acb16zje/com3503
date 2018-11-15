@@ -1,6 +1,9 @@
+package models;
+
 import com.jogamp.opengl.*;
-import gmaths.*;
 import lib.*;
+import lib.gmaths.*;
+import shapes.*;
 
 /**
  * I declare that this code is my own work.
@@ -8,7 +11,7 @@ import lib.*;
  *
  * @author Zer Jun Eng
  */
-class Room {
+public class Room {
 
   private Model floor, topWall, bottomWall, leftWall, rightWall;               // Cube models
   private Model topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;  // TwoTriangles
@@ -22,7 +25,7 @@ class Room {
    * @param roomDimension The room dimension in width, height, depth
    * @param floor The floor
    */
-  Room(Vec3 roomDimension, Model floor) {
+  public Room(Vec3 roomDimension, Model floor) {
     this.roomWidth = roomDimension.x;
     this.roomHeight = roomDimension.y;
     this.roomDepth = roomDimension.z;
@@ -30,11 +33,11 @@ class Room {
   }
 
   /**
-   * Renders floor, wallpaper, and wall
+   * Renders floor, wallpaper, and wall (Cannot use scene graph for TwoTriangles)
    *
    * @param gl OpenGL object, for rendering
    */
-  void render(GL3 gl) {
+  public void render(GL3 gl) {
     // Floor
     floor.setModelMatrix(getMatForFloor());
     floor.render(gl);
@@ -160,7 +163,7 @@ class Room {
     return modelMatrix;
   }
 
-  class Wall {
+  public class Wall {
 
     /**
      * @param top The wall above the window
@@ -168,7 +171,7 @@ class Room {
      * @param left The wall on the left side of the window
      * @param right The wall on the right side of the window
      */
-    Wall(Model top, Model bottom, Model left, Model right) {
+    public Wall(Model top, Model bottom, Model left, Model right) {
       topWall = top;
       bottomWall = bottom;
       leftWall = left;
@@ -176,7 +179,7 @@ class Room {
     }
   }
 
-  class Wallpaper {
+  public class Wallpaper {
 
     /**
      * @param top The wallpaper above the window
@@ -184,7 +187,7 @@ class Room {
      * @param left The wallpaper on the left side of the window
      * @param right The wallpaper on the right side of the window
      */
-    Wallpaper(Model top, Model bottom, Model left, Model right) {
+    public Wallpaper(Model top, Model bottom, Model left, Model right) {
       topWallpaper = top;
       bottomWallpaper = bottom;
       leftWallpaper = left;

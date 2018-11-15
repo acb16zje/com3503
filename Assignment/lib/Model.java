@@ -1,12 +1,13 @@
 package lib;
 
 import com.jogamp.opengl.*;
-import gmaths.*;
+import java.util.*;
+import lib.gmaths.*;
 
 /**
  * Model class adapted from tutorial 7
  *
- * @author Dr. Steve Maddock
+ * @author Dr. Steve Maddock and Zer Jun Eng
  */
 public class Model {
 
@@ -17,40 +18,27 @@ public class Model {
   private Shader shader;
   private Mat4 modelMatrix;
   private Camera camera;
-  private Light light;
+  private List<Light> lightList;
 
-  public Model(GL3 gl, Camera camera, Light light, Shader shader, Material material,
-      Mat4 modelMatrix, Mesh mesh, int[] textureId1, int[] textureId2) {
+  public Model(Camera camera, List<Light> lightList, Shader shader, Material material, Mesh mesh,
+      int[] textureId1, int[] textureId2) {
     this.mesh = mesh;
     this.material = material;
-    this.modelMatrix = modelMatrix;
+    this.modelMatrix = new Mat4();
     this.shader = shader;
     this.camera = camera;
-    this.light = light;
+    this.lightList = lightList;
     this.textureId1 = textureId1;
     this.textureId2 = textureId2;
   }
 
-  public Model(GL3 gl, Camera camera, Light light, Shader shader, Material material,
-      Mat4 modelMatrix, Mesh mesh, int[] textureId1) {
-    this(gl, camera, light, shader, material, modelMatrix, mesh, textureId1, null);
-  }
-
-  public Model(GL3 gl, Camera camera, Light light, Shader shader, Material material,
-      Mat4 modelMatrix, Mesh mesh) {
-    this(gl, camera, light, shader, material, modelMatrix, mesh, null, null);
+  public Model(Camera camera, List<Light> lightList, Shader shader, Material material, Mesh mesh,
+      int[] textureId1) {
+    this(camera, lightList, shader, material, mesh, textureId1, null);
   }
 
   public void setModelMatrix(Mat4 m) {
     modelMatrix = m;
-  }
-
-  public void setCamera(Camera camera) {
-    this.camera = camera;
-  }
-
-  public void setLight(Light light) {
-    this.light = light;
   }
 
   public void render(GL3 gl, Mat4 modelMatrix) {
@@ -62,10 +50,22 @@ public class Model {
 
     shader.setVec3(gl, "viewPos", camera.getPosition());
 
-    shader.setVec3(gl, "light.position", light.getPosition());
-    shader.setVec3(gl, "light.ambient", light.getMaterial().getAmbient());
-    shader.setVec3(gl, "light.diffuse", light.getMaterial().getDiffuse());
-    shader.setVec3(gl, "light.specular", light.getMaterial().getSpecular());
+    for (int i = 0; i < lightList.size(); i++) {
+      String light;
+
+      if (lightList.get(i).getClass().equals(Spotlight.class)) {
+        // Spotlight - lamp light
+        light = "spotLight";
+      } else {
+        // Directional world light
+        light = "dirLight" + "[" + i + "]";
+      }
+
+      shader.setVec3(gl, light + ".position", lightList.get(i).getPosition());
+      shader.setVec3(gl, light + ".ambient", lightList.get(i).getMaterial().getAmbient());
+      shader.setVec3(gl, light + ".diffuse", lightList.get(i).getMaterial().getDiffuse());
+      shader.setVec3(gl, light + ".specular", lightList.get(i).getMaterial().getSpecular());
+    }
 
     shader.setVec3(gl, "material.ambient", material.getAmbient());
     shader.setVec3(gl, "material.diffuse", material.getDiffuse());
@@ -73,8 +73,7 @@ public class Model {
     shader.setFloat(gl, "material.shininess", material.getShininess());
 
     if (textureId1 != null) {
-      shader.setInt(gl, "first_texture",
-          0);  // be careful to match these with GL_TEXTURE0 and GL_TEXTURE1
+      shader.setInt(gl, "first_texture", 0);  // be careful to match these with GL_TEXTURE0 and GL_TEXTURE1
       gl.glActiveTexture(GL.GL_TEXTURE0);
       gl.glBindTexture(GL.GL_TEXTURE_2D, textureId1[0]);
     }

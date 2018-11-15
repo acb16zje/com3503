@@ -1,4 +1,4 @@
-package gmaths;
+package lib.gmaths;
 
 public final class Vec3 {
   public float x;

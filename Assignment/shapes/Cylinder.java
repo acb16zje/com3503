@@ -1,4 +1,4 @@
-package lib;
+package shapes;
 
 /**
  * I declare that this code is my own work

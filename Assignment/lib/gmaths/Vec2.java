@@ -1,4 +1,4 @@
-package gmaths;
+package lib.gmaths;
 
 /**
  * A class for a 2D vector.

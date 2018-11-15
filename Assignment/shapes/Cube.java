@@ -1,9 +1,10 @@
-package lib;
+package shapes;
 
 /**
  * Cube class adapted from tutorial 7
+ * I declare that the code below line 59 is my own work
  *
- * @author Dr. Steve Maddock
+ * @author Dr. Steve Maddock and Zer Jun Eng
  */
 public final class Cube {
 

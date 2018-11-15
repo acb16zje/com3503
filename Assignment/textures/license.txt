@@ -4,6 +4,7 @@ Images are compressed in https://tinypng.com/
 Specular maps are created in http://cpetry.github.io/NormalMap-Online/
 
 drawer_handle.jpg - https://www.deviantart.com/sweetsoulsister/art/Brushed-Metal-Silver-Texture-145936387
+glass.jpg - https://mbtskoudsalg.com/explore/window-texture-png/#gal_post_4621_glass-wall-png-8.png
 floor.jpg - https://www.flickr.com/photos/alandelmas/6285936917
 table.jpg - http://www.texturise.club/2014/05/seamless-natural-wood-texture-maps.html
 wall.jpg - https://imgkid.com/white-paint-texture-seamless.shtml

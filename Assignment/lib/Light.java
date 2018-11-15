@@ -2,12 +2,12 @@ package lib;
 
 import com.jogamp.common.nio.*;
 import com.jogamp.opengl.*;
-import gmaths.*;
 import java.nio.*;
+import lib.gmaths.*;
 
 /**
  * Light class adapted from tutorial 7
- * A new constructor has been added to allow different shapes of light
+ * Constructor have been added to allow inheritance and different shapes of light
  *
  * @author Dr. Steve Maddock and Zer Jun Eng
  */
@@ -17,29 +17,38 @@ public class Light {
   private Vec3 position;
   private Shader shader;
   private Camera camera;
+  private float lightColor = 1;
 
-  public Light(GL3 gl) {
-    this(gl, vertices, indices);
+  /**
+   * Constructor for cube shape light
+   *
+   * @param gl OpenGL object
+   * @param camera Camera object
+   */
+  public Light(GL3 gl, Camera camera) {
+    this(gl, camera, vertices, indices);
   }
 
   /**
    * Constructor for light that allows different shape
    *
    * @param gl OpenGL object
+   * @param camera Camera object
    * @param vertices Custom vertices
    * @param indices Custom indices
    */
-  public Light(GL3 gl, float[] vertices, int[] indices) {
+  public Light(GL3 gl, Camera camera, float[] vertices, int[] indices) {
     material = new Material();
     material.setAmbient(0.5f, 0.5f, 0.5f);
     material.setDiffuse(0.8f, 0.8f, 0.8f);
     material.setSpecular(0.8f, 0.8f, 0.8f);
     position = new Vec3(3f, 2f, 1f);
     shader = new Shader(gl, "shaders/vs_light.txt", "shaders/fs_light.txt");
-    vertexStride = Light.vertices == vertices ? 3 : 8; // Only change to 8 stride for different shape
+    vertexStride = Light.vertices == vertices ? 3 : 8;  // Change to 8 stride for different shape
     Light.vertices = vertices;
     Light.indices = indices;
     fillBuffers(gl);
+    setCamera(camera);
   }
 
   public void setPosition(Vec3 v) {
@@ -58,13 +67,13 @@ public class Light {
     return position;
   }
 
-  public void setMaterial(Material m) {
-    material = m;
-  }
+  public void setMaterial(Material m) { material = m; }
 
-  Material getMaterial() {
+  public Material getMaterial() {
     return material;
   }
+
+  public void setLightColor(float value) { this.lightColor = value; }
 
   public void setCamera(Camera camera) {
     this.camera = camera;
@@ -80,6 +89,7 @@ public class Light {
 
     shader.use(gl);
     shader.setFloatArray(gl, "mvpMatrix", mvpMatrix.toFloatArrayForGLSL());
+    shader.setFloat(gl, "lightColor", this.lightColor);
 
     gl.glBindVertexArray(vertexArrayId[0]);
     gl.glDrawElements(GL.GL_TRIANGLES, indices.length, GL.GL_UNSIGNED_INT, 0);

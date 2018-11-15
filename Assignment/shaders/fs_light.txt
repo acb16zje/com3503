@@ -1,7 +1,11 @@
+/* Adapted from Lab 7, fs_light_01.txt */
+
 #version 330 core
 
 out vec4 fragColor;
 
+uniform float lightColor;
+
 void main() {
-  fragColor = vec4(1.0f);
+  fragColor = vec4(lightColor);
 }

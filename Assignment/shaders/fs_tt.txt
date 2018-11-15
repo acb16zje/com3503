@@ -1,3 +1,6 @@
+/* Adapted and modified from https://learnopengl.com/Lighting/Multiple-lights */
+/* Adapted and modified from Lab 7, fs_cube.txt */
+
 #version 330 core
 
 in vec3 aPos;
@@ -6,43 +9,55 @@ in vec2 aTexCoord;
 
 out vec4 fragColor;
 
-uniform sampler2D first_texture;
-uniform vec3 viewPos;
+struct Material {
+  vec3 ambient;
+  vec3 diffuse;
+  vec3 specular;
+  float shininess;
+};
 
-struct Light {
+struct DirLight {
   vec3 position;
   vec3 ambient;
   vec3 diffuse;
   vec3 specular;
 };
 
-uniform Light light;  
+#define NUM_DIR_LIGHTS 2
 
-struct Material {
-  vec3 ambient;
-  vec3 diffuse;
-  vec3 specular;
-  float shininess;
-}; 
-  
+uniform vec3 viewPos;
+uniform sampler2D first_texture;
+uniform sampler2D second_texture;
 uniform Material material;
+uniform DirLight dirLight[NUM_DIR_LIGHTS];
 
-void main() {
-  // ambient
-  vec3 ambient = light.ambient * material.ambient * texture(first_texture, aTexCoord).rgb;
-
+vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
   // diffuse
-  vec3 norm = normalize(aNormal);
   vec3 lightDir = normalize(light.position - aPos);
   float diff = max(dot(norm, lightDir), 0.0);
-  vec3 diffuse = light.diffuse * (diff * material.diffuse) * texture(first_texture, aTexCoord).rgb;
 
   // specular
-  vec3 viewDir = normalize(viewPos - aPos);
   vec3 reflectDir = reflect(-lightDir, norm);
   float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-  vec3 specular = light.specular * (spec * material.specular);
 
-  vec3 result = ambient + diffuse + specular;
+  // result
+  vec3 ambient = light.ambient * material.ambient * texture(first_texture, aTexCoord).rgb;
+  vec3 diffuse = light.diffuse * (diff * material.diffuse) * texture(first_texture, aTexCoord).rgb;
+  vec3 specular = light.specular * (spec * material.specular) * texture(second_texture, aTexCoord).rgb;
+
+  return (ambient + diffuse + specular);
+}
+
+void main() {
+  vec3 norm = normalize(aNormal);
+  vec3 viewDir = normalize(viewPos - aPos);
+  vec3 result;
+
+  for (int i = 0; i < NUM_DIR_LIGHTS; i++) {
+    result += calcDirLight(dirLight[i], norm, viewDir);
+  }
+
+  result /= float(NUM_DIR_LIGHTS);
+
   fragColor = vec4(result, 1.0);
 }

@@ -1,6 +1,6 @@
 package lib;
 
-import gmaths.*;
+import lib.gmaths.*;
 
 /**
  * This class stores the Material properties for a Mesh, adapted from tutorial 7

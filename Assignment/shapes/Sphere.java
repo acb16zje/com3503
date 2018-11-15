@@ -1,4 +1,4 @@
-package lib;
+package shapes;
 
 /**
  * Sphere class adapted from tutorial 7

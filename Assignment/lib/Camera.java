@@ -1,6 +1,6 @@
 package lib;
 
-import gmaths.*;
+import lib.gmaths.*;
 
 /**
  * Camera class adapted from tutorial 7
@@ -10,13 +10,14 @@ import gmaths.*;
 
 public class Camera {
 
-  public enum CameraType {X, Z}
+  public enum CameraType {X, Z, NZ}
 
   public enum Movement {NO_MOVEMENT, LEFT, RIGHT, UP, DOWN, FORWARD, BACK}
 
   private static final float DEFAULT_RADIUS = 25;
   public static final Vec3 DEFAULT_POSITION = new Vec3(0, 10, 25);
   public static final Vec3 DEFAULT_POSITION_2 = new Vec3(25, 10, 0);
+  public static final Vec3 DEFAULT_POSITION_3 = new Vec3(-25, 10, 0);
   public static final Vec3 DEFAULT_TARGET = new Vec3(0, 8f, 0);
   public static final Vec3 DEFAULT_UP = new Vec3(0, 1, 0);
 
@@ -72,6 +73,9 @@ public class Camera {
         break;
       case Z:
         setupCamera(DEFAULT_POSITION_2, DEFAULT_TARGET, DEFAULT_UP);
+        break;
+      case NZ:
+        setupCamera(DEFAULT_POSITION_3, DEFAULT_TARGET, DEFAULT_UP);
         break;
     }
   }

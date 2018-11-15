@@ -1,8 +1,8 @@
 package lib;
 
 import com.jogamp.opengl.*;
-import gmaths.*;
 import java.util.*;
+import lib.gmaths.*;
 
 
 /**

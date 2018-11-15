@@ -1,6 +1,9 @@
+package models;
+
 import com.jogamp.opengl.*;
-import gmaths.*;
 import lib.*;
+import lib.gmaths.*;
+import shapes.*;
 
 /**
  * I declare that this code is my own work
@@ -8,44 +11,53 @@ import lib.*;
  *
  * @author Zer Jun Eng
  */
-class Window {
+public class Window {
 
-  private Model windowFrame;
-  private SGNode frameRoot;
+  private Model windowFrame, glass;
 
   private float roomWidth, roomHeight, roomDepth;
-  private float horizontalWidth, verticalHeight;
+  private float windowWidth, windowHeight;
+  private float glassWidth, glassHeight, glassDepth;
+  private Mat4 glassScale;
   private final float FRAME_DIM = Cube.THICKNESS / 2;
 
   // Dimension ratio of window with respect to room dimension
-  static final Vec3 RATIO = new Vec3(0.45f, 0.39f, 0);
-  static final float Y_POS = RATIO.y + 0.1f;
+  public static final Vec3 RATIO = new Vec3(0.45f, 0.39f, 0);
+  public static final float Y_POS = RATIO.y + 0.1f;
 
   /**
    * Window constructor
    *
    * @param roomDimension The room dimension in width, height, depth
+   * @param windowFrame Cube window frame
+   * @param glass Cube class
    */
-  Window(Vec3 roomDimension, Model windowFrame) {
+  public Window(Vec3 roomDimension, Model windowFrame, Model glass) {
     this.roomWidth = roomDimension.x;
     this.roomHeight = roomDimension.y;
     this.roomDepth = roomDimension.z;
     this.windowFrame = windowFrame;
+    this.glass = glass;
 
-    horizontalWidth = roomWidth * RATIO.x;
-    verticalHeight = roomHeight * RATIO.y - 2 * FRAME_DIM; // 2 * FRAME_DIM for top and bot bar
+    windowWidth = roomWidth * RATIO.x;
+    windowHeight = roomHeight * RATIO.y - 2 * FRAME_DIM; // 2 * FRAME_DIM for top and bot bar
 
-    sceneGraph();
+    glassWidth = windowWidth / 2 - FRAME_DIM;
+    glassHeight = (windowHeight - FRAME_DIM) / 2;
+    glassDepth = FRAME_DIM / 8;
+    glassScale = Mat4Transform.scale(glassWidth, glassHeight, glassDepth);
   }
 
   /**
-   * Construct the main scene graph
+   * Constructs the scene graph of window and renders it
+   *
+   * @param gl OpenGL object, for rendering
    */
-  private void sceneGraph() {
+  public void render(GL3 gl) {
     final float POS_Z = -(roomDepth + Cube.THICKNESS) / 2;
 
     // Root
-    frameRoot = new NameNode("Window frame structure");
+    SGNode frameRoot = new NameNode("Window frame structure");
     TransformNode rootTranslate = new TransformNode("Root translate",
         Mat4Transform.translate(0, roomHeight * Y_POS, POS_Z));
 
@@ -54,15 +66,17 @@ class Window {
     createHorizontalBar(rootTranslate);
 
     frameRoot.update();
+
+    frameRoot.draw(gl);
   }
 
   /**
-   * Create three horizontal bars: bot, mid and top
+   * Creates three horizontal bars: bot, mid and top
    *
    * @param parent Parent node
    */
   private void createHorizontalBar(SGNode parent) {
-    final Mat4 H_MAT = Mat4Transform.scale(horizontalWidth, FRAME_DIM, FRAME_DIM); // Horizontal mat
+    final Mat4 H_MAT = Mat4Transform.scale(windowWidth, FRAME_DIM, FRAME_DIM); // Horizontal mat
 
     // Bottom horizontal bar
     NameNode botH = new NameNode("Bottom horizontal bar");
@@ -93,17 +107,21 @@ class Window {
     parent.addChild(topH);
       topH.addChild(topHTransform);
         topHTransform.addChild(topHModel);
+
+    // Glasses have to be added at last for transparency to fully work with window frames
+    createBottomGlass(parent);               // 2 bottom glasses as children
+    createTopGlass(parent);                  // 2 top glasses as children
   }
 
   /**
-   * Create three vertical bars: left, mid and right
+   * Creates three vertical bars: left, mid and right
    *
    * @param parent Parent node
    */
   private void createVerticalBar(SGNode parent) {
-    final Mat4 V_MAT = Mat4Transform.scale(FRAME_DIM, verticalHeight, FRAME_DIM);  // Vertical mat
-    final float V_BAR_POS_X = (horizontalWidth - FRAME_DIM) / 2;
-    final float V_BAR_POS_Y = FRAME_DIM + verticalHeight / 2;
+    final Mat4 V_MAT = Mat4Transform.scale(FRAME_DIM, windowHeight, FRAME_DIM);  // Vertical mat
+    final float V_BAR_POS_X = (windowWidth - FRAME_DIM) / 2;
+    final float V_BAR_POS_Y = FRAME_DIM + windowHeight / 2;
 
     TransformNode verticalTranslate = new TransformNode("Vertical translate",
         Mat4Transform.translate(0, V_BAR_POS_Y, 0));
@@ -126,7 +144,6 @@ class Window {
     TransformNode rightVTransform = new TransformNode("rightV Transform", m);
     ModelNode rightVModel = new ModelNode("rightV Model", windowFrame);
 
-
     parent.addChild(verticalTranslate);
       verticalTranslate.addChild(leftV);
         leftV.addChild(leftVTransform);
@@ -140,11 +157,56 @@ class Window {
   }
 
   /**
-   * Renders window
+   * Creates the bottom left and bottom right glass
    *
-   * @param gl OpenGL object, for rendering
+   * @param parent Parent node
    */
-  void render(GL3 gl) {
-    frameRoot.draw(gl);
+  private void createBottomGlass(SGNode parent) {
+    final float POS_X = -glassWidth / 2;
+    final float POS_Y = glassHeight / 2 + FRAME_DIM;
+
+    NameNode leftGlass = new NameNode("Bottom left glass");
+    Mat4 m = Mat4.multiply(Mat4Transform.translate(POS_X, POS_Y, 0), glassScale);
+    TransformNode leftGlassTransform = new TransformNode("Bottom left glass transform", m);
+    ModelNode leftGlassModel = new ModelNode("Bottom left glass model", glass);
+
+    NameNode rightGlass = new NameNode("Bottom right glass");
+    m = Mat4.multiply(Mat4Transform.translate(-POS_X, POS_Y, 0), glassScale);
+    TransformNode rightGlassTransform = new TransformNode("Bottom right glasss transform", m);
+    ModelNode rightGlassModel = new ModelNode("Bottom right glass model", glass);
+
+    parent.addChild(leftGlass);
+      leftGlass.addChild(leftGlassTransform);
+        leftGlassTransform.addChild(leftGlassModel);
+    parent.addChild(rightGlass);
+      rightGlass.addChild(rightGlassTransform);
+        rightGlassTransform.addChild(rightGlassModel);
+  }
+
+  /**
+   * Creates the top left and top right glass
+   *
+   * @param parent Parent node
+   */
+  private void createTopGlass(SGNode parent) {
+    final float POS_X = -glassWidth / 2;
+    final float POS_Y = glassHeight * 2 - FRAME_DIM - 0.05f; // 0.05 offset for floating point error
+
+    NameNode leftGlass = new NameNode("Top left glass");
+    Mat4 m = Mat4.multiply(Mat4Transform.translate(POS_X, POS_Y, 0), glassScale);
+    TransformNode leftGlassTransform = new TransformNode("Top left glass transform", m);
+    ModelNode leftGlassModel = new ModelNode("Top left glass model", glass);
+
+    NameNode rightGlass = new NameNode("Top right glass");
+    m = Mat4.multiply(Mat4Transform.translate(-POS_X, POS_Y, 0), glassScale);
+    TransformNode rightGlassTransform = new TransformNode("Top right glasss transform", m);
+    ModelNode rightGlassModel = new ModelNode("Top right glass model", glass);
+
+    parent.addChild(leftGlass);
+      leftGlass.addChild(leftGlassTransform);
+        leftGlassTransform.addChild(leftGlassModel);
+    parent.addChild(rightGlass);
+      rightGlass.addChild(rightGlassTransform);
+        rightGlassTransform.addChild(rightGlassModel);
   }
 }
