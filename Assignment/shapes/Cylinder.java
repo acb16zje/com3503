@@ -33,7 +33,7 @@ public final class Cylinder {
         double z = Math.cos(b) * Math.cos(a);
         int base = j * XLONG * step;
 
-        // Top and bottom cylinder
+        // Top and bottom cover
         if (j == 0 || j == YLAT - 1) {
           vertices[base + i * step + 1] = (float) (r * y) / 2;
         } else {
@@ -53,10 +53,10 @@ public final class Cylinder {
   }
 
   private static int[] createIndices() {
-    int[] indices = new int[(XLONG) * (YLAT) * 6];
+    int[] indices = new int[XLONG * YLAT * 6];
     for (int j = 0; j < YLAT; ++j) {
       for (int i = 0; i < XLONG; ++i) {
-        int base = j * (XLONG) * 6;
+        int base = j * XLONG * 6;
         indices[base + i * 6] = j * XLONG + i;
         indices[base + i * 6 + 1] = j * XLONG + i + 1;
         indices[base + i * 6 + 2] = (j + 1) * XLONG + i + 1;

@@ -6,25 +6,29 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.GroupLayout.*;
 import lib.*;
+import lib.Camera.*;
 
 /**
- * I declare that this code is my own work.
+ * I declare that this code is my own work. UI are generated using Eclipse Window Builder and
+ * modified by myself.
  * Main class for the program
  *
  * @author Zer Jun Eng
  */
-public class Anilamp extends JFrame implements ActionListener {
+public class Anilamp extends JFrame {
 
   private GLCanvas canvas;
   private Camera camera;
-  Anilamp_GLEventListener glEventListener;
+  private Anilamp_GLEventListener glEventListener;
 
   /**
    * The main method for Anilamp
    *
    * @param args Command line arguments  (not used)
    */
-  public static void main(String[] args) { new Anilamp(); }
+  public static void main(String[] args) {
+    new Anilamp();
+  }
 
   /**
    * Constructor for the Anilamp frame
@@ -39,7 +43,7 @@ public class Anilamp extends JFrame implements ActionListener {
     // Canvas on center
     GLCapabilities glcapabilities = new GLCapabilities(GLProfile.get(GLProfile.GL3));
     canvas = new GLCanvas(glcapabilities);
-    camera = new Camera(Camera.DEFAULT_POSITION, Camera.DEFAULT_TARGET, Camera.DEFAULT_UP);
+    camera = new Camera(Camera.ROOM_X, Camera.DEFAULT_TARGET, Camera.DEFAULT_UP);
     glEventListener = new Anilamp_GLEventListener(camera);
     canvas.addGLEventListener(glEventListener);
     canvas.addMouseMotionListener(new MyMouseInput(camera));
@@ -96,28 +100,74 @@ public class Anilamp extends JFrame implements ActionListener {
     JPanel cameraPanel = new JPanel();
     cameraPanel.setBorder(BorderFactory.createTitledBorder("Camera"));
 
-    final JButton frontView = new JButton("Front view");
-    final JButton leftView = new JButton("Left view");
-    final JButton rightView = new JButton("Right view");
-    frontView.addActionListener(this);
-    leftView.addActionListener(this);
-    rightView.addActionListener(this);
+    JPanel roomPanel = new JPanel();
+    roomPanel.setBorder(BorderFactory.createTitledBorder("Room"));
+
+    final JButton frontView = new JButton("Front View");
+    final JButton leftView = new JButton("Left View");
+    final JButton rightView = new JButton("Right View");
+
+    JPanel deskPanel = new JPanel();
+    deskPanel.setBorder(BorderFactory.createTitledBorder("Desk"));
+
+    final JButton deskView = new JButton("Front View");
 
     GroupLayout cameraGroup = new GroupLayout(cameraPanel);
     cameraGroup.setAutoCreateGaps(true);
-    cameraGroup.setAutoCreateContainerGaps(true);
     cameraGroup.setHorizontalGroup(cameraGroup.createParallelGroup(Alignment.LEADING)
-      .addComponent(frontView)
-      .addComponent(leftView)
-      .addComponent(rightView)
+        .addComponent(roomPanel)
+        .addComponent(deskPanel)
     );
     cameraGroup.setVerticalGroup(cameraGroup.createParallelGroup(Alignment.LEADING)
-      .addGroup(cameraGroup.createSequentialGroup()
-        .addComponent(frontView)
-        .addComponent(leftView)
-        .addComponent(rightView))
+        .addGroup(cameraGroup.createSequentialGroup()
+            .addComponent(roomPanel)
+            .addComponent(deskPanel))
     );
     cameraPanel.setLayout(cameraGroup);
+
+    GroupLayout deskGroup = new GroupLayout(deskPanel);
+    deskGroup.setAutoCreateContainerGaps(true);
+    deskGroup.setAutoCreateGaps(true);
+    deskGroup.setHorizontalGroup(deskGroup.createParallelGroup(Alignment.LEADING)
+        .addComponent(deskView)
+    );
+    deskGroup.setVerticalGroup(deskGroup.createParallelGroup(Alignment.LEADING)
+        .addComponent(deskView)
+    );
+    deskPanel.setLayout(deskGroup);
+
+    GroupLayout roomGroup = new GroupLayout(roomPanel);
+    roomGroup.setAutoCreateContainerGaps(true);
+    roomGroup.setAutoCreateGaps(true);
+    roomGroup.setHorizontalGroup(roomGroup.createParallelGroup(Alignment.LEADING)
+        .addComponent(frontView)
+        .addComponent(leftView)
+        .addComponent(rightView)
+    );
+    roomGroup.setVerticalGroup(roomGroup.createParallelGroup(Alignment.LEADING)
+        .addGroup(roomGroup.createSequentialGroup()
+            .addComponent(frontView)
+            .addComponent(leftView)
+            .addComponent(rightView))
+    );
+    roomPanel.setLayout(roomGroup);
+
+    frontView.addActionListener(e -> {
+      camera.setCamera(Camera.CameraType.X);
+      canvas.requestFocusInWindow();
+    });
+    leftView.addActionListener(e -> {
+      camera.setCamera(Camera.CameraType.NZ);
+      canvas.requestFocusInWindow();
+    });
+    rightView.addActionListener(e -> {
+      camera.setCamera(Camera.CameraType.Z);
+      canvas.requestFocusInWindow();
+    });
+    deskView.addActionListener(e -> {
+      camera.setCamera(Camera.CameraType.DESK);
+      canvas.requestFocusInWindow();
+    });
 
     return cameraPanel;
   }
@@ -199,44 +249,24 @@ public class Anilamp extends JFrame implements ActionListener {
     JPanel lampPanel = new JPanel();
     lampPanel.setBorder(BorderFactory.createTitledBorder("Lamp"));
 
-    JButton resetLamp = new JButton("Reset");
+    JButton random = new JButton("Random Pose");
     JButton jump = new JButton("Jump");
 
     GroupLayout lampGroup = new GroupLayout(lampPanel);
     lampGroup.setAutoCreateGaps(true);
     lampGroup.setAutoCreateContainerGaps(true);
     lampGroup.setHorizontalGroup(lampGroup.createParallelGroup(Alignment.LEADING)
-      .addComponent(resetLamp)
-      .addComponent(jump)
+        .addComponent(random)
+        .addComponent(jump)
     );
     lampGroup.setVerticalGroup(lampGroup.createParallelGroup(Alignment.LEADING)
-      .addGroup(lampGroup.createSequentialGroup()
-        .addComponent(resetLamp)
-        .addComponent(jump))
+        .addGroup(lampGroup.createSequentialGroup()
+            .addComponent(random)
+            .addComponent(jump))
     );
     lampPanel.setLayout(lampGroup);
 
     return lampPanel;
-  }
-
-  /**
-   * Invoked when an action occurs.
-   *
-   * @param e the event to be processed
-   */
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    switch (e.getActionCommand()) {
-      case "Front view":
-        camera.setCamera(Camera.CameraType.X);
-        canvas.requestFocusInWindow(); break;
-      case "Left view":
-        camera.setCamera(Camera.CameraType.NZ);
-        canvas.requestFocusInWindow(); break;
-      case "Right view":
-        camera.setCamera(Camera.CameraType.Z);
-        canvas.requestFocusInWindow(); break;
-    }
   }
 
   /**
@@ -302,7 +332,7 @@ public class Anilamp extends JFrame implements ActionListener {
       float sensitivity = 0.001f;
       float dx = (float) (ms.x - lastpoint.x) * sensitivity;
       float dy = (float) (ms.y - lastpoint.y) * sensitivity;
-      if (e.getModifiers() == MouseEvent.BUTTON1_MASK) {
+      if (e.getModifiersEx() == MouseEvent.BUTTON1_DOWN_MASK) {
         camera.updateYawPitch(dx, -dy);
       }
       lastpoint = ms;

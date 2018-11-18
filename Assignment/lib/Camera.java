@@ -10,16 +10,18 @@ import lib.gmaths.*;
 
 public class Camera {
 
-  public enum CameraType {X, Z, NZ}
+  public enum CameraType {X, Z, NZ, DESK}
 
   public enum Movement {NO_MOVEMENT, LEFT, RIGHT, UP, DOWN, FORWARD, BACK}
 
   private static final float DEFAULT_RADIUS = 25;
-  public static final Vec3 DEFAULT_POSITION = new Vec3(0, 10, 25);
-  public static final Vec3 DEFAULT_POSITION_2 = new Vec3(25, 10, 0);
-  public static final Vec3 DEFAULT_POSITION_3 = new Vec3(-25, 10, 0);
-  public static final Vec3 DEFAULT_TARGET = new Vec3(0, 8f, 0);
-  public static final Vec3 DEFAULT_UP = new Vec3(0, 1, 0);
+  public static final Vec3 ROOM_X = new Vec3(0, 10, 25);
+  public static final Vec3 ROOM_Z = new Vec3(25, 10, 0);
+  public static final Vec3 ROOM_NZ = new Vec3(-25, 10, 0);
+  public static final Vec3 DESK_X = new Vec3(0, 12, 3);
+  public static final Vec3 DEFAULT_TARGET = new Vec3(0, 8, 0);
+  public static final Vec3 DESK_TARGET = new Vec3(0, 11, 0);
+  public static final Vec3 DEFAULT_UP = new Vec3(0, 11, 0);
 
   public final float YAW = -90f;
   public final float PITCH = 0f;
@@ -69,13 +71,16 @@ public class Camera {
   public void setCamera(CameraType c) {
     switch (c) {
       case X:
-        setupCamera(DEFAULT_POSITION, DEFAULT_TARGET, DEFAULT_UP);
+        setupCamera(ROOM_X, DEFAULT_TARGET, DEFAULT_UP);
         break;
       case Z:
-        setupCamera(DEFAULT_POSITION_2, DEFAULT_TARGET, DEFAULT_UP);
+        setupCamera(ROOM_Z, DEFAULT_TARGET, DEFAULT_UP);
         break;
       case NZ:
-        setupCamera(DEFAULT_POSITION_3, DEFAULT_TARGET, DEFAULT_UP);
+        setupCamera(ROOM_NZ, DEFAULT_TARGET, DEFAULT_UP);
+        break;
+      case DESK:
+        setupCamera(DESK_X, DESK_TARGET, DEFAULT_UP);
         break;
     }
   }

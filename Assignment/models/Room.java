@@ -23,7 +23,7 @@ public class Room {
    * Room constructor
    *
    * @param roomDimension The room dimension in width, height, depth
-   * @param floor The floor
+   * @param floor Cube floo model
    */
   public Room(Vec3 roomDimension, Model floor) {
     this.roomWidth = roomDimension.x;
@@ -33,7 +33,7 @@ public class Room {
   }
 
   /**
-   * Renders floor, wallpaper, and wall (Cannot use scene graph for TwoTriangles)
+   * Renders floor, wallpaper, and wall
    *
    * @param gl OpenGL object, for rendering
    */

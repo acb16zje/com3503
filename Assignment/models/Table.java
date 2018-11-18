@@ -13,28 +13,42 @@ import shapes.*;
  */
 public class Table {
 
+  // Parent of lamp and 3 table accessories
+  static SGNode tableRoot;
+  static NameNode tableTop;
+
   private Model tableFrame, drawerGaps, drawerHandle;
 
+  static float tableWidth, tableHeight, tableDepth;
   private float roomWidth, roomHeight, roomDepth;
-  public float tableWidth, tableHeight, tableDepth;
   private float drawerWidth, drawerHeight, drawerDepth, topDrawerHeight, bottomDrawerHeight;
   private float handleWidth, handleHeight, handleDepth, supportHeight;
   private float gapsWidth, gapsDepth;
 
   // Dimension ratio of table with respect to room dimension
-  public static final Vec3 RATIO = new Vec3(0.679f, 0.39f, 0.286f);
+  private static final Vec3 RATIO = new Vec3(0.679f, 0.39f, 0.286f);
+
+  private final float GAPS_HEIGHT = 0.03f;
 
   // Dimension ratio of drawers with respect to table dimension
-  private final Vec3 DRAWER_RATIO = new Vec3(0.331f, 0.6f, 1);
+  private final Vec2 DRAWER_RATIO = new Vec2(0.331f, 0.6f);
   private final float TOP_DRAWER_HEIGHT_RATIO = 0.4f;
 
   // Width ratio of drawer handles width
   private final float HANDLE_HEIGHT_RATIO = 2f;      // with respect to draweer
   private final float SUPPORT_HEIGHT_RATIO = 0.15f;  // with respect to handle
 
-  private final float GAPS_HEIGHT = 0.03f;
+  // Used to define the height of horizontal bars, and width of vertical bars
   private final float FRAME_DIM = Cube.THICKNESS / 4;
 
+  /**
+   * Table constructor
+   *
+   * @param roomDimension The room dimension in width, height, depth
+   * @param tableFrame Cube table frame model
+   * @param drawerGaps Cube drawer gaps model
+   * @param drawerHandle Cylinder drawer handle model
+   */
   public Table(Vec3 roomDimension, Model tableFrame, Model drawerGaps, Model drawerHandle) {
     this.roomWidth = roomDimension.x;
     this.roomHeight = roomDimension.y;
@@ -51,7 +65,7 @@ public class Table {
     // Drawer
     drawerWidth = tableWidth * DRAWER_RATIO.x;
     drawerHeight = tableHeight * DRAWER_RATIO.y;
-    drawerDepth = tableDepth * DRAWER_RATIO.z - FRAME_DIM;
+    drawerDepth = tableDepth - FRAME_DIM;
     topDrawerHeight = drawerHeight * TOP_DRAWER_HEIGHT_RATIO;
     bottomDrawerHeight = drawerHeight - topDrawerHeight;
 
@@ -72,10 +86,10 @@ public class Table {
    * @param gl OpenGL object, for rendering
    */
   public void render(GL3 gl) {
-    final float POS_Z = -(roomDepth - tableDepth) / 2;
+    float POS_Z = -(roomDepth - tableDepth) / 2;
 
     // Root
-    SGNode tableRoot = new NameNode("Table structure");
+    tableRoot = new NameNode("Table structure");
     TransformNode rootTranslate = new TransformNode("Root translate",
         Mat4Transform.translate(0, (tableHeight + Cube.THICKNESS) / 2 , POS_Z));
 
@@ -84,7 +98,6 @@ public class Table {
     createLegs(rootTranslate);
 
     tableRoot.update();
-
     tableRoot.draw(gl);
   }
 
@@ -108,13 +121,9 @@ public class Table {
     TransformNode rightLegTransform = new TransformNode("Right leg transform", m);
     ModelNode rightLegModel = new ModelNode("Right leg model", tableFrame);
 
-    parent.addChild(leftLeg);
-      leftLeg.addChild(leftLegTransform);
-        leftLegTransform.addChild(leftLegModel);
+    parent.addAllChildren(leftLeg, leftLegTransform, leftLegModel);
       createTableTop(leftLeg);                         // Table top
-    parent.addChild(rightLeg);
-      rightLeg.addChild(rightLegTransform);
-        rightLegTransform.addChild(rightLegModel);
+    parent.addAllChildren(rightLeg, rightLegTransform, rightLegModel);
   }
 
   /**
@@ -123,18 +132,19 @@ public class Table {
    * @param parent Parent node
    */
   private void createTableTop(SGNode parent) {
+    TransformNode tableTopTranslate = new TransformNode("",
+        Mat4Transform.translate(0, tableHeight / 2, 0));
+
     // Table top
-    NameNode tableTop = new NameNode("Table top");
+    tableTop = new NameNode("Table top");
     Mat4 m = Mat4Transform.scale(tableWidth + FRAME_DIM, FRAME_DIM, tableDepth);
-    m = Mat4.multiply(Mat4Transform.translate(0, tableHeight / 2, 0), m);
     TransformNode tableTopTransform = new TransformNode("Table top transform", m);
     ModelNode tableTopModel = new ModelNode("Table top model", tableFrame);
 
-    parent.addChild(tableTop);
-      tableTop.addChild(tableTopTransform);
-        tableTopTransform.addChild(tableTopModel);
-      createBackSupport(tableTop);                     // Back support
-      createTopDrawer(tableTop);                       // Top drawer
+    parent.addChild(tableTopTranslate);
+      tableTopTranslate.addAllChildren(tableTop, tableTopTransform, tableTopModel);
+        createBackSupport(tableTop);                     // Back support
+        createTopDrawer(tableTop);                       // Top drawer
   }
 
   /**
@@ -143,19 +153,16 @@ public class Table {
    * @param parent Parent node
    */
   private void createBackSupport(SGNode parent) {
+    final float HEIGHT = drawerHeight + GAPS_HEIGHT;
+
     // Back support - child of table top
     NameNode backSupport = new NameNode("Back drawer support");
-    Mat4 m = Mat4Transform.scale(tableWidth - FRAME_DIM, drawerHeight + GAPS_HEIGHT, FRAME_DIM);
-    m = Mat4.multiply(Mat4Transform.translate(
-        0,
-        (drawerHeight - Cube.THICKNESS) / 2 - FRAME_DIM - GAPS_HEIGHT,
-        -(tableDepth - FRAME_DIM) / 2), m);
+    Mat4 m = Mat4Transform.scale(tableWidth - FRAME_DIM, HEIGHT, FRAME_DIM);
+    m = Mat4.multiply(Mat4Transform.translate(0, -HEIGHT / 2, -(tableDepth - FRAME_DIM) / 2), m);
     TransformNode backSupportTransform = new TransformNode("Back support transform", m);
     ModelNode backSupportModel = new ModelNode("Back support model", tableFrame);
 
-    parent.addChild(backSupport);
-      backSupport.addChild(backSupportTransform);
-        backSupportTransform.addChild(backSupportModel);
+    parent.addAllChildren(backSupport, backSupportTransform, backSupportModel);
   }
 
   /**
@@ -167,7 +174,7 @@ public class Table {
     final float POS_X = (tableWidth - drawerWidth - FRAME_DIM) / 2;
 
     TransformNode topDrawerTranslate = new TransformNode("Drawer translate",
-        Mat4Transform.translate(POS_X, (tableHeight - topDrawerHeight) / 2, FRAME_DIM / 2));
+        Mat4Transform.translate(POS_X, -topDrawerHeight / 2, FRAME_DIM / 2));
 
     // Top drawer - child of table top
     NameNode topDrawer = new NameNode("Top drawer");
@@ -177,9 +184,7 @@ public class Table {
     ModelNode topDrawerModel = new ModelNode("Top drawer model", tableFrame);
 
     parent.addChild(topDrawerTranslate);
-      topDrawerTranslate.addChild(topDrawer);
-        topDrawer.addChild(topDrawerTransform);
-          topDrawerTransform.addChild(topDrawerModel);
+      topDrawerTranslate.addAllChildren(topDrawer, topDrawerTransform, topDrawerModel);
         createTopHandleSupport(topDrawer);                  // Top handle support
         createGaps(topDrawer);                              // Gaps
   }
@@ -213,13 +218,9 @@ public class Table {
     ModelNode rightSupportModel = new ModelNode("Top handle right support model", drawerHandle);
 
     parent.addChild(topTranslate);
-      topTranslate.addChild(leftSupport);
-        leftSupport.addChild(leftSupportTransform);
-        leftSupportTransform.addChild(leftSupportModel);
+      topTranslate.addAllChildren(leftSupport, leftSupportTransform, leftSupportModel);
         createTopHandle(leftSupport);                       // Top handle
-      topTranslate.addChild(rightSupport);
-        rightSupport.addChild(rightSupportTransform);
-        rightSupportTransform.addChild(rightSupportModel);
+      topTranslate.addAllChildren(rightSupport, rightSupportTransform, rightSupportModel);
   }
 
   /**
@@ -238,9 +239,7 @@ public class Table {
     TransformNode topHandleTransform = new TransformNode("Top handle transform", m);
     ModelNode topHandleModel = new ModelNode("Top handle model", drawerHandle);
 
-    parent.addChild(topHandle);
-      topHandle.addChild(topHandleTransform);
-        topHandleTransform.addChild(topHandleModel);
+    parent.addAllChildren(topHandle, topHandleTransform, topHandleModel);
   }
 
   /**
@@ -257,9 +256,7 @@ public class Table {
     TransformNode gapsTransform = new TransformNode("Gaps transform", m);
     ModelNode gapsModel = new ModelNode("Gaps model", drawerGaps);
 
-    parent.addChild(gaps);
-      gaps.addChild(gapsTransform);
-        gapsTransform.addChild(gapsModel);
+    parent.addAllChildren(gaps, gapsTransform, gapsModel);
       createBottomDrawer(gaps);                        // Bottom drawer
   }
 
@@ -279,9 +276,7 @@ public class Table {
     ModelNode botDrawerModel = new ModelNode("Bottom drawer model", tableFrame);
 
     parent.addChild(botDrawerTranslate);
-      botDrawerTranslate.addChild(botDrawer);
-        botDrawer.addChild(botDrawerTransform);
-          botDrawerTransform.addChild(botDrawerModel);
+      botDrawerTranslate.addAllChildren(botDrawer, botDrawerTransform, botDrawerModel);
         createBotHandleSupport(botDrawer);               // Bottom handle support
   }
 
@@ -316,13 +311,9 @@ public class Table {
     ModelNode botSupportModel = new ModelNode("Bot handle bot support model", drawerHandle);
 
     parent.addChild(botTranslate);
-      botTranslate.addChild(topSupport);
-        topSupport.addChild(topSupportTransform);
-          topSupportTransform.addChild(topSupportModel);
+      botTranslate.addAllChildren(topSupport, topSupportTransform, topSupportModel);
         createBotHandle(topSupport);                       // Bottom handle
-      botTranslate.addChild(botSupport);
-        botSupport.addChild(botSupportTransform);
-          botSupportTransform.addChild(botSupportModel);
+      botTranslate.addAllChildren(botSupport, botSupportTransform, botSupportModel);
   }
 
   /**
@@ -341,8 +332,6 @@ public class Table {
     TransformNode botHandleTransform = new TransformNode("Bot handle transform", m);
     ModelNode botHandleModel = new ModelNode("Bot handle model", drawerHandle);
 
-    parent.addChild(botHandle);
-      botHandle.addChild(botHandleTransform);
-        botHandleTransform.addChild(botHandleModel);
+    parent.addAllChildren(botHandle, botHandleTransform, botHandleModel);
   }
 }

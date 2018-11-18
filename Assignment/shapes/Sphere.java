@@ -31,7 +31,7 @@ public final class Sphere {
         double y = Math.sin(b);
         double z = Math.cos(b) * Math.cos(a);
         int base = j * XLONG * step;
-        vertices[base + i * step + 0] = (float) (r * x);
+        vertices[base + i * step] = (float) (r * x);
         vertices[base + i * step + 1] = (float) (r * y);
         vertices[base + i * step + 2] = (float) (r * z);
         vertices[base + i * step + 3] = (float) x;
@@ -45,8 +45,8 @@ public final class Sphere {
 
     //debugging code:
     //for (int i=0; i<vertices.length; i+=step) {
-    //  System.out.println(vertices[i]+", "+vertices[i+1]+", "+vertices[i+2]);
-    //}
+    //     //  System.out.println(vertices[i]+", "+vertices[i+1]+", "+vertices[i+2]);
+    //     //}
   }
 
   private static int[] createIndices() {
@@ -54,7 +54,7 @@ public final class Sphere {
     for (int j = 0; j < YLAT - 1; ++j) {
       for (int i = 0; i < XLONG - 1; ++i) {
         int base = j * (XLONG - 1) * 6;
-        indices[base + i * 6 + 0] = j * XLONG + i;
+        indices[base + i * 6] = j * XLONG + i;
         indices[base + i * 6 + 1] = j * XLONG + i + 1;
         indices[base + i * 6 + 2] = (j + 1) * XLONG + i + 1;
         indices[base + i * 6 + 3] = j * XLONG + i;

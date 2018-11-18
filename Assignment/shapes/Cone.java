@@ -14,9 +14,7 @@ public class Cone {
   public static final int[] indices = Sphere.indices;
 
   private static float[] createVertices() {
-    // Radius
     double r = 0.5;
-
     int step = 8;
     float[] vertices = new float[XLONG * YLAT * step];
 

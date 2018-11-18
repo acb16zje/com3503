@@ -18,8 +18,8 @@ public class ModelNode extends SGNode {
 
   public void draw(GL3 gl) {
     model.render(gl, worldTransform);
-    for (int i = 0; i < children.size(); i++) {
-      children.get(i).draw(gl);
+    for (SGNode aChildren : children) {
+      aChildren.draw(gl);
     }
   }
 }

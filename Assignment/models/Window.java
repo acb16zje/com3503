@@ -22,15 +22,15 @@ public class Window {
   private final float FRAME_DIM = Cube.THICKNESS / 2;
 
   // Dimension ratio of window with respect to room dimension
-  public static final Vec3 RATIO = new Vec3(0.45f, 0.39f, 0);
+  public static final Vec2 RATIO = new Vec2(0.45f, 0.39f);
   public static final float Y_POS = RATIO.y + 0.1f;
 
   /**
    * Window constructor
    *
    * @param roomDimension The room dimension in width, height, depth
-   * @param windowFrame Cube window frame
-   * @param glass Cube class
+   * @param windowFrame Cube window frame model
+   * @param glass Cube glass model
    */
   public Window(Vec3 roomDimension, Model windowFrame, Model glass) {
     this.roomWidth = roomDimension.x;
@@ -97,16 +97,10 @@ public class Window {
     TransformNode topHTransform = new TransformNode("topH Transform", m);
     ModelNode topHModel = new ModelNode("topH Model", windowFrame);
 
-    parent.addChild(botH);
-      botH.addChild(botHTransform);
-        botHTransform.addChild(botHModel);
+    parent.addAllChildren(botH, botHTransform, botHModel);
       createVerticalBar(botH);               // 3 vertical bars as children
-    parent.addChild(midH);
-      midH.addChild(midHTransform);
-        midHTransform.addChild(midHModel);
-    parent.addChild(topH);
-      topH.addChild(topHTransform);
-        topHTransform.addChild(topHModel);
+    parent.addAllChildren(midH, midHTransform, midHModel);
+    parent.addAllChildren(topH, topHTransform, topHModel);
 
     // Glasses have to be added at last for transparency to fully work with window frames
     createBottomGlass(parent);               // 2 bottom glasses as children
@@ -145,15 +139,9 @@ public class Window {
     ModelNode rightVModel = new ModelNode("rightV Model", windowFrame);
 
     parent.addChild(verticalTranslate);
-      verticalTranslate.addChild(leftV);
-        leftV.addChild(leftVTransform);
-          leftVTransform.addChild(leftVModel);
-      verticalTranslate.addChild(midV);
-        midV.addChild(midVTransform);
-          midVTransform.addChild(midVModel);
-      verticalTranslate.addChild(rightV);
-        rightV.addChild(rightVTransform);
-          rightVTransform.addChild(rightVModel);
+      verticalTranslate.addAllChildren(leftV, leftVTransform, leftVModel);
+      verticalTranslate.addAllChildren(midV, midVTransform, midVModel);
+      verticalTranslate.addAllChildren(rightV, rightVTransform, rightVModel);
   }
 
   /**
@@ -175,12 +163,8 @@ public class Window {
     TransformNode rightGlassTransform = new TransformNode("Bottom right glasss transform", m);
     ModelNode rightGlassModel = new ModelNode("Bottom right glass model", glass);
 
-    parent.addChild(leftGlass);
-      leftGlass.addChild(leftGlassTransform);
-        leftGlassTransform.addChild(leftGlassModel);
-    parent.addChild(rightGlass);
-      rightGlass.addChild(rightGlassTransform);
-        rightGlassTransform.addChild(rightGlassModel);
+    parent.addAllChildren(leftGlass, leftGlassTransform, leftGlassModel);
+    parent.addAllChildren(rightGlass, rightGlassTransform, rightGlassModel);
   }
 
   /**
@@ -202,11 +186,7 @@ public class Window {
     TransformNode rightGlassTransform = new TransformNode("Top right glasss transform", m);
     ModelNode rightGlassModel = new ModelNode("Top right glass model", glass);
 
-    parent.addChild(leftGlass);
-      leftGlass.addChild(leftGlassTransform);
-        leftGlassTransform.addChild(leftGlassModel);
-    parent.addChild(rightGlass);
-      rightGlass.addChild(rightGlassTransform);
-        rightGlassTransform.addChild(rightGlassModel);
+    parent.addAllChildren(leftGlass, leftGlassTransform, leftGlassModel);
+    parent.addAllChildren(rightGlass, rightGlassTransform, rightGlassModel);
   }
 }

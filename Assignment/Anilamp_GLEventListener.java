@@ -7,6 +7,7 @@ import shapes.*;
 
 /**
  * I declare that this code is my own work.
+ * OpenGL event listener class
  *
  * @author Zer Jun Eng
  */
@@ -32,7 +33,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
     gl.glEnable(GL.GL_CULL_FACE); // default is 'not enabled'
     gl.glCullFace(GL.GL_BACK);    // default is 'back', assuming CCW
     gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-    gl.glEnable( GL.GL_BLEND );
+    gl.glEnable(GL.GL_BLEND);
     initialise(gl);
     startTime = getSeconds();
   }
@@ -98,9 +99,11 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private Model floor;                                                         // Floor
   private Model topWall, bottomWall, leftWall, rightWall;                      // Wall
   private Model topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;  // Wallpaper
-  private Model windowFrame, glass;                                            // Window frame
   private Model tableFrame, drawerGaps, drawerHandle;                          // Table
+  private Model frame, holder, picture;                                        // Picture frame
+  private Model pot, cactus, flower;                                           // Cactus plant pot
   private Model cylinder, sphere, cone;                                        // Lamp
+  private Model windowFrame, glass;                                            // Window frame
 
   private List<Light> lightList = new ArrayList<>();
   private List<Light> worldLightList;
@@ -109,6 +112,8 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private Room room;
   private Window window;
   private Table table;
+  private PictureFrame pictureFrame;
+  private CactusPot cactusPot;
   private Lamp lamp;
 
   // Room dimension (width, height, depth)
@@ -120,8 +125,8 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private final Vec3 LIGHT_OFF = new Vec3(0, 0, 0);
 
   // Constant mesh, shaders
-  private Mesh cubeMesh, cylinderMesh, sphereMesh;
-  private Shader cubeShader, sphereShader, twoTriangleShader;
+  private Mesh cubeMesh, cylinderMesh, frustumConeMesh, sphereMesh, twoTrianglesMesh;
+  private Shader cubeShader, twoTrianglesShader;
 
   private void initialise(GL3 gl) {
     // Create constant mesh, shaders
@@ -143,7 +148,9 @@ public class Anilamp_GLEventListener implements GLEventListener {
     modelWallpaper(gl);
     modelWindow(gl);
     modelTable(gl);
-    modelLamp(gl);
+    modelPictureFrame(gl);
+    modelCactusPot(gl);
+    // modelLamp(gl);
 
     // Room
     room = new Room(ROOM_DIMENSION, floor);
@@ -156,14 +163,19 @@ public class Anilamp_GLEventListener implements GLEventListener {
     // Table
     table = new Table(ROOM_DIMENSION, tableFrame, drawerGaps, drawerHandle);
 
+    // 3 Table accessories
+    pictureFrame = new PictureFrame(frame, holder, picture);
+    cactusPot = new CactusPot(pot, cactus, flower);
+
     // Add all lights to list for disposal management
-    worldLightList = List.of(innerWorldLight, outerWorldLight);
+    worldLightList = Arrays.asList(innerWorldLight, outerWorldLight);
     lightList.addAll(worldLightList);
     // lightList.add(lampLight);
 
     // Add all models to list for disposal management
-    modelList = List.of(floor, leftWallpaper, rightWallpaper, topWallpaper, bottomWallpaper,
-        windowFrame, tableFrame);
+    modelList = Arrays.asList(floor, topWall, bottomWall, leftWall, rightWall, topWallpaper,
+        bottomWallpaper, leftWallpaper, rightWallpaper, tableFrame, drawerGaps, drawerHandle,
+        frame, holder, picture, pot, cactus, flower, windowFrame, glass);
   }
 
   /**
@@ -180,6 +192,8 @@ public class Anilamp_GLEventListener implements GLEventListener {
 
     room.render(gl);
     table.render(gl);
+    pictureFrame.render(gl);
+    cactusPot.render(gl);
     window.render(gl);
   }
 
@@ -191,11 +205,12 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private void createConstants(GL3 gl) {
     cubeMesh = new Mesh(gl, Cube.vertices.clone(), Cube.indices.clone());
     cylinderMesh = new Mesh(gl, Cylinder.vertices.clone(), Cylinder.indices.clone());
+    frustumConeMesh = new Mesh(gl, FrustumCone.vertices.clone(), FrustumCone.indices.clone());
     sphereMesh = new Mesh(gl, Sphere.vertices.clone(), Sphere.indices.clone());
+    twoTrianglesMesh = new Mesh(gl, TwoTriangles.vertices.clone(), TwoTriangles.indices.clone());
 
     cubeShader = new Shader(gl, "shaders/vs_cube.txt", "shaders/fs_cube.txt");
-    // sphereShader = new Shader(gl, "shaders/vs_sphere.txt", "shaders/fs_sphere.txt");
-    twoTriangleShader = new Shader(gl, "shaders/vs_tt.txt", "shaders/fs_tt.txt");
+    twoTrianglesShader = new Shader(gl, "shaders/vs_tt.txt", "shaders/fs_tt.txt");
   }
 
   // ***************************************************
@@ -252,7 +267,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
     Material material = new Material(
         new Vec3(0, 0, 0),
         new Vec3(0, 0, 0),
-        new Vec3(0.3f, 0.3f, 0.3f), 30f);
+        new Vec3(0.3f, 0.3f, 0.3f), 25f);
     floor = new Model(camera, lightList, cubeShader, material, cubeMesh, DIFFUSE, SPECULAR);
   }
 
@@ -268,7 +283,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
     Material material = new Material(
         new Vec3(0, 0, 0),
         new Vec3(0, 0, 0),
-        new Vec3(0.3f, 0.3f, 0.3f), 30f);
+        new Vec3(0.3f, 0.3f, 0.3f), 25f);
     topWall = new Model(camera, lightList, cubeShader, material, cubeMesh, DIFFUSE, SPECULAR);
     bottomWall = new Model(camera, lightList, cubeShader, material, cubeMesh, DIFFUSE, SPECULAR);
     leftWall = new Model(camera, lightList, cubeShader, material, cubeMesh, DIFFUSE, SPECULAR);
@@ -325,11 +340,10 @@ public class Anilamp_GLEventListener implements GLEventListener {
         new Vec3(1f, 1f, 1f),
         new Vec3(1f, 1f, 1f),
         new Vec3(0.0f, 0.0f, 0.0f), 32f);
-
-    topWallpaper = new Model(camera, lightList, twoTriangleShader, material, topMesh, DIFFUSE, SPECULAR);
-    bottomWallpaper = new Model(camera, lightList, twoTriangleShader, material, bottomMesh, DIFFUSE, SPECULAR);
-    leftWallpaper = new Model(camera, lightList, twoTriangleShader, material, leftMesh, DIFFUSE, SPECULAR);
-    rightWallpaper = new Model(camera, lightList, twoTriangleShader, material, rightMesh, DIFFUSE, SPECULAR);
+    topWallpaper = new Model(camera, lightList, twoTrianglesShader, material, topMesh, DIFFUSE, SPECULAR);
+    bottomWallpaper = new Model(camera, lightList, twoTrianglesShader, material, bottomMesh, DIFFUSE, SPECULAR);
+    leftWallpaper = new Model(camera, lightList, twoTrianglesShader, material, leftMesh, DIFFUSE, SPECULAR);
+    rightWallpaper = new Model(camera, lightList, twoTrianglesShader, material, rightMesh, DIFFUSE, SPECULAR);
   }
 
   /**
@@ -373,6 +387,50 @@ public class Anilamp_GLEventListener implements GLEventListener {
     tableFrame = new Model(camera, lightList, cubeShader, material, cubeMesh, DIFFUSE, SPECULAR);
     drawerGaps = new Model(camera, lightList, cubeShader, material, cubeMesh, GAPS);
     drawerHandle = new Model(camera, lightList, cubeShader, material, cylinderMesh, HANDLE_DIFFUSE, HANDLE_SPECULAR);
+  }
+
+  /**
+   * Creates a picture frame
+   *
+   * @param gl OpenGL object, for modelling
+   */
+  private void modelPictureFrame(GL3 gl) {
+    final int[] DIFFUSE = TextureLibrary.loadTexture(gl, "textures/frame.jpg");
+    final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/frame_specular.jpg");
+    final int[] PICTURE_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/dog.jpg");
+    final int[] PICTURE_SPEUCLAR = TextureLibrary.loadTexture(gl, "textures/dog_specular.jpg");
+    final int[] HOLDER_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/window_frame.jpg");
+    final int[] HOLDER_SPECULAR = TextureLibrary.loadTexture(gl, "textures/window_frame_specular.jpg");
+
+    Material material = new Material(
+        new Vec3(1f, 1f, 1f),
+        new Vec3(1f, 1f, 1f),
+        new Vec3(0.0f, 0.0f, 0.0f), 32f);
+    frame = new Model(camera, lightList, cubeShader, material, cubeMesh, DIFFUSE, SPECULAR);
+    picture = new Model(camera, lightList, twoTrianglesShader, material, twoTrianglesMesh, PICTURE_DIFFUSE, PICTURE_SPEUCLAR);
+    holder = new Model(camera, lightList, cubeShader, material, cubeMesh, HOLDER_DIFFUSE, HOLDER_SPECULAR);
+  }
+
+  /**
+   * Creates a cactus plant pot
+   *
+   * @param gl OpenGL object, for modelling
+   */
+  private void modelCactusPot(GL3 gl) {
+    final int[] POT_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/pot.jpg");
+    final int[] POT_SPECULAR = TextureLibrary.loadTexture(gl, "textures/pot_specular.jpg");
+    final int[] CACTUS_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/cactus.jpg");
+    final int[] CACTUS_SPECULAR = TextureLibrary.loadTexture(gl, "textures/cactus_specular.jpg");
+    final int[] FLOWER_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/flower.jpg");;
+    final int[] FLOWER_SPECULAR = TextureLibrary.loadTexture(gl, "textures/flower_specular.jpg.jpg");;
+
+    Material material = new Material(
+        new Vec3(1f, 1f, 1f),
+        new Vec3(1f, 1f, 1f),
+        new Vec3(0.0f, 0.0f, 0.0f), 32f);
+    pot = new Model(camera, lightList, cubeShader, material, frustumConeMesh, POT_DIFFUSE, POT_SPECULAR);
+    cactus = new Model(camera, lightList, cubeShader, material, sphereMesh, CACTUS_DIFFUSE, CACTUS_SPECULAR);
+    flower = new Model(camera, lightList, cubeShader, material, sphereMesh, FLOWER_DIFFUSE, FLOWER_SPECULAR);
   }
 
   /**
