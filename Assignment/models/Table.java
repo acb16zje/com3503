@@ -211,9 +211,7 @@ public class Table {
 
     // Right support - child of top drawer
     NameNode rightSupport = new NameNode("Top handle right support");
-    m = Mat4Transform.scale(handleWidth, supportHeight, handleDepth);
-    m = Mat4.multiply(Mat4Transform.rotateAroundX(90), m);
-    m = Mat4.multiply(Mat4Transform.translate(POS_X_TO_LEFT, 0, 0), m);
+    m = Mat4.multiply(Mat4Transform.translate(POS_X_TO_LEFT * 2, 0, 0), m);
     TransformNode rightSupportTransform = new TransformNode("Top handle right support transform", m);
     ModelNode rightSupportModel = new ModelNode("Top handle right support model", drawerHandle);
 
@@ -304,9 +302,7 @@ public class Table {
 
     // Bottom support - child of bottom drawer
     NameNode botSupport = new NameNode("Bot handle bot support");
-    m = Mat4Transform.scale(handleWidth, supportHeight, handleDepth);
-    m = Mat4.multiply(Mat4Transform.rotateAroundX(90), m);
-    m = Mat4.multiply(Mat4Transform.translate(0, -POS_Y_TO_TOP, 0), m);
+    m = Mat4.multiply(Mat4Transform.translate(0, -POS_Y_TO_TOP * 2, 0), m);
     TransformNode botSupportTransform = new TransformNode("Bot handle bot support transform", m);
     ModelNode botSupportModel = new ModelNode("Bot handle bot support model", drawerHandle);
 

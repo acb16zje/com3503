@@ -1,6 +1,8 @@
 package models;
 
 import com.jogamp.opengl.*;
+import javax.swing.text.*;
+import javax.xml.crypto.dsig.*;
 import lib.*;
 import lib.gmaths.*;
 import shapes.*;
@@ -17,7 +19,9 @@ public class Room {
   private Model topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;  // TwoTriangles
 
   private float roomWidth, roomHeight, roomDepth;
-  private float POS_Z;
+  private float windowWidth, windowMaxYHeight;
+  private float leftWallWidth, leftWallHeight;
+  private float bottomWallWidth, bottomWallHeight, topWallHeight;
 
   /**
    * Room constructor
@@ -30,6 +34,15 @@ public class Room {
     this.roomHeight = roomDimension.y;
     this.roomDepth = roomDimension.z;
     this.floor = floor;
+
+    windowWidth = roomWidth * Window.RATIO.x;
+    windowMaxYHeight = roomHeight * (Window.Y_POS + Window.RATIO.y);
+
+    leftWallWidth = (roomWidth - windowWidth) / 2;
+    leftWallHeight = roomHeight + Cube.THICKNESS / 2;
+    bottomWallWidth = windowWidth;
+    bottomWallHeight = (roomHeight + Cube.THICKNESS) * Window.Y_POS;
+    topWallHeight = roomHeight - windowMaxYHeight;
   }
 
   /**
@@ -38,129 +51,130 @@ public class Room {
    * @param gl OpenGL object, for rendering
    */
   public void render(GL3 gl) {
-    // Floor
-    floor.setModelMatrix(getMatForFloor());
-    floor.render(gl);
+    final float POS_Z =  -(roomDepth + Cube.THICKNESS) / 2;
 
-    // Wallpaper
-    topWallpaper.setModelMatrix(getMatForTopWall(true));
-    topWallpaper.render(gl);
-    bottomWallpaper.setModelMatrix(getMatForBottomWall(true));
-    bottomWallpaper.render(gl);
-    leftWallpaper.setModelMatrix(getMatForLeftRightWall(true, true));
-    leftWallpaper.render(gl);
-    rightWallpaper.setModelMatrix(getMatForLeftRightWall(false, true));
-    rightWallpaper.render(gl);
+    SGNode roomRoot = new NameNode("Room root");
+    TransformNode wallTransform = new TransformNode("Wall transform",
+        Mat4Transform.translate(0, 0, POS_Z));
 
-    // Wall
-    topWall.setModelMatrix(getMatForTopWall(false));
-    topWall.render(gl);
-    bottomWall.setModelMatrix(getMatForBottomWall(false));
-    bottomWall.render(gl);
-    leftWall.setModelMatrix(getMatForLeftRightWall(true, false));
-    leftWall.render(gl);
-    rightWall.setModelMatrix(getMatForLeftRightWall(false, false));
-    rightWall.render(gl);
+    createFloor(roomRoot);
+    roomRoot.addChild(wallTransform);
+      createBottomWall(wallTransform);
+      createLeftRightWall(wallTransform);
+      createTopWall(wallTransform);
+
+    roomRoot.update();
+    roomRoot.draw(gl);
   }
 
 
   /**
-   * Get the model matrix for floor
+   * Creates a floor
    *
-   * @return The model matrix for floor
+   * @param parent Parent node
    */
-  private Mat4 getMatForFloor() {
-    return Mat4Transform.scale(roomWidth, 1, roomDepth);
+  private void createFloor(SGNode parent) {
+    NameNode floor = new NameNode("Floor");
+    Mat4 m = Mat4Transform.scale(roomWidth, 1, roomDepth);
+    TransformNode floorTransform = new TransformNode("Floor transform", m);
+    ModelNode floorModel = new ModelNode("Floor model", this.floor);
+
+    parent.addAllChildren(floor, floorTransform, floorModel);
   }
 
   /**
-   * Get the model matrix for top wall or wallpaper
+   * Creates a bottom wall with wallpaper
    *
-   * @param isWallpaper For rendering a wallpaper
-   * @return The model matrix for top wallpaper
+   * @param parent Parent node
    */
-  private Mat4 getMatForTopWall(boolean isWallpaper) {
-    final float WIDTH = Window.RATIO.x * roomWidth;
-    final float HEIGHT = roomHeight - (Window.Y_POS + Window.RATIO.y) * roomHeight;
-    final float POS_Y = roomHeight * (Window.Y_POS + Window.RATIO.y) + HEIGHT / 2;
+  private void createBottomWall(SGNode parent) {
+    final float WALL_POS_Y = (bottomWallHeight - Cube.THICKNESS) / 2;
 
-    if (isWallpaper) {
-      POS_Z = -roomDepth / 2;
-    } else {
-      POS_Z = -(roomDepth + Cube.THICKNESS) / 2;
-    }
+    float wallpaperHeight = bottomWallHeight - Cube.THICKNESS * (Window.Y_POS + 0.5f);
+    final float WALLPAPER_POS_Y = (wallpaperHeight + Cube.THICKNESS) / 2;
 
-    Mat4 modelMatrix = Mat4Transform.scale(WIDTH, 1, HEIGHT);
-    modelMatrix = Mat4.multiply(Mat4Transform.rotateAroundX(90), modelMatrix);
-    modelMatrix = Mat4.multiply(Mat4Transform.translate(0, POS_Y, POS_Z), modelMatrix);
+    NameNode bottomWall = new NameNode("Bottom wall");
+    Mat4 m = Mat4Transform.scale(bottomWallWidth, bottomWallHeight, 1);
+    m = Mat4.multiply(Mat4Transform.translate(0, WALL_POS_Y, 0), m);
+    TransformNode bottomWallTransform = new TransformNode("Bottom wall transform", m);
+    ModelNode bottomWallModel = new ModelNode("Bottom wall model", this.bottomWall);
 
-    return modelMatrix;
+    NameNode bottomWallpaper = new NameNode("Bottom wallpaper");
+    m = Mat4Transform.scale(bottomWallWidth, 1, wallpaperHeight);
+    m = Mat4.multiply(Mat4Transform.rotateAroundX(90), m);
+    m = Mat4.multiply(Mat4Transform.translate(0, WALLPAPER_POS_Y, Cube.THICKNESS / 2), m);
+    TransformNode bottomWallpaperTransform = new TransformNode("Bottom wallpaper transform", m);
+    ModelNode bottomWallpaperModel = new ModelNode("Bottom wallpaper model", this.bottomWallpaper);
+
+    parent.addAllChildren(bottomWall, bottomWallTransform, bottomWallModel);
+    parent.addAllChildren(bottomWallpaper, bottomWallpaperTransform, bottomWallpaperModel);
   }
 
   /**
-   * Get the model matrix for bottom wall or wallpaper
+   * Creates a left wall with wallpaper and right wall with wallpaper
    *
-   * @param isWallpaper For rendering a wallpaper
-   * @return The model matrix for bottom wallpaper
+   * @param parent Parent node
    */
-  private Mat4 getMatForBottomWall(boolean isWallpaper) {
-    final float WIDTH = Window.RATIO.x * roomWidth;
-    final float HEIGHT;
-    final float POS_Y;
+  private void createLeftRightWall(SGNode parent) {
+    final float POS_X = (roomWidth - leftWallWidth) / 2;
+    final float POS_Y = (leftWallHeight - Cube.THICKNESS) / 2;
 
-    if (isWallpaper) {
-      HEIGHT = roomHeight * Window.Y_POS;
-      POS_Y = HEIGHT / 2;
-      POS_Z = -roomDepth / 2;
-    } else {
-      // Make the bottom wall reaches the bottom level of the floor
-      HEIGHT = (roomHeight + Cube.THICKNESS) * Window.Y_POS;
-      POS_Y = (HEIGHT - Cube.THICKNESS) / 2;
-      POS_Z = -(roomDepth + Cube.THICKNESS) / 2;
-    }
+    float wallpaperHeight = leftWallHeight - Cube.THICKNESS * (Window.Y_POS + 0.5f);
+    final float WALLPAPER_POS_Y = (wallpaperHeight + Cube.THICKNESS) / 2;
 
-    Mat4 modelMatrix = Mat4Transform.scale(WIDTH, 1, HEIGHT);
-    modelMatrix = Mat4.multiply(Mat4Transform.rotateAroundX(90), modelMatrix);
-    modelMatrix = Mat4.multiply(Mat4Transform.translate(0, POS_Y, POS_Z), modelMatrix);
+    NameNode leftWall = new NameNode("Left wall");
+    Mat4 m = Mat4Transform.scale(leftWallWidth, leftWallHeight, 1);
+    m = Mat4.multiply(Mat4Transform.translate(-POS_X, POS_Y, 0), m);
+    TransformNode leftWallTransform = new TransformNode("Left wall transform", m);
+    ModelNode leftWallModel = new ModelNode("Left wall modeL", this.leftWall);
 
-    return modelMatrix;
+    NameNode rightWall = new NameNode("Right wall");
+    m = Mat4.multiply(Mat4Transform.translate(POS_X * 2, 0, 0), m);
+    TransformNode rightWallTransform = new TransformNode("Right wall transform", m);
+    ModelNode rightWallModel = new ModelNode("Right wall model", this.rightWall);
+
+    NameNode leftWallpaper = new NameNode("Left wallpaper");
+    m = Mat4Transform.scale(leftWallWidth, 1, wallpaperHeight);
+    m = Mat4.multiply(Mat4Transform.rotateAroundX(90), m);
+    m = Mat4.multiply(Mat4Transform.translate(-POS_X, WALLPAPER_POS_Y, Cube.THICKNESS / 2), m);
+    TransformNode leftWallpaperTransform = new TransformNode("Left wallpaper transform", m);
+    ModelNode leftWallpaperModel = new ModelNode("Left wallpaper model", this.leftWallpaper);
+
+    NameNode rightWallpaper = new NameNode("Right wallpaper");
+    m = Mat4.multiply(Mat4Transform.translate(POS_X * 2, 0, 0), m);
+    TransformNode rightWallpaperTransform = new TransformNode("Right wallpaper transform", m);
+    ModelNode rightWallpaperModel = new ModelNode("Right wallpaper model", this.rightWallpaper);
+
+    parent.addAllChildren(leftWall, leftWallTransform, leftWallModel);
+    parent.addAllChildren(leftWallpaper, leftWallpaperTransform, leftWallpaperModel);
+    parent.addAllChildren(rightWall, rightWallTransform, rightWallModel);
+    parent.addAllChildren(rightWallpaper, rightWallpaperTransform, rightWallpaperModel);
   }
 
   /**
-   * Get the model matrix for left / right wall or wallpaper
+   * Creates a top wall with wallpaper
    *
-   * @param isLeft Left side or right side
-   * @param isWallpaper For rendering a wallpaper
-   * @return The model matrix for right wallpaper
+   * @param parent Parent node
    */
-  private Mat4 getMatForLeftRightWall(boolean isLeft, boolean isWallpaper) {
-    final float WIDTH = (roomWidth - (Window.RATIO.x * roomWidth)) / 2;
-    final float HEIGHT;
-    final float POS_X;
-    final float POS_Y;
+  private void createTopWall(SGNode parent) {
+    final float POS_Y = windowMaxYHeight + topWallHeight / 2;
+    final float WALLPAPER_POS_Z = Cube.THICKNESS / 2;
 
-    if (isWallpaper) {
-      HEIGHT = roomHeight;
-      POS_Y = HEIGHT / 2;
-      POS_Z = -roomDepth / 2;
-    } else {
-      // Make the left wall reaches the bottom level of the floor
-      HEIGHT = roomHeight + Cube.THICKNESS / 2;
-      POS_Y = (HEIGHT - Cube.THICKNESS) / 2;
-      POS_Z = -(roomDepth + Cube.THICKNESS) / 2;
-    }
+    NameNode topWall = new NameNode("Top wall");
+    Mat4 m = Mat4Transform.scale(bottomWallWidth, topWallHeight, 1);
+    m = Mat4.multiply(Mat4Transform.translate(0, POS_Y, 0), m);
+    TransformNode topWallTransform = new TransformNode("Top wall transform", m);
+    ModelNode topWallModel = new ModelNode("Top wall model", this.topWall);
 
-    if (isLeft) {
-      POS_X = -(roomWidth - WIDTH) / 2;
-    } else {
-      POS_X = (roomWidth - WIDTH) / 2;
-    }
+    NameNode topWallpaper = new NameNode("Top wallpaper");
+    m = Mat4Transform.scale(bottomWallWidth, 1, topWallHeight);
+    m = Mat4.multiply(Mat4Transform.rotateAroundX(90), m);
+    m = Mat4.multiply(Mat4Transform.translate(0, POS_Y, WALLPAPER_POS_Z), m);
+    TransformNode topWallpaperTransform = new TransformNode("Top wallpaper transform", m);
+    ModelNode topWallpaperModel = new ModelNode("Top wallpaper model", this.topWallpaper);
 
-    Mat4 modelMatrix = Mat4Transform.scale(WIDTH, 1, HEIGHT);
-    modelMatrix = Mat4.multiply(Mat4Transform.rotateAroundX(90), modelMatrix);
-    modelMatrix = Mat4.multiply(Mat4Transform.translate(POS_X, POS_Y, POS_Z), modelMatrix);
-
-    return modelMatrix;
+    parent.addAllChildren(topWall, topWallTransform, topWallModel);
+    parent.addAllChildren(topWallpaper, topWallpaperTransform, topWallpaperModel);
   }
 
   public class Wall {

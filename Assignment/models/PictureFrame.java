@@ -21,9 +21,6 @@ public class PictureFrame {
   private final float FRAME_DIM = Cube.THICKNESS * 0.15f;
   private final float FRAME_DEPTH = Cube.THICKNESS / 16;
 
-  // Dimension ratio of picture frame with respect to table width
-  private static final Vec2 RATIO = new Vec2(0.1f, 0.1f);
-
   // The X and Z position of the picture frame holder (parent of frame)
   private float holderX, holderZ;
 
@@ -39,8 +36,9 @@ public class PictureFrame {
     this.holder = holder;
     this.picture = picture;
 
-    frameWidth = Table.tableWidth * RATIO.x;
-    frameHeight = Table.tableWidth * RATIO.y;
+    // Dimension ratio of picture frame with respect to table width
+    frameWidth = Table.tableWidth * 0.1f;
+    frameHeight = Table.tableWidth * 0.1f;
     holderHeight = frameHeight / 2;
 
     // Top right corner

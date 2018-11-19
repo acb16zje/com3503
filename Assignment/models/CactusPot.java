@@ -23,9 +23,6 @@ public class CactusPot {
   private final float BRANCH_WIDTH = CACTUS_BODY_WIDTH / 1.5f;
   private final float BRANCH_HEIGHT = CACTUS_BODY_HEIGHT / 1.5f;
 
-  // Dimension ratio of cactus plant pot with respect to table width
-  private static final Vec2 RATIO = new Vec2(0.1f, 0.15f);
-
   // The X and Z position of the cactus plant pot
   private float potX, potZ;
 
@@ -41,8 +38,9 @@ public class CactusPot {
     this.cactus = cactus;
     this.flower = flower;
 
-    potWidth = Table.tableWidth * RATIO.x;
-    potHeight = Table.tableWidth * RATIO.y;
+    // Dimension ratio of cactus plant pot with respect to table width
+    potWidth = Table.tableWidth * 0.1f;
+    potHeight = Table.tableWidth * 0.15f;
     potDepth = potWidth;
 
     // Below the right side on window, and on the left side of picture frame

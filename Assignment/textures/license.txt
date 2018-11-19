@@ -1,15 +1,17 @@
 The following textures are downloaded from the given link for personal use (non-profit)
-Images are resized and compressed in https://squoosh.app/ to make the dimensions the power of 2
+Images are resized in https://squoosh.app/ to make the dimensions the power of 2
+Images are compressed in https://tinyjpg.com/
 Specular maps are created in http://cpetry.github.io/NormalMap-Online/
 
 cactus.jpg - https://www.flickr.com/photos/retinafunk/5454097648
 drawer_handle.jpg - https://www.deviantart.com/sweetsoulsister/art/Brushed-Metal-Silver-Texture-145936387
-glass.jpg - https://mbtskoudsalg.com/explore/window-texture-png/#gal_post_4621_glass-wall-png-8.png
 floor.jpg - https://www.flickr.com/photos/alandelmas/6285936917
 flower.jpg - https://www.flickr.com/photos/brettmorrison/3732902667
-table.jpg - http://www.texturise.club/2014/05/seamless-natural-wood-texture-maps.html
-picture_frame.jpg - https://d2gg9evh47fn9z.cloudfront.net/800px_COLOURBOX2820410.jpg
+frame.jpg - https://d2gg9evh47fn9z.cloudfront.net/800px_COLOURBOX2820410.jpg
+glass.jpg - https://mbtskoudsalg.com/explore/window-texture-png/#gal_post_4621_glass-wall-png-8.png
+piggybank.jpg - https://www.textureking.com/dsc_3523/
 pot.jpg - http://elishacuthbertfan.net/extraordinary_textured-wall-paint-designs/extraordinary_textured-wall-paint-design-texture-pinterest-idea-painting-technique
+table.jpg - http://www.texturise.club/2014/05/seamless-natural-wood-texture-maps.html
 wall.jpg - https://imgkid.com/white-paint-texture-seamless.shtml
 wallpaper.jpg - https://wallpapersite.com/creative-graphics/firewatch-green-forest-mountains-minimal-4k-14771.html
 window_frame.jpg - http://www.discovertextures.com/2015/11/11/wood-0024/
