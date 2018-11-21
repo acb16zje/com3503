@@ -27,7 +27,6 @@ struct DirLight {
 
 uniform vec3 viewPos;
 uniform sampler2D first_texture;
-uniform sampler2D second_texture;
 uniform Material material;
 uniform DirLight dirLight[NUM_DIR_LIGHTS];
 
@@ -43,7 +42,7 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
   // result
   vec3 ambient = light.ambient * material.ambient * texture(first_texture, aTexCoord).rgb;
   vec3 diffuse = light.diffuse * (diff * material.diffuse) * texture(first_texture, aTexCoord).rgb;
-  vec3 specular = light.specular * (spec * material.specular) * texture(second_texture, aTexCoord).rgb;
+  vec3 specular = light.specular * (spec * material.specular);
 
   return (ambient + diffuse + specular);
 }

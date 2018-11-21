@@ -6,6 +6,8 @@ import lib.gmaths.*;
 
 /**
  * Model class adapted from tutorial 7
+ * Constructors and renders are modified
+ * A new method is added for daytime / nighttime transformation
  *
  * @author Dr. Steve Maddock and Zer Jun Eng
  */
@@ -39,6 +41,22 @@ public class Model {
 
   public void setModelMatrix(Mat4 m) {
     modelMatrix = m;
+  }
+
+  public void setDayNightCycle(float value) {
+    final float THRESHOLD = 0.2f;
+
+    if (value < THRESHOLD) {
+      this.material.setAmbient(value, value, THRESHOLD);
+    } else {
+      this.material.setAmbient(value, value, value);
+    }
+
+    this.material.setDiffuse(value, value, value);
+  }
+
+  public void setMovingTexture() {
+
   }
 
   public void render(GL3 gl, Mat4 modelMatrix) {

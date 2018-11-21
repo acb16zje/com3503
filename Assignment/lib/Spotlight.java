@@ -15,10 +15,8 @@ public class Spotlight extends Light {
    *
    * @param gl OpenGL object
    * @param camera Camera object for setting
-   * @param vertices The shape vertices
-   * @param indices The shape indices
    */
-  public Spotlight(GL3 gl, Camera camera, float[] vertices, int[] indices) {
-    super(gl, camera, vertices, indices);
+  public Spotlight(GL3 gl, Camera camera) {
+    super(gl, camera);
   }
 }

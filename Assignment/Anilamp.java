@@ -227,7 +227,7 @@ public class Anilamp extends JFrame {
         intensity.setValue(0.0);
       } else {
         onOrOff.setText("Turn OFF");
-        intensity.setValue(0.8);
+        intensity.setValue(0.8); // Default 0.8 intensity
       }
       glEventListener.setOnOff();
     });

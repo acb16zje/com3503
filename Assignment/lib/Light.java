@@ -4,6 +4,7 @@ import com.jogamp.common.nio.*;
 import com.jogamp.opengl.*;
 import java.nio.*;
 import lib.gmaths.*;
+import shapes.*;
 
 /**
  * Light class adapted from tutorial 7
@@ -20,33 +21,18 @@ public class Light {
   private float lightColor = 1;
 
   /**
-   * Constructor for cube shape light
+   * Constructor for light that allows different shape
    *
    * @param gl OpenGL object
    * @param camera Camera object
    */
   public Light(GL3 gl, Camera camera) {
-    this(gl, camera, vertices, indices);
-  }
-
-  /**
-   * Constructor for light that allows different shape
-   *
-   * @param gl OpenGL object
-   * @param camera Camera object
-   * @param vertices Custom vertices
-   * @param indices Custom indices
-   */
-  public Light(GL3 gl, Camera camera, float[] vertices, int[] indices) {
     material = new Material();
     material.setAmbient(0.5f, 0.5f, 0.5f);
     material.setDiffuse(0.8f, 0.8f, 0.8f);
     material.setSpecular(0.8f, 0.8f, 0.8f);
     position = new Vec3(3f, 2f, 1f);
     shader = new Shader(gl, "shaders/vs_light.txt", "shaders/fs_light.txt");
-    vertexStride = Light.vertices == vertices ? 3 : 8;  // Change to 8 stride for different shape
-    Light.vertices = vertices;
-    Light.indices = indices;
     fillBuffers(gl);
     setCamera(camera);
   }
@@ -107,33 +93,11 @@ public class Light {
    */
   // anticlockwise/counterclockwise ordering
 
-  private static float[] vertices = new float[]{  // x,y,z
-      -0.5f, -0.5f, -0.5f,  // 0
-      -0.5f, -0.5f, 0.5f,  // 1
-      -0.5f, 0.5f, -0.5f,  // 2
-      -0.5f, 0.5f, 0.5f,  // 3
-      0.5f, -0.5f, -0.5f,  // 4
-      0.5f, -0.5f, 0.5f,  // 5
-      0.5f, 0.5f, -0.5f,  // 6
-      0.5f, 0.5f, 0.5f   // 7
-  };
+  private static float[] vertices = Sphere.vertices.clone();
 
-  private static int[] indices = new int[]{
-      0, 1, 4, // x -ve
-      3, 2, 0, // x -ve
-      4, 6, 7, // x +ve
-      7, 5, 4, // x +ve
-      1, 5, 7, // z +ve
-      7, 3, 1, // z +ve
-      6, 4, 0, // z -ve
-      0, 2, 6, // z -ve
-      0, 4, 5, // y -ve
-      5, 1, 0, // y -ve
-      2, 3, 7, // y +ve
-      7, 6, 2  // y +ve
-  };
+  private static int[] indices = Sphere.indices.clone();
 
-  private int vertexStride = 3;
+  private int vertexStride = 8;
   private int vertexXYZFloats = 3;
 
   // ***************************************************
