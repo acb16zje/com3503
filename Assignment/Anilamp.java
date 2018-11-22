@@ -103,14 +103,14 @@ public class Anilamp extends JFrame {
     JPanel roomPanel = new JPanel();
     roomPanel.setBorder(BorderFactory.createTitledBorder("Room"));
 
-    final JButton frontView = new JButton("Front View");
-    final JButton leftView = new JButton("Left View");
-    final JButton rightView = new JButton("Right View");
+    JButton frontView = new JButton("Front View");
+    JButton leftView = new JButton("Left View");
+    JButton rightView = new JButton("Right View");
 
     JPanel deskPanel = new JPanel();
     deskPanel.setBorder(BorderFactory.createTitledBorder("Desk"));
 
-    final JButton deskView = new JButton("Front View");
+    JButton deskView = new JButton("Front View");
 
     GroupLayout cameraGroup = new GroupLayout(cameraPanel);
     cameraGroup.setAutoCreateGaps(true);
@@ -124,17 +124,6 @@ public class Anilamp extends JFrame {
             .addComponent(deskPanel))
     );
     cameraPanel.setLayout(cameraGroup);
-
-    GroupLayout deskGroup = new GroupLayout(deskPanel);
-    deskGroup.setAutoCreateContainerGaps(true);
-    deskGroup.setAutoCreateGaps(true);
-    deskGroup.setHorizontalGroup(deskGroup.createParallelGroup(Alignment.LEADING)
-        .addComponent(deskView)
-    );
-    deskGroup.setVerticalGroup(deskGroup.createParallelGroup(Alignment.LEADING)
-        .addComponent(deskView)
-    );
-    deskPanel.setLayout(deskGroup);
 
     GroupLayout roomGroup = new GroupLayout(roomPanel);
     roomGroup.setAutoCreateContainerGaps(true);
@@ -151,6 +140,17 @@ public class Anilamp extends JFrame {
             .addComponent(rightView))
     );
     roomPanel.setLayout(roomGroup);
+
+    GroupLayout deskGroup = new GroupLayout(deskPanel);
+    deskGroup.setAutoCreateContainerGaps(true);
+    deskGroup.setAutoCreateGaps(true);
+    deskGroup.setHorizontalGroup(deskGroup.createParallelGroup(Alignment.LEADING)
+        .addComponent(deskView)
+    );
+    deskGroup.setVerticalGroup(deskGroup.createParallelGroup(Alignment.LEADING)
+        .addComponent(deskView)
+    );
+    deskPanel.setLayout(deskGroup);
 
     frontView.addActionListener(e -> {
       camera.setCamera(Camera.CameraType.X);
@@ -256,22 +256,65 @@ public class Anilamp extends JFrame {
     JPanel lampPanel = new JPanel();
     lampPanel.setBorder(BorderFactory.createTitledBorder("Lamp"));
 
+    JPanel lightPanel = new JPanel();
+    lightPanel.setBorder(BorderFactory.createTitledBorder("Spotlight"));
+
+    JButton onOrOff = new JButton("Turn OFF");
+
+    JPanel animationPanel = new JPanel();
+    animationPanel.setBorder(BorderFactory.createTitledBorder("Animation"));
+
     JButton random = new JButton("Random Pose");
     JButton jump = new JButton("Jump");
 
     GroupLayout lampGroup = new GroupLayout(lampPanel);
     lampGroup.setAutoCreateGaps(true);
-    lampGroup.setAutoCreateContainerGaps(true);
     lampGroup.setHorizontalGroup(lampGroup.createParallelGroup(Alignment.LEADING)
-        .addComponent(random)
-        .addComponent(jump)
+        .addComponent(lightPanel)
+        .addComponent(animationPanel)
     );
     lampGroup.setVerticalGroup(lampGroup.createParallelGroup(Alignment.LEADING)
         .addGroup(lampGroup.createSequentialGroup()
+            .addComponent(lightPanel)
+            .addComponent(animationPanel))
+    );
+    lampPanel.setLayout(lampGroup);
+
+    GroupLayout lightGroup = new GroupLayout(lightPanel);
+    lightGroup.setAutoCreateContainerGaps(true);
+    lightGroup.setAutoCreateGaps(true);
+    lightGroup.setHorizontalGroup(lightGroup.createParallelGroup(Alignment.LEADING)
+        .addComponent(onOrOff)
+    );
+    lightGroup.setVerticalGroup(lightGroup.createParallelGroup(Alignment.LEADING)
+        .addGroup(lightGroup.createSequentialGroup()
+            .addComponent(onOrOff))
+    );
+    lightPanel.setLayout(lightGroup);
+
+    GroupLayout animationGroup = new GroupLayout(animationPanel);
+    animationGroup.setAutoCreateContainerGaps(true);
+    animationGroup.setAutoCreateGaps(true);
+    animationGroup.setHorizontalGroup(animationGroup.createParallelGroup(Alignment.LEADING)
+        .addComponent(random)
+        .addComponent(jump)
+    );
+    animationGroup.setVerticalGroup(animationGroup.createParallelGroup(Alignment.LEADING)
+        .addGroup(animationGroup.createSequentialGroup()
             .addComponent(random)
             .addComponent(jump))
     );
-    lampPanel.setLayout(lampGroup);
+    animationPanel.setLayout(animationGroup);
+
+    onOrOff.addActionListener(e -> {
+      if (glEventListener.spotlightIsOn) {
+        onOrOff.setText("Turn ON");
+      } else {
+        onOrOff.setText("Turn OFF");
+      }
+
+      glEventListener.setSpotlightOnOrOff();
+    });
 
     return lampPanel;
   }

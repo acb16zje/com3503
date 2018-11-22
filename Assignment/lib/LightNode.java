@@ -17,6 +17,8 @@ public class LightNode extends SGNode {
   }
 
   public void draw(GL3 gl) {
+    light.setPosition(worldTransform.getTranslateVec());
+    light.setDirection(worldTransform.getRotationVec());
     light.render(gl, worldTransform);
   }
 }

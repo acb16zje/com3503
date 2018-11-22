@@ -12,9 +12,9 @@ import lib.gmaths.*;
  */
 public class SGNode {
 
-  protected String name;
-  protected ArrayList<SGNode> children;
-  protected Mat4 worldTransform;
+  String name;
+  ArrayList<SGNode> children;
+  Mat4 worldTransform;
 
   public SGNode(String name) {
     children = new ArrayList<>();
@@ -51,7 +51,7 @@ public class SGNode {
     }
   }
 
-  protected String getIndentString(int indent) {
+  String getIndentString(int indent) {
     String s = "" + indent + " ";
     for (int i = 0; i < indent; ++i) {
       s += "  ";

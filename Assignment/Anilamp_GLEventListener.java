@@ -86,6 +86,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
   /* THE SCENE */
 
   private Camera camera;
+  private Light lampLight;
   private Model floor;                                                         // Floor
   private Model wall;                                                          // Wall
   private Model topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;  // Wallpaper
@@ -124,7 +125,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
     outerWorldLight.setPosition(0, ROOM_DIMENSION.y - Cube.THICKNESS, -ROOM_DIMENSION.z * 1.5f);
 
     // Create lamp light (spotlight)
-    Light lampLight = new Spotlight(gl, camera);
+    lampLight = new Spotlight(gl, camera);
 
     // Add all lights to list for disposal management
     lightList = Arrays.asList(innerWorldLight, outerWorldLight, lampLight);
@@ -221,6 +222,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
 
   // Turn light off and on
   boolean lightIsOn = true;
+  boolean spotlightIsOn = true;
 
   /**
    * Sets the intensity of the world lights
@@ -237,6 +239,23 @@ public class Anilamp_GLEventListener implements GLEventListener {
         worldLight.setLightColor(1 - (1 - intensity) / 2);
       }
     }
+  }
+
+  /**
+   * Sets the spotlight on or off
+   */
+  void setSpotlightOnOrOff() {
+    Material m = lampLight.getMaterial();
+
+    if (spotlightIsOn) {
+      lampLight.setSpotlightIntensity(0);
+      lampLight.setLightColor(0.5f);
+    } else {
+      lampLight.setSpotlightIntensity(1);
+      lampLight.setLightColor(1);
+    }
+
+    spotlightIsOn = !spotlightIsOn;
   }
 
   // ***************************************************

@@ -193,7 +193,8 @@ public class PiggyBank {
    */
   private void createNose(SGNode parent) {
     final float POS_X = bodyWidth / 2;
-    final float DECO_POS_X = -noseScale / 8;
+    final float DECO_POS_X = -noseScale / 4;
+    final float DECO_POS_Z = -noseScale / 8;
 
     TransformNode noseTranslate = new TransformNode("Nose translate",
         Mat4Transform.translate(-POS_X, 0, 0));
@@ -209,12 +210,12 @@ public class PiggyBank {
 
     NameNode leftStrip = new NameNode("Nose left strip");
     m = Mat4Transform.scale(0.01f, noseDecoHeight, noseDecoDepth);
-    m = Mat4.multiply(Mat4Transform.translate(0, 0, -DECO_POS_X), m);
+    m = Mat4.multiply(Mat4Transform.translate(0, 0, -DECO_POS_Z), m);
     TransformNode leftStripTransform = new TransformNode("Nose left strip transform", m);
     ModelNode leftStripModel = new ModelNode("Nose left strip model", cubeDeco);
 
     NameNode rightStrip = new NameNode("Nose right strip");
-    m = Mat4.multiply(Mat4Transform.translate(0, 0, DECO_POS_X * 2), m);
+    m = Mat4.multiply(Mat4Transform.translate(0, 0, DECO_POS_Z * 2), m);
     TransformNode rightStripTransform = new TransformNode("Nose right strip transform", m);
     ModelNode rightStripModel = new ModelNode("Nose right strip model", cubeDeco);
 

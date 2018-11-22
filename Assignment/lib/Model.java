@@ -87,6 +87,14 @@ public class Model {
       if (lightList.get(i).getClass().equals(Spotlight.class)) {
         // Spotlight - lamp light
         light = "spotLight";
+
+        shader.setFloat(gl, "spotlight_intensity", lightList.get(i).getSpotlightIntensity());
+        shader.setVec3(gl,"spotLight.direction", lightList.get(i).getDirection());
+        shader.setFloat(gl, "spotLight.constant", 1.0f);
+        shader.setFloat(gl, "spotLight.linear", 0.09f);
+        shader.setFloat(gl, "spotLight.quadratic", 0.032f);
+        shader.setFloat(gl, "spotLight.cutOff", (float) Math.cos(Math.toRadians(12.5)));
+        shader.setFloat(gl, "spotLight.outerCutOff", (float) Math.cos(Math.toRadians(15)));
       } else {
         // Directional world light
         light = "dirLight" + "[" + i + "]";

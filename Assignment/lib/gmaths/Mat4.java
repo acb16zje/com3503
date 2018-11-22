@@ -1,5 +1,9 @@
 package lib.gmaths;
 
+/**
+ *
+ * @author Dr. Steve Maddock and Zer Jun Eng
+ */
 public class Mat4 {   // row column formulation
 
   private float[][] values;
@@ -124,7 +128,39 @@ public class Mat4 {   // row column formulation
     }
     return f;
   }
-  
+
+  /**
+   * Gets the translated position of the spotlight
+   * Source: Lecture 2, Slide 8
+   *
+   * @return x, y, z position of the spotlight
+   */
+  public Vec3 getTranslateVec() {
+    float[] f;
+    f = toFloatArrayForGLSL();
+
+    return new Vec3(f[12], f[13], f[14]);
+  }
+
+  /**
+   * Gets the rotated direction of the spotlight
+   * Source: Lecture 2, Slide 10
+   *
+   * @return The x, y, z rotation of the spotlight
+   */
+  public Vec3 getRotationVec() {
+    float[] f;
+    f = toFloatArrayForGLSL();
+
+    float offsetX = (float) Math.sin(Math.toRadians(20));
+    float offsetY = (float) Math.sin(Math.toRadians(-90));
+
+    /* The Z of headJoint is the X of the light bulb
+    * For the rotation of headJoint, f[6] is X, f[8] is Y, f[1] is Z+
+    * */
+    return new Vec3(f[1] + offsetX, offsetY, 0);
+  }
+
   public String asFloatArrayForGLSL() {  // col by row
     String s = "{";
     for (int j=0; j<4; ++j) {

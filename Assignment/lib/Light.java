@@ -10,6 +10,7 @@ import shapes.*;
  * Light class adapted from tutorial 7
  * Constructor have been added to allow inheritance and different shapes of light
  * A new render method has been added to allow Light in scene graph
+ * setDirection() and getDirection() have been added for spotlight
  *
  * @author Dr. Steve Maddock and Zer Jun Eng
  */
@@ -17,9 +18,11 @@ public class Light {
 
   private Material material;
   private Vec3 position;
+  private Vec3 direction = new Vec3();
   private Shader shader;
   private Camera camera;
   private float lightColor = 1;
+  private float spotlightIntensity = 1;
 
   /**
    * Constructor for light that allows different shape
@@ -54,6 +57,24 @@ public class Light {
     return position;
   }
 
+  /**
+   * Sets the direction of the spotlight
+   *
+   * @param v 3D vector
+   */
+  void setDirection(Vec3 v) {
+    direction.x = v.x;
+    direction.y = v.y;
+    direction.z = v.z;
+  }
+
+  /**
+   * Gets the direction of the spotlight
+   *
+   * @return The direction of the spotlight
+   */
+  Vec3 getDirection() { return direction; }
+
   public void setMaterial(Material m) { material = m; }
 
   public Material getMaterial() {
@@ -61,6 +82,12 @@ public class Light {
   }
 
   public void setLightColor(float value) { this.lightColor = value; }
+
+  public float getSpotlightIntensity() { return this.spotlightIntensity; }
+
+  public void setSpotlightIntensity(float value) {
+    this.spotlightIntensity = value;
+  }
 
   public void setCamera(Camera camera) {
     this.camera = camera;
