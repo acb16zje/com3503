@@ -20,7 +20,7 @@ public final class Cylinder {
   public static final int[] indices = createIndices();
 
   private static float[] createVertices() {
-    double r = 0.5, h = 0.5;
+    double r = 0.5;
     int step = 8;
     float[] vertices = new float[XLONG * YLAT * step + 2 * step];
 
@@ -29,7 +29,7 @@ public final class Cylinder {
       for (int i = 0; i < XLONG + 2; ++i) {
         double a = Math.toRadians(360 * (double) (i) / (XLONG - 1));
         double x = Math.cos(b) * Math.sin(a);
-        double y = Math.sin(b) * h;
+        double y = Math.sin(b);
         double z = Math.cos(b) * Math.cos(a);
         int base = j * XLONG * step;
 

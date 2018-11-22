@@ -1,8 +1,6 @@
 package models;
 
 import com.jogamp.opengl.*;
-import javax.swing.text.*;
-import javax.xml.crypto.dsig.*;
 import lib.*;
 import lib.gmaths.*;
 import shapes.*;
@@ -15,7 +13,7 @@ import shapes.*;
  */
 public class Room {
 
-  private Model floor, topWall, bottomWall, leftWall, rightWall;               // Cube models
+  private Model floor, wall;                                                   // Cube models
   private Model topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;  // TwoTriangles
 
   private float roomWidth, roomHeight, roomDepth;
@@ -29,11 +27,12 @@ public class Room {
    * @param roomDimension The room dimension in width, height, depth
    * @param floor Cube floo model
    */
-  public Room(Vec3 roomDimension, Model floor) {
+  public Room(Vec3 roomDimension, Model floor, Model wall) {
     this.roomWidth = roomDimension.x;
     this.roomHeight = roomDimension.y;
     this.roomDepth = roomDimension.z;
     this.floor = floor;
+    this.wall = wall;
 
     windowWidth = roomWidth * Window.RATIO.x;
     windowMaxYHeight = roomHeight * (Window.Y_POS + Window.RATIO.y);
@@ -97,7 +96,7 @@ public class Room {
     Mat4 m = Mat4Transform.scale(bottomWallWidth, bottomWallHeight, 1);
     m = Mat4.multiply(Mat4Transform.translate(0, WALL_POS_Y, 0), m);
     TransformNode bottomWallTransform = new TransformNode("Bottom wall transform", m);
-    ModelNode bottomWallModel = new ModelNode("Bottom wall model", this.bottomWall);
+    ModelNode bottomWallModel = new ModelNode("Bottom wall model", wall);
 
     NameNode bottomWallpaper = new NameNode("Bottom wallpaper");
     m = Mat4Transform.scale(bottomWallWidth, 1, wallpaperHeight);
@@ -126,12 +125,12 @@ public class Room {
     Mat4 m = Mat4Transform.scale(leftWallWidth, leftWallHeight, 1);
     m = Mat4.multiply(Mat4Transform.translate(-POS_X, POS_Y, 0), m);
     TransformNode leftWallTransform = new TransformNode("Left wall transform", m);
-    ModelNode leftWallModel = new ModelNode("Left wall modeL", this.leftWall);
+    ModelNode leftWallModel = new ModelNode("Left wall modeL", wall);
 
     NameNode rightWall = new NameNode("Right wall");
     m = Mat4.multiply(Mat4Transform.translate(POS_X * 2, 0, 0), m);
     TransformNode rightWallTransform = new TransformNode("Right wall transform", m);
-    ModelNode rightWallModel = new ModelNode("Right wall model", this.rightWall);
+    ModelNode rightWallModel = new ModelNode("Right wall model", wall);
 
     NameNode leftWallpaper = new NameNode("Left wallpaper");
     m = Mat4Transform.scale(leftWallWidth, 1, wallpaperHeight);
@@ -164,7 +163,7 @@ public class Room {
     Mat4 m = Mat4Transform.scale(bottomWallWidth, topWallHeight, 1);
     m = Mat4.multiply(Mat4Transform.translate(0, POS_Y, 0), m);
     TransformNode topWallTransform = new TransformNode("Top wall transform", m);
-    ModelNode topWallModel = new ModelNode("Top wall model", this.topWall);
+    ModelNode topWallModel = new ModelNode("Top wall model", wall);
 
     NameNode topWallpaper = new NameNode("Top wallpaper");
     m = Mat4Transform.scale(bottomWallWidth, 1, topWallHeight);
@@ -175,22 +174,6 @@ public class Room {
 
     parent.addAllChildren(topWall, topWallTransform, topWallModel);
     parent.addAllChildren(topWallpaper, topWallpaperTransform, topWallpaperModel);
-  }
-
-  public class Wall {
-
-    /**
-     * @param top The wall above the window
-     * @param bottom The wall below the window
-     * @param left The wall on the left side of the window
-     * @param right The wall on the right side of the window
-     */
-    public Wall(Model top, Model bottom, Model left, Model right) {
-      topWall = top;
-      bottomWall = bottom;
-      leftWall = left;
-      rightWall = right;
-    }
   }
 
   public class Wallpaper {

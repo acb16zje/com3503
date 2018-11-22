@@ -15,6 +15,7 @@ public class CactusPot {
   private Model pot, cactus, flower;
 
   private float potWidth, potHeight, potDepth;
+  private float potX, potZ;                        // The X and Z position of the cactus plant pot
 
   private final float CACTUS_BODY_WIDTH = 0.65f;
   private final float CACTUS_BODY_HEIGHT = 0.8f;
@@ -22,9 +23,6 @@ public class CactusPot {
 
   private final float BRANCH_WIDTH = CACTUS_BODY_WIDTH / 1.5f;
   private final float BRANCH_HEIGHT = CACTUS_BODY_HEIGHT / 1.5f;
-
-  // The X and Z position of the cactus plant pot
-  private float potX, potZ;
 
   /**
    * Cactus plant pot constructor

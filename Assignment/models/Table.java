@@ -35,11 +35,10 @@ public class Table {
   private final float TOP_DRAWER_HEIGHT_RATIO = 0.4f;
 
   // Width ratio of drawer handles width
-  private final float HANDLE_HEIGHT_RATIO = 2f;      // with respect to draweer
-  private final float SUPPORT_HEIGHT_RATIO = 0.15f;  // with respect to handle
+  private final float SUPPORT_HEIGHT_RATIO = 0.15f;  // with respect to handleHeight
 
   // Used to define the height of horizontal bars, and width of vertical bars
-  private final float FRAME_DIM = Cube.THICKNESS / 4;
+  static final float FRAME_DIM = Cube.THICKNESS / 4;
 
   /**
    * Table constructor
@@ -71,7 +70,7 @@ public class Table {
 
     // Drawer handle
     handleWidth = FRAME_DIM / 2;
-    handleHeight = drawerHeight * HANDLE_HEIGHT_RATIO;
+    handleHeight = drawerHeight;
     handleDepth = handleWidth;
     supportHeight = handleHeight * SUPPORT_HEIGHT_RATIO;
 
@@ -195,7 +194,7 @@ public class Table {
    * @param parent Parent node
    */
   private void createTopHandleSupport(SGNode parent) {
-    final float POS_X_TO_LEFT = handleHeight * 0.1f;
+    final float POS_X_TO_LEFT = handleHeight * 0.2f;
     final float POS_Z = tableDepth / 2;
 
     TransformNode topTranslate = new TransformNode("Top handle support translate",
@@ -286,7 +285,7 @@ public class Table {
   private void createBotHandleSupport(SGNode parent) {
     // Manual adjustments to position
     final float POS_X = -drawerWidth / 2.5f;
-    final float POS_Y_TO_TOP = handleHeight * 0.1f;
+    final float POS_Y_TO_TOP = handleHeight * 0.2f;
     final float POS_Z = tableDepth / 2;
 
     TransformNode botTranslate = new TransformNode("Handle translate",

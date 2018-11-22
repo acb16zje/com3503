@@ -14,6 +14,7 @@ import lib.gmaths.*;
 public class Model {
 
   private Mesh mesh;
+  private float offsetX = 0, offsetY = 0;
   private int[] textureId1;
   private int[] textureId2;
   private Material material;
@@ -43,8 +44,13 @@ public class Model {
     modelMatrix = m;
   }
 
+  /**
+   * Day night transformation for outside scene
+   *
+   * @param value RGB value
+   */
   public void setDayNightCycle(float value) {
-    final float THRESHOLD = 0.2f;
+    final float THRESHOLD = 0.25f;
 
     if (value < THRESHOLD) {
       this.material.setAmbient(value, value, THRESHOLD);
@@ -55,8 +61,15 @@ public class Model {
     this.material.setDiffuse(value, value, value);
   }
 
-  public void setMovingTexture() {
-
+  /**
+   * Makes texture moves by adding offsets
+   *
+   * @param offsetX X coordinate offset of texture
+   * @param offsetY Y coordinate offset of texture
+   */
+  public void setMovingTexture(float offsetX, float offsetY) {
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
   }
 
   public void render(GL3 gl, Mat4 modelMatrix) {
@@ -89,6 +102,8 @@ public class Model {
     shader.setVec3(gl, "material.diffuse", material.getDiffuse());
     shader.setVec3(gl, "material.specular", material.getSpecular());
     shader.setFloat(gl, "material.shininess", material.getShininess());
+
+    shader.setFloat(gl, "offset", offsetX, offsetY);
 
     if (textureId1 != null) {
       shader.setInt(gl, "first_texture", 0);  // be careful to match these with GL_TEXTURE0 and GL_TEXTURE1

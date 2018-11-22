@@ -213,7 +213,7 @@ public class Anilamp extends JFrame {
     gbc_intensityLabel.insets = new Insets(0, 0, 0, 5);
     intensityPanel.add(intensityLabel, gbc_intensityLabel);
 
-    SpinnerNumberModel model = new SpinnerNumberModel(0.8, 0, 1, 0.1);
+    SpinnerNumberModel model = new SpinnerNumberModel(1.0, 0, 1, 0.1);
     JSpinner intensity = new JSpinner(model);
     intensity.setEditor(new JSpinner.DefaultEditor(intensity));
     GridBagConstraints gbc_intensity = new GridBagConstraints();
@@ -227,14 +227,21 @@ public class Anilamp extends JFrame {
         intensity.setValue(0.0);
       } else {
         onOrOff.setText("Turn OFF");
-        intensity.setValue(0.8); // Default 0.8 intensity
+        intensity.setValue(1.0); // Default intensity is 1
       }
-      glEventListener.setOnOff();
     });
 
     intensity.addChangeListener(e -> {
       float val = ((Double) intensity.getValue()).floatValue();
       glEventListener.setIntensity(val);
+
+      if (val == 0) {
+        glEventListener.lightIsOn = false;
+        onOrOff.setText("Turn ON");
+      } else {
+        glEventListener.lightIsOn = true;
+        onOrOff.setText("Turn OFF");
+      }
     });
 
     return lightPanel;

@@ -51,7 +51,10 @@ public class OutsideScene {
   public void render(GL3 gl) {
     double elapsedTime = getSeconds() - startTime;
     double wavelength = elapsedTime * 0.5;
+    double t = wavelength * 0.1;
     float cosine = (float) ((Math.cos(wavelength) + 1) * 0.5);
+    float offsetX = (float) (t - Math.floor(t));
+    float offsetY = (float) (Math.sin(wavelength) * 0.1);
 
     SGNode sceneRoot = new NameNode("Outside scene root");
     TransformNode rootTranslate = new TransformNode("Root translate",
@@ -64,6 +67,7 @@ public class OutsideScene {
       createSky(rootTranslate);
 
     garden.setDayNightCycle(cosine);
+    sky.setMovingTexture(offsetX, offsetY);
     sceneRoot.update();
     sceneRoot.draw(gl);
   }

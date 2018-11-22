@@ -11,15 +11,15 @@ public class FrustumCone {
   private static final int XLONG = 30;
   private static final int YLAT = 4;
 
-  public static final float[] vertices = createVertices();
-  public static final int[] indices = createIndices();
+  public static final float[] vertices = createVertices(false);
+  public static final int[] indices = createIndices(true);
 
   /**
    * Create an array of cone vertices
    *
    * @return Frustum cone vertices
    */
-  private static float[] createVertices() {
+  public static float[] createVertices(boolean isForLamp) {
     double r = 0.5;
     int step = 8;
     float[] vertices = new float[XLONG * YLAT * step];
@@ -31,6 +31,11 @@ public class FrustumCone {
         double x = Math.cos(b) * Math.cos(a);
         double y = Math.sin(b);
         double z = Math.cos(b) * Math.sin(a);
+
+        if (isForLamp) {
+          x *= 1.5;
+          z *= 1.5;
+        }
 
         int base = j * XLONG * step;
         vertices[base + i * step] = (float) (r * x);
@@ -52,7 +57,7 @@ public class FrustumCone {
    *
    * @return Frustum cone indices
    */
-  private static int[] createIndices() {
+  public static int[] createIndices(boolean hasCover) {
     int[] indices = new int[(XLONG - 1) * YLAT * 6];
     for (int j = 0; j < YLAT - 1; ++j) {
       for (int i = 0; i < XLONG - 1; ++i) {
@@ -67,11 +72,13 @@ public class FrustumCone {
     }
 
     // Bottom cover
-    for (int i = 0; i < XLONG - 1; i++) {
-      int base = (XLONG - 1) * (YLAT - 1) * 6;
-      indices[base + i * 3] = i;
-      indices[base + i * 3 + 1] = i + 1;
-      indices[base + i * 3 + 2] = vertices.length - 15;
+    if (hasCover) {
+      for (int i = 0; i < XLONG - 1; i++) {
+        int base = (XLONG - 1) * (YLAT - 1) * 6;
+        indices[base + i * 3] = i;
+        indices[base + i * 3 + 1] = i + 1;
+        indices[base + i * 3 + 2] = vertices.length - 15;
+      }
     }
 
     return indices;

@@ -10,6 +10,7 @@ out vec2 aTexCoord;
 
 uniform mat4 model;
 uniform mat4 mvpMatrix;
+uniform vec2 offset;
 
 void main() {
   gl_Position = mvpMatrix * vec4(position, 1.0);
@@ -17,7 +18,5 @@ void main() {
   mat4 normalMatrix = transpose(inverse(model));
   vec3 norm = normalize(normal);
   aNormal = mat3(normalMatrix) * norm;
-
-  //aNormal = vec3((normalMatrix) * vec4(normal,1.0));
-  aTexCoord = texCoord;
+  aTexCoord = texCoord + offset;
 }

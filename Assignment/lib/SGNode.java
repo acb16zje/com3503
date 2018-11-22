@@ -34,7 +34,7 @@ public class SGNode {
    * @param transform The transform node
    * @param model The model node
    */
-  public void addAllChildren(NameNode name, TransformNode transform, ModelNode model) {
+  public void addAllChildren(NameNode name, TransformNode transform, SGNode model) {
     children.add(name);
     name.addChild(transform);
     transform.addChild(model);

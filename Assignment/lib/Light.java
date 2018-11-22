@@ -9,6 +9,7 @@ import shapes.*;
 /**
  * Light class adapted from tutorial 7
  * Constructor have been added to allow inheritance and different shapes of light
+ * A new render method has been added to allow Light in scene graph
  *
  * @author Dr. Steve Maddock and Zer Jun Eng
  */
@@ -29,8 +30,8 @@ public class Light {
   public Light(GL3 gl, Camera camera) {
     material = new Material();
     material.setAmbient(0.5f, 0.5f, 0.5f);
-    material.setDiffuse(0.8f, 0.8f, 0.8f);
-    material.setSpecular(0.8f, 0.8f, 0.8f);
+    material.setDiffuse(1, 1, 1);
+    material.setSpecular(1, 1, 1);
     position = new Vec3(3f, 2f, 1f);
     shader = new Shader(gl, "shaders/vs_light.txt", "shaders/fs_light.txt");
     fillBuffers(gl);
@@ -72,6 +73,25 @@ public class Light {
 
     Mat4 mvpMatrix = Mat4
         .multiply(camera.getPerspectiveMatrix(), Mat4.multiply(camera.getViewMatrix(), model));
+
+    shader.use(gl);
+    shader.setFloatArray(gl, "mvpMatrix", mvpMatrix.toFloatArrayForGLSL());
+    shader.setFloat(gl, "lightColor", this.lightColor);
+
+    gl.glBindVertexArray(vertexArrayId[0]);
+    gl.glDrawElements(GL.GL_TRIANGLES, indices.length, GL.GL_UNSIGNED_INT, 0);
+    gl.glBindVertexArray(0);
+  }
+
+  /**
+   * Render method that allows Light to be used in scene graph
+   *
+   * @param gl OpenGL object, for rendering
+   * @param modelMatrix Model matrix from scene graph
+   */
+  public void render(GL3 gl, Mat4 modelMatrix) {
+    Mat4 mvpMatrix = Mat4
+        .multiply(camera.getPerspectiveMatrix(), Mat4.multiply(camera.getViewMatrix(), modelMatrix));
 
     shader.use(gl);
     shader.setFloatArray(gl, "mvpMatrix", mvpMatrix.toFloatArrayForGLSL());
