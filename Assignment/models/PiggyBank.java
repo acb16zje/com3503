@@ -12,6 +12,8 @@ import lib.gmaths.*;
  */
 public class PiggyBank {
 
+  private SGNode piggyRoot;
+
   private Model body, nose, ear, leg, cubeDeco, sphereDeco;
 
   private float bodyWidth, bodyHeight, bodyDepth;
@@ -70,12 +72,10 @@ public class PiggyBank {
   }
 
   /**
-   * Renders a piggy bank
-   *
-   * @param gl OpenGL object, for rendering
+   * Initialises the scene graph
    */
-  public void render(GL3 gl) {
-    SGNode piggyRoot = new NameNode("Piggy bank root");
+  public void initialise() {
+    piggyRoot = new NameNode("Piggy bank root");
 
     // 0.15f offset because the leg rotated, hence it will intersect with table top
     TransformNode rootTranslate = new TransformNode("Root translate",
@@ -87,6 +87,14 @@ public class PiggyBank {
 
     Table.tableTop.update();
     piggyRoot.update();
+  }
+
+  /**
+   * Renders a piggy bank
+   *
+   * @param gl OpenGL object, for rendering
+   */
+  public void render(GL3 gl) {
     piggyRoot.draw(gl);
   }
 

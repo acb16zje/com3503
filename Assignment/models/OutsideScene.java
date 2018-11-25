@@ -13,6 +13,8 @@ import shapes.*;
  */
 public class OutsideScene {
 
+  private SGNode sceneRoot;
+
   private Model grass, garden, leftGarden, rightGarden, sky;
 
   private double startTime;
@@ -33,14 +35,30 @@ public class OutsideScene {
     this.roomWidth = roomDimension.x;
     this.roomHeight = roomDimension.y;
     this.roomDepth = roomDimension.z;
-
-    grassDepth = roomDepth * 2;
-
     this.grass = grass;
     this.garden = garden;
     this.leftGarden = leftGarden;
     this.rightGarden = rightGarden;
     this.sky = sky;
+
+    grassDepth = roomDepth * 2;
+    startTime = getSeconds();
+  }
+
+  /**
+   * Initialises the scene graph
+   */
+  public void initialise() {
+    sceneRoot = new NameNode("Outside scene root");
+    TransformNode rootTranslate = new TransformNode("Root translate",
+        Mat4Transform.translate(0, 0, -(roomDepth + grassDepth) / 2 - Cube.THICKNESS));
+
+    sceneRoot.addChild(rootTranslate);
+      createGrass(rootTranslate);
+      createGarden(rootTranslate);
+      createLeftRightGarden(rootTranslate);
+      createSky(rootTranslate);
+    sceneRoot.update();
   }
 
   /**
@@ -56,19 +74,8 @@ public class OutsideScene {
     float offsetX = (float) (t - Math.floor(t));
     float offsetY = (float) (Math.sin(wavelength) * 0.1);
 
-    SGNode sceneRoot = new NameNode("Outside scene root");
-    TransformNode rootTranslate = new TransformNode("Root translate",
-        Mat4Transform.translate(0, 0, -(roomDepth + grassDepth) / 2 - Cube.THICKNESS));
-
-    sceneRoot.addChild(rootTranslate);
-      createGrass(rootTranslate);
-      createGarden(rootTranslate);
-      createLeftRightGarden(rootTranslate);
-      createSky(rootTranslate);
-
     garden.setDayNightCycle(cosine);
     sky.setMovingTexture(offsetX, offsetY);
-    sceneRoot.update();
     sceneRoot.draw(gl);
   }
 

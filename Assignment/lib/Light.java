@@ -62,7 +62,7 @@ public class Light {
    *
    * @param v 3D vector
    */
-  void setDirection(Vec3 v) {
+  public void setDirection(Vec3 v) {
     direction.x = v.x;
     direction.y = v.y;
     direction.z = v.z;

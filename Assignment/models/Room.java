@@ -13,6 +13,8 @@ import shapes.*;
  */
 public class Room {
 
+  private SGNode roomRoot;
+
   private Model floor, wall;                                                   // Cube models
   private Model topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;  // TwoTriangles
 
@@ -45,27 +47,32 @@ public class Room {
   }
 
   /**
+   * Initialises the scene graph
+   */
+  public void initialise() {
+    final float POS_Z =  -(roomDepth + Cube.THICKNESS) / 2;
+
+    roomRoot = new NameNode("Room root");
+    TransformNode wallTransform = new TransformNode("Wall transform",
+        Mat4Transform.translate(0, 0, POS_Z));
+
+    createFloor(roomRoot);
+      roomRoot.addChild(wallTransform);
+        createBottomWall(wallTransform);
+        createLeftRightWall(wallTransform);
+        createTopWall(wallTransform);
+
+    roomRoot.update();
+  }
+
+  /**
    * Renders floor, wallpaper, and wall
    *
    * @param gl OpenGL object, for rendering
    */
   public void render(GL3 gl) {
-    final float POS_Z =  -(roomDepth + Cube.THICKNESS) / 2;
-
-    SGNode roomRoot = new NameNode("Room root");
-    TransformNode wallTransform = new TransformNode("Wall transform",
-        Mat4Transform.translate(0, 0, POS_Z));
-
-    createFloor(roomRoot);
-    roomRoot.addChild(wallTransform);
-      createBottomWall(wallTransform);
-      createLeftRightWall(wallTransform);
-      createTopWall(wallTransform);
-
-    roomRoot.update();
     roomRoot.draw(gl);
   }
-
 
   /**
    * Creates a floor

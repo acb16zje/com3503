@@ -12,6 +12,8 @@ import lib.gmaths.*;
  */
 public class CactusPot {
 
+  private SGNode potRoot;
+
   private Model pot, cactus, flower;
 
   private float potWidth, potHeight, potDepth;
@@ -47,13 +49,10 @@ public class CactusPot {
   }
 
   /**
-   * Renders a cactus plant pot
-   *
-   * @param gl OpenGL object, for rendering
+   * Initialise the scene graph
    */
-  public void render(GL3 gl) {
-    // Root
-    SGNode potRoot = new NameNode("Cactus plant pot root");
+  public void initialise() {
+    potRoot = new NameNode("Cactus plant pot root");
     TransformNode rootTranslate = new TransformNode("Root translate",
         Mat4Transform.translate(potX, potHeight / 2, potZ));
 
@@ -63,6 +62,14 @@ public class CactusPot {
 
     Table.tableRoot.update();
     potRoot.update();
+  }
+
+  /**
+   * Renders a cactus plant pot
+   *
+   * @param gl OpenGL object, for rendering
+   */
+  public void render(GL3 gl) {
     potRoot.draw(gl);
   }
 
@@ -81,7 +88,6 @@ public class CactusPot {
     parent.addAllChildren(pot, potTransform, potModel);
       createCactusBody(pot);
   }
-
 
   /**
    * Creates a body of the cactus

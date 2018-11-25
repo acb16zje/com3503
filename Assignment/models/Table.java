@@ -80,11 +80,9 @@ public class Table {
   }
 
   /**
-   * Constructs the scene graph of table and renders it
-   *
-   * @param gl OpenGL object, for rendering
+   * Initialises the scene graph
    */
-  public void render(GL3 gl) {
+  public void initialise() {
     float POS_Z = -(roomDepth - tableDepth) / 2;
 
     // Root
@@ -97,6 +95,14 @@ public class Table {
     createLegs(rootTranslate);
 
     tableRoot.update();
+  }
+
+  /**
+   * Renders the table
+   *
+   * @param gl OpenGL object, for rendering
+   */
+  public void render(GL3 gl) {
     tableRoot.draw(gl);
   }
 

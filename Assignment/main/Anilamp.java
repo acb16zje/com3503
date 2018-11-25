@@ -1,3 +1,5 @@
+package main;
+
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.*;
 import com.jogamp.opengl.util.*;
@@ -6,7 +8,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.GroupLayout.*;
 import lib.*;
-import lib.Camera.*;
 
 /**
  * I declare that this code is my own work. UI are generated using Eclipse Window Builder and
@@ -21,24 +22,20 @@ public class Anilamp extends JFrame {
   private Camera camera;
   private Anilamp_GLEventListener glEventListener;
 
+  public static JButton random, reset, jump;
+
   /**
    * The main method for Anilamp
    *
    * @param args Command line arguments  (not used)
    */
-  public static void main(String[] args) {
-    new Anilamp();
-  }
+  public static void main(String[] args) { new Anilamp(); }
 
   /**
    * Constructor for the Anilamp frame
    */
   private Anilamp() {
     final Container contentPane = getContentPane();
-
-    // Creates a control panel on the left side
-    final JPanel buttonPanel = createControlPanel();
-    contentPane.add(buttonPanel, BorderLayout.WEST);
 
     // Canvas on center
     GLCapabilities glcapabilities = new GLCapabilities(GLProfile.get(GLProfile.GL3));
@@ -48,6 +45,10 @@ public class Anilamp extends JFrame {
     canvas.addGLEventListener(glEventListener);
     canvas.addMouseMotionListener(new MyMouseInput(camera));
     canvas.addKeyListener(new MyKeyboardInput(camera));
+
+    // Creates a control panel on the left side
+    final JPanel buttonPanel = createControlPanel();
+    contentPane.add(buttonPanel, BorderLayout.WEST);
     contentPane.add(canvas, BorderLayout.CENTER);
 
     FPSAnimator animator = new FPSAnimator(canvas, 60);
@@ -221,6 +222,7 @@ public class Anilamp extends JFrame {
     intensityPanel.add(intensity, gbc_intensity);
     lightPanel.setLayout(lightGroup);
 
+    // Turn world lights on or off
     onOrOff.addActionListener(e -> {
       if (glEventListener.lightIsOn) {
         onOrOff.setText("Turn ON");
@@ -231,6 +233,7 @@ public class Anilamp extends JFrame {
       }
     });
 
+    // Change the intensity of world lights
     intensity.addChangeListener(e -> {
       float val = ((Double) intensity.getValue()).floatValue();
       glEventListener.setIntensity(val);
@@ -264,8 +267,9 @@ public class Anilamp extends JFrame {
     JPanel animationPanel = new JPanel();
     animationPanel.setBorder(BorderFactory.createTitledBorder("Animation"));
 
-    JButton random = new JButton("Random Pose");
-    JButton jump = new JButton("Jump");
+    random = new JButton("Random Pose");
+    reset = new JButton("Reset");
+    jump = new JButton("Jump");
 
     GroupLayout lampGroup = new GroupLayout(lampPanel);
     lampGroup.setAutoCreateGaps(true);
@@ -297,15 +301,18 @@ public class Anilamp extends JFrame {
     animationGroup.setAutoCreateGaps(true);
     animationGroup.setHorizontalGroup(animationGroup.createParallelGroup(Alignment.LEADING)
         .addComponent(random)
+        .addComponent(reset)
         .addComponent(jump)
     );
     animationGroup.setVerticalGroup(animationGroup.createParallelGroup(Alignment.LEADING)
         .addGroup(animationGroup.createSequentialGroup()
             .addComponent(random)
+            .addComponent(reset)
             .addComponent(jump))
     );
     animationPanel.setLayout(animationGroup);
 
+    // Turn spotlight on or off
     onOrOff.addActionListener(e -> {
       if (glEventListener.spotlightIsOn) {
         onOrOff.setText("Turn ON");
@@ -315,6 +322,11 @@ public class Anilamp extends JFrame {
 
       glEventListener.setSpotlightOnOrOff();
     });
+
+    // Animation controls
+    random.addActionListener(e -> glEventListener.lamp.isRandom = true);
+    reset.addActionListener(e -> glEventListener.lamp.isReset = true);
+    jump.addActionListener(e -> glEventListener.lamp.isJump = true);
 
     return lampPanel;
   }

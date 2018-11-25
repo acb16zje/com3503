@@ -13,6 +13,8 @@ import shapes.*;
  */
 public class Window {
 
+  private SGNode windowRoot;
+
   private Model windowFrame, glass;
 
   private float roomWidth, roomHeight, roomDepth;
@@ -49,25 +51,28 @@ public class Window {
   }
 
   /**
-   * Constructs the scene graph of window and renders it
+   * Initialises the scene graph
+   */
+  public void initialise() {
+    final float POS_Z = -(roomDepth + Cube.THICKNESS) / 2;
+
+    windowRoot = new NameNode("Window frame structure");
+    TransformNode rootTranslate = new TransformNode("Root translate",
+        Mat4Transform.translate(0, roomHeight * Y_POS, POS_Z));
+
+    windowRoot.addChild(rootTranslate);
+      createHorizontalBar(rootTranslate);
+
+    windowRoot.update();
+  }
+
+  /**
+   * Renders the window frame and glass
    *
    * @param gl OpenGL object, for rendering
    */
   public void render(GL3 gl) {
-    final float POS_Z = -(roomDepth + Cube.THICKNESS) / 2;
-
-    // Root
-    SGNode frameRoot = new NameNode("Window frame structure");
-    TransformNode rootTranslate = new TransformNode("Root translate",
-        Mat4Transform.translate(0, roomHeight * Y_POS, POS_Z));
-
-    // Scene graph
-    frameRoot.addChild(rootTranslate);
-    createHorizontalBar(rootTranslate);
-
-    frameRoot.update();
-
-    frameRoot.draw(gl);
+    windowRoot.draw(gl);
   }
 
   /**

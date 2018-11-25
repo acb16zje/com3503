@@ -3,6 +3,8 @@ Images are resized in https://squoosh.app/ to make the dimensions the power of 2
 Images are compressed in https://tinyjpg.com/
 Specular maps are created in http://cpetry.github.io/NormalMap-Online/
 
+Online images
+================================================================
 cactus.jpg - https://www.flickr.com/photos/retinafunk/5454097648
 drawer_handle.jpg - https://www.deviantart.com/sweetsoulsister/art/Brushed-Metal-Silver-Texture-145936387
 floor.jpg - https://www.flickr.com/photos/alandelmas/6285936917
@@ -10,6 +12,7 @@ flower.jpg - https://www.flickr.com/photos/brettmorrison/3732902667
 frame.jpg - https://d2gg9evh47fn9z.cloudfront.net/800px_COLOURBOX2820410.jpg
 garden.jpg - https://commons.wikimedia.org/wiki/File:Bartow-Pell_Garden_View.jpg
 glass.jpg - https://mbtskoudsalg.com/explore/window-texture-png/#gal_post_4621_glass-wall-png-8.png
+lamp_specular - http://www.wallpaperhdc.com/polished-metal-assignment.textures/x
 piggybank.jpg - https://www.textureking.com/dsc_3523/
 pot.jpg - http://elishacuthbertfan.net/extraordinary_textured-wall-paint-designs/extraordinary_textured-wall-paint-design-texture-pinterest-idea-painting-technique
 sky.jpg - http://www.photos-public-domain.com/2011/03/20/sky-texture/
@@ -18,6 +21,11 @@ wall.jpg - https://imgkid.com/white-paint-texture-seamless.shtml
 wallpaper.jpg - https://wallpapersite.com/creative-graphics/firewatch-green-forest-mountains-minimal-4k-14771.html
 window_frame.jpg - http://www.discovertextures.com/2015/11/11/wood-0024/
 
-Self-created images
+Self-owned / self-created images
+================================================================
 dog.jpg
 gaps.jpg
+lamp.jpg
+lamp_ear.jpg
+lamp_joint.jpg
+lamp_tail.jpg

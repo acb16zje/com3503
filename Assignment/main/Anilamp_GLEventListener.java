@@ -1,8 +1,9 @@
+package main;
+
 import com.jogamp.opengl.*;
-import java.lang.reflect.*;
-import lib.gmaths.*;
 import java.util.*;
 import lib.*;
+import lib.gmaths.*;
 import models.*;
 import shapes.*;
 
@@ -18,9 +19,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
   }
 
   // ***************************************************
-  /*
-   * METHODS DEFINED BY GLEventListener
-   */
+  /* METHODS DEFINED BY GLEventListener */
 
   /* Initialisation */
   public void init(GLAutoDrawable drawable) {
@@ -67,22 +66,6 @@ public class Anilamp_GLEventListener implements GLEventListener {
   }
 
   // ***************************************************
-  /* INTERACTION */
-
-  // private boolean animation = true;
-  // private double savedTime = 0;
-  //
-  // public void startAnimation() {
-  //   animation = true;
-  //   startTime = getSeconds() - savedTime;
-  // }
-  //
-  // public void stopAnimation() {
-  //   animation = false;
-  //   savedTime = getSeconds() - startTime;
-  // }
-
-  // ***************************************************
   /* THE SCENE */
 
   private Camera camera;
@@ -90,13 +73,14 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private Model floor;                                                         // Floor
   private Model wall;                                                          // Wall
   private Model topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;  // Wallpaper
-  private Model windowFrame, glass;                                            // Window frame
   private Model tableFrame, drawerGaps, drawerHandle;                          // Table
   private Model frame, holder, picture;                                        // Picture frame
   private Model pot, cactus, flower;                                           // Cactus plant pot
   private Model body, nose, ear, leg, cubeDeco, sphereDeco;                    // Piggy bank
   private Model grass, garden, leftGarden, rightGarden, sky;                   // Outside scene
-  private Model cylinder, sphere, frustumCone;                                 // Lamp
+  private Model cube, cylinder, sphere, frustumCone;                           // Lamp
+  private Model lampEar, lowerTail;                                            // Lamp decorations
+  private Model windowFrame, glass;                                            // Window frame
 
   private List<Light> lightList;
   private List<Model> modelList;
@@ -108,7 +92,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private CactusPot cactusPot;
   private PiggyBank piggyBank;
   private OutsideScene outsideScene;
-  private Lamp lamp;
+  Lamp lamp;
 
   // Room dimension (width, height, depth)
   private final Vec3 ROOM_DIMENSION = new Vec3(20f, 20f, 20f);
@@ -134,40 +118,48 @@ public class Anilamp_GLEventListener implements GLEventListener {
     modelFloor(gl);
     modelWall(gl);
     modelWallpaper(gl);
-    modelWindow(gl);
     modelTable(gl);
-    modelPictureFrame(gl);
-    modelCactusPot(gl);
-    modelPiggyBank(gl);
-    modelOutsideScene(gl);
+    // modelPictureFrame(gl);
+    // modelCactusPot(gl);
+    // modelPiggyBank(gl);
+    // modelOutsideScene(gl);
     modelLamp(gl);
+    // modelWindow(gl);
 
     // Add all models to list for disposal management
     modelList = Arrays.asList(floor, wall, topWallpaper, bottomWallpaper, leftWallpaper,
-        rightWallpaper, windowFrame, glass, tableFrame, drawerGaps, drawerHandle, frame, holder,
-        picture, pot, cactus, flower, body, nose, ear, leg, cubeDeco, sphereDeco, grass, garden,
-        leftGarden, rightGarden, sky, cylinder, sphere, frustumCone);
+        rightWallpaper, tableFrame, drawerGaps, drawerHandle, frame, holder, picture, pot, cactus,
+        flower, body, nose, ear, leg, cubeDeco, sphereDeco, grass, garden, leftGarden, rightGarden,
+        sky, cube, cylinder, sphere, frustumCone, lampEar, lowerTail, windowFrame, glass);
 
     // Room
     room = new Room(ROOM_DIMENSION, floor, wall);
     room.new Wallpaper(topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper);
-
-    // Window
-    window = new Window(ROOM_DIMENSION, windowFrame, glass);
+    room.initialise();
 
     // Table
     table = new Table(ROOM_DIMENSION, tableFrame, drawerGaps, drawerHandle);
+    table.initialise();
 
     // 3 Table accessories
-    pictureFrame = new PictureFrame(frame, holder, picture);
-    cactusPot = new CactusPot(pot, cactus, flower);
-    piggyBank = new PiggyBank(body, nose, ear, leg, cubeDeco, sphereDeco);
-
-    // Outside scene
-    outsideScene = new OutsideScene(ROOM_DIMENSION, grass, garden, leftGarden, rightGarden, sky);
+    // pictureFrame = new PictureFrame(frame, holder, picture);
+    // pictureFrame.initialise();
+    // cactusPot = new CactusPot(pot, cactus, flower);
+    // cactusPot.initialise();
+    // piggyBank = new PiggyBank(body, nose, ear, leg, cubeDeco, sphereDeco);
+    // piggyBank.initialise();
+    //
+    // // Outside scene
+    // outsideScene = new OutsideScene(ROOM_DIMENSION, grass, garden, leftGarden, rightGarden, sky);
+    // outsideScene.initialise();
 
     // Desk lamp
-    lamp = new Lamp(cylinder, sphere, frustumCone, lampLight);
+    lamp = new Lamp(cube, cylinder, sphere, frustumCone, lampLight, lampEar, lowerTail);
+    lamp.initialise();
+
+    // Window
+    // window = new Window(ROOM_DIMENSION, windowFrame, glass);
+    // window.initialise();
   }
 
   /**
@@ -179,20 +171,17 @@ public class Anilamp_GLEventListener implements GLEventListener {
     gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
     for (Light light : lightList) {
-      // Spotlight will be rendered in Lamp.java, as part of the scene graph
-      if (!light.getClass().equals(Spotlight.class)) {
-        light.render(gl);
-      }
+      light.render(gl);
     }
 
     room.render(gl);
     table.render(gl);
-    pictureFrame.render(gl);
-    cactusPot.render(gl);
-    piggyBank.render(gl);
-    outsideScene.render(gl);
+    // pictureFrame.render(gl);
+    // cactusPot.render(gl);
+    // piggyBank.render(gl);
+    // outsideScene.render(gl);
     lamp.render(gl);
-    window.render(gl);
+    // window.render(gl);
   }
 
   // ***************************************************
@@ -245,8 +234,6 @@ public class Anilamp_GLEventListener implements GLEventListener {
    * Sets the spotlight on or off
    */
   void setSpotlightOnOrOff() {
-    Material m = lampLight.getMaterial();
-
     if (spotlightIsOn) {
       lampLight.setSpotlightIntensity(0);
       lampLight.setLightColor(0.5f);
@@ -366,7 +353,8 @@ public class Anilamp_GLEventListener implements GLEventListener {
     windowFrame = new Model(camera, lightList, cubeShader, material, cubeMesh, DIFFUSE, SPECULAR);
 
     // Transparency glass
-    Shader shader = new Shader(gl, "shaders/vs_cube.txt", "shaders/fs_glass.txt");
+    Shader shader = new Shader(gl, "shaders/vs_cube.txt",
+        "shaders/fs_glass.txt");
     glass = new Model(camera, lightList, shader, material, cubeMesh, GLASS_DIFFUSE, GLASS_SPECULAR);
   }
 
@@ -401,7 +389,8 @@ public class Anilamp_GLEventListener implements GLEventListener {
     final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/frame_specular.jpg");
     final int[] PICTURE = TextureLibrary.loadTexture(gl, "textures/dog.jpg");
     final int[] HOLDER_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/window_frame.jpg");
-    final int[] HOLDER_SPECULAR = TextureLibrary.loadTexture(gl, "textures/window_frame_specular.jpg");
+    final int[] HOLDER_SPECULAR = TextureLibrary.loadTexture(gl,
+        "textures/window_frame_specular.jpg");
 
     Material material = new Material(
         new Vec3(1, 1, 1),
@@ -423,7 +412,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
     final int[] CACTUS_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/cactus.jpg");
     final int[] CACTUS_SPECULAR = TextureLibrary.loadTexture(gl, "textures/cactus_specular.jpg");
     final int[] FLOWER_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/flower.jpg");
-    final int[] FLOWER_SPECULAR = TextureLibrary.loadTexture(gl, "textures/flower_specular.jpg");;
+    final int[] FLOWER_SPECULAR = TextureLibrary.loadTexture(gl, "textures/flower_specular.jpg");
 
     Material material = new Material(
         new Vec3(1, 1, 1),
@@ -523,16 +512,23 @@ public class Anilamp_GLEventListener implements GLEventListener {
   private void modelLamp(GL3 gl) {
     final int[] DIFFUSE = TextureLibrary.loadTexture(gl, "textures/lamp.jpg");
     final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/lamp_specular.jpg");
+    final int[] JOINT = TextureLibrary.loadTexture(gl, "textures/lamp_joint.jpg");
+    final int[] EAR = TextureLibrary.loadTexture(gl, "textures/lamp_ear.jpg");
 
     Material material = new Material(
         new Vec3(1, 1, 1),
         new Vec3(0, 0, 0),
-        new Vec3(0, 0, 0), 32f);
+        new Vec3(1, 1, 1), 32f);
 
     Mesh mesh = new Mesh(gl, FrustumCone.createVertices(true), FrustumCone.createIndices(false));
 
+    cube = new Model(camera, lightList, cubeShader, material, cubeMesh, DIFFUSE, SPECULAR);
     cylinder = new Model(camera, lightList, cubeShader, material, cylinderMesh, DIFFUSE, SPECULAR);
-    sphere = new Model(camera, lightList, cubeShader, material, sphereMesh, DIFFUSE, SPECULAR);
+    sphere = new Model(camera, lightList, cubeShader, material, sphereMesh, JOINT, SPECULAR);
     frustumCone = new Model(camera, lightList, cubeShader, material, mesh, DIFFUSE, SPECULAR);
+
+    // Decorations
+    lampEar = new Model(camera, lightList, cubeShader, material, sphereMesh, EAR, SPECULAR);
+    lowerTail = new Model(camera, lightList, cubeShader, material, cubeMesh, JOINT, SPECULAR); // Use joint texture
   }
 }

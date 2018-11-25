@@ -1,6 +1,7 @@
 package lib.gmaths;
 
 /**
+ * A matrix class
  *
  * @author Dr. Steve Maddock and Zer Jun Eng
  */
@@ -149,16 +150,35 @@ public class Mat4 {   // row column formulation
    * @return The x, y, z rotation of the spotlight
    */
   public Vec3 getRotationVec() {
-    float[] f;
-    f = toFloatArrayForGLSL();
+    /*
+    * The X rotation of headJoint is the Z of the light bulb
+    * The Y rotation of headJoint is the Y of the light bulb
+    * The Z rotation of headJoint is the X of the light bulb
+    */
 
-    float offsetX = (float) Math.sin(Math.toRadians(20));
-    float offsetY = (float) Math.sin(Math.toRadians(-90));
+    float x = (float) Math.asin(values[0][1]);
+    float y = (float) Math.asin(values[1][1]);
+    float z = (float) Math.asin(values[2][1]);
 
-    /* The Z of headJoint is the X of the light bulb
-    * For the rotation of headJoint, f[6] is X, f[8] is Y, f[1] is Z+
-    * */
-    return new Vec3(f[1] + offsetX, offsetY, 0);
+    return new Vec3(-x, -y, -z);
+  }
+
+  /**
+   * Gets the Y rotation angle of a transform node
+   *
+   * @return The Y rotation angle of a transform node
+   */
+  public int getYRotationAngle() {
+    return (int) Math.round(Math.toDegrees(Math.asin(values[1][0])));
+  }
+
+  /**
+   * Gets the Z rotation angle of a transform node
+   *
+   * @return The Z rotation angle of a transform node
+   */
+  public int getZRotationAngle() {
+    return (int) Math.round(Math.toDegrees(Math.asin(values[1][0])));
   }
 
   public String asFloatArrayForGLSL() {  // col by row
@@ -177,7 +197,7 @@ public class Mat4 {   // row column formulation
     for (int i=0; i<4; ++i) {
       s += (i==0) ? "{" : " {";
       for (int j=0; j<4; ++j) {
-        s += String.format("%.2f",values[i][j]);  
+        s += String.format("%.2f",values[i][j]);
         if (j<3) s += ", ";
       }
       s += (i==3) ? "}" : "},\n";

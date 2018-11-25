@@ -13,16 +13,18 @@ import shapes.*;
  */
 public class PictureFrame {
 
+  private SGNode frameRoot;
+
   private Model frame, holder, picture;
 
   private float frameWidth, frameHeight, holderHeight;
 
+  // The X and Z position of the picture frame holder (parent of frame)
+  private float holderX, holderZ;
+
   // Used to define the height of horizontal bars, and width of vertical bars
   private final float FRAME_DIM = Cube.THICKNESS * 0.15f;
   private final float FRAME_DEPTH = Cube.THICKNESS / 16;
-
-  // The X and Z position of the picture frame holder (parent of frame)
-  private float holderX, holderZ;
 
   /**
    * Picture frame constructor
@@ -47,13 +49,10 @@ public class PictureFrame {
   }
 
   /**
-   * Renders a complete picture frame with frame, picture, and support holder
-   *
-   * @param gl OpenGL object, for rendering
+   * Initialises the scene graph
    */
-  public void render(GL3 gl) {
-    // Root
-    SGNode frameRoot = new NameNode("Picture frame root (frame holder)");
+  public void initialise() {
+    frameRoot = new NameNode("Picture frame root (frame holder)");
     TransformNode rootTranslate = new TransformNode("Root translate",
         Mat4Transform.translate(holderX, holderHeight / 2 + 0.1f, holderZ));
 
@@ -63,6 +62,14 @@ public class PictureFrame {
 
     Table.tableRoot.update();
     frameRoot.update();
+  }
+
+  /**
+   * Renders a complete picture frame with frame, picture, and support holder
+   *
+   * @param gl OpenGL object, for rendering
+   */
+  public void render(GL3 gl) {
     frameRoot.draw(gl);
   }
 
