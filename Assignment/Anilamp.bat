@@ -1,2 +1,2 @@
-javac main/Anilamp.java --release 8
+javac main/Anilamp.java
 java main/Anilamp

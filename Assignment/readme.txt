@@ -1,0 +1,14 @@
+NOTE: Make sure you are using the same version of JDK (javac) and JRE (java)
+
+How to run
+====================
+Run the Anilamp.bat
+
+Folder structure
+====================
+lib - For "libraries" (gmaths, Camera, Light, SGNode etc.)
+main - Anilamp, Anilamp_GLEventListener
+models - Models file (CactusPot, Lamp, OutsideScene, PictureFrame, PiggyBank, Room, Table, Window)
+shaders - Shaders file
+shapes - Files for the mesh shape (Cone, Cube, Cylinder, FrustumCone, Sphere, TwoTriangles)
+textures - Textures file

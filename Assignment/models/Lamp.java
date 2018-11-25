@@ -40,8 +40,8 @@ public class Lamp {
   private final int DEFAULT_BASE_ANGLE_Y = 0;
 
   private final int DEFAULT_LOWER_JOINT_ANGLE_Z = 30;
-  private final int MIN_LOWER_JOINT_ANGLE_Z = -70;
-  private final int MAX_LOWER_JOINT_ANGLE_Z = 70;
+  private final int MIN_LOWER_JOINT_ANGLE_Z = -30;
+  private final int MAX_LOWER_JOINT_ANGLE_Z = 30;
   private int initialLowerJointAngle = DEFAULT_LOWER_JOINT_ANGLE_Z;
   private int targetLowerJointAngle;
 
@@ -138,9 +138,13 @@ public class Lamp {
         float elapsedTime = (float) Math.sin(getSeconds() - startTime);
         randomPose(elapsedTime);
       }
-    } else if (isReset) {
-      // isAnimatingReset = true;
-      // reset();
+    } else if (isReset || isAnimatingReset) {
+      if (isReset && !isAnimatingReset) {
+        calculateResetPose();
+      } else {
+        float elapsedTime = (float) Math.sin(getSeconds() - startTime);
+        randomPose(elapsedTime);
+      }
     } else {
       // isAnimatingJump = true;
       // jump();
@@ -154,31 +158,16 @@ public class Lamp {
    */
   private void calculateRandomPose() {
     /* Lower joint */
-    initialLowerJointAngle = lowerJointRotateZ.getTransform().getZRotationAngle();
     int min = MIN_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle;
     int max = MAX_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle;
     targetLowerJointAngle = r.nextInt(max - min) + min;
 
     /* Upper joint */
-    initialUpperJointAngle = upperJointRotateZ.getTransform().getZRotationAngle();
     max = MAX_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
-
-    // Less than this value will cause the upper body to intersect with table
-    if (initialLowerJointAngle + targetLowerJointAngle <= -35) {
-      min = -20 - initialUpperJointAngle;
-    } else {
-      min = MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
-    }
-
+    min = MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
     targetUpperJointAngle = r.nextInt(max - min) + min;
 
-    System.out.print(initialLowerJointAngle + targetLowerJointAngle + " ");
-    System.out.println(initialUpperJointAngle + targetUpperJointAngle);
-
     /* Head joint */
-    initialHeadJointAngleY = headJointRotateY.getTransform().getYRotationAngle();
-    initialHeadJointAngleZ = headJointRotateZ.getTransform().getZRotationAngle();
-
     max = MAX_HEAD_JOINT_ANGLE_Y - initialHeadJointAngleY;
     min = MIN_HEAD_JOINT_ANGLE_Y - initialHeadJointAngleY;
     targetHeadJointAngleY = r.nextInt(max - min) + min;
@@ -193,60 +182,66 @@ public class Lamp {
   }
 
   /**
+   * Calculate the reset pose
+   */
+  private void calculateResetPose() {
+    targetLowerJointAngle = DEFAULT_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle;
+    targetUpperJointAngle = DEFAULT_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
+    targetHeadJointAngleY = DEFAULT_HEAD_JOINT_ANGLE_Y - initialHeadJointAngleY;
+    targetHeadJointAngleZ = DEFAULT_HEAD_JOINT_ANGLE_Z - initialHeadJointAngleZ;
+
+    isReset = false;
+    isAnimatingReset = true;
+    startTime = getSeconds();
+  }
+
+  /**
    * The lamp will make a random pose
    *
    * @param time The elapsed time
    */
   private void randomPose(float time) {
-    float rotateAngleL = initialLowerJointAngle + targetLowerJointAngle * time;
-    float rotateAngleU = initialUpperJointAngle + targetUpperJointAngle * time;
-    float rotateAngleHY = initialHeadJointAngleY + targetHeadJointAngleY * time;
-    float rotateANgleHZ = initialHeadJointAngleZ + targetHeadJointAngleZ * time;
+    float rotateAngleL = initialLowerJointAngle + targetLowerJointAngle * time; // Lower joint
+    float rotateAngleU = initialUpperJointAngle + targetUpperJointAngle * time; // Upper joint
+    float rotateAngleHY = initialHeadJointAngleY + targetHeadJointAngleY * time; // Head joint Y
+    float rotateANgleHZ = initialHeadJointAngleZ + targetHeadJointAngleZ * time; // Head joint Z
 
     float finalAngleL = initialLowerJointAngle + targetLowerJointAngle - rotateAngleL;
     float finalAngleU = initialUpperJointAngle + targetUpperJointAngle - rotateAngleU;
     float finalAngleHY = initialHeadJointAngleY + targetHeadJointAngleY - rotateAngleHY;
     float finalAngleHZ = initialHeadJointAngleZ + targetHeadJointAngleZ - rotateANgleHZ;
 
-    if (Math.abs(finalAngleL) < 0.1f && Math.abs(finalAngleU) < 0.1f &&
-        Math.abs(finalAngleHY) < 0.1f && Math.abs(finalAngleHZ) < 0.1f) {
+    final float THRESHOLD = 0.1f;
+
+    if (Math.abs(finalAngleL) < THRESHOLD && Math.abs(finalAngleU) < THRESHOLD &&
+        Math.abs(finalAngleHY) < THRESHOLD && Math.abs(finalAngleHZ) < THRESHOLD) {
+      // Update the initial joint angle
+      initialLowerJointAngle += targetLowerJointAngle;
+      initialUpperJointAngle += targetUpperJointAngle;
+      initialHeadJointAngleY += targetHeadJointAngleY;
+      initialHeadJointAngleZ += targetHeadJointAngleZ;
+
       isAnimatingRandom = false;
+      isAnimatingReset = false;
     } else {
-      if (Math.abs(finalAngleL) > 0.1f) {
+      if (Math.abs(finalAngleL) > THRESHOLD) {
         lowerJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleL));
       }
 
-      if (Math.abs(finalAngleU) > 0.1f) {
+      if (Math.abs(finalAngleU) > THRESHOLD) {
         upperJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleU));
       }
 
-      if (Math.abs(finalAngleHY) > 0.1f) {
+      if (Math.abs(finalAngleHY) > THRESHOLD) {
         headJointRotateY.setTransform(Mat4Transform.rotateAroundY(rotateAngleHY));
       }
 
-      if (Math.abs(finalAngleHZ) > 0.1f) {
+      if (Math.abs(finalAngleHZ) > THRESHOLD) {
         headJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateANgleHZ));
       }
 
       lampRoot.update();
     }
-  }
-
-  /**
-   * Resets the lamp to default pose
-   */
-  private void reset() {
-    lowerJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(DEFAULT_LOWER_JOINT_ANGLE_Z));
-    lowerJointRotateZ.update();
-
-    upperJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(DEFAULT_UPPER_JOINT_ANGLE_Z));
-    upperJointRotateZ.update();
-
-    headJointRotateY.setTransform(Mat4Transform.rotateAroundY(DEFAULT_HEAD_JOINT_ANGLE_Y));
-    headJointRotateY.update();
-
-    headJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(DEFAULT_HEAD_JOINT_ANGLE_Z));
-    headJointRotateZ.update();
   }
 
   /**

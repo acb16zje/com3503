@@ -1,4 +1,4 @@
-The following textures are downloaded from the given link for personal use (non-profit)
+The following assignment.textures are downloaded from the given link for personal use (non-profit)
 Images are resized in https://squoosh.app/ to make the dimensions the power of 2
 Images are compressed in https://tinyjpg.com/
 Specular maps are created in http://cpetry.github.io/NormalMap-Online/
@@ -21,7 +21,7 @@ wall.jpg - https://imgkid.com/white-paint-texture-seamless.shtml
 wallpaper.jpg - https://wallpapersite.com/creative-graphics/firewatch-green-forest-mountains-minimal-4k-14771.html
 window_frame.jpg - http://www.discovertextures.com/2015/11/11/wood-0024/
 
-Self-owned / self-created images
+Self images
 ================================================================
 dog.jpg
 gaps.jpg

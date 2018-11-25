@@ -57,10 +57,10 @@ public class Room {
         Mat4Transform.translate(0, 0, POS_Z));
 
     createFloor(roomRoot);
-      roomRoot.addChild(wallTransform);
-        createBottomWall(wallTransform);
-        createLeftRightWall(wallTransform);
-        createTopWall(wallTransform);
+    roomRoot.addChild(wallTransform);
+      createBottomWall(wallTransform);
+      createLeftRightWall(wallTransform);
+      createTopWall(wallTransform);
 
     roomRoot.update();
   }

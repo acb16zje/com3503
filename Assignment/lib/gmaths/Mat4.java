@@ -163,24 +163,6 @@ public class Mat4 {   // row column formulation
     return new Vec3(-x, -y, -z);
   }
 
-  /**
-   * Gets the Y rotation angle of a transform node
-   *
-   * @return The Y rotation angle of a transform node
-   */
-  public int getYRotationAngle() {
-    return (int) Math.round(Math.toDegrees(Math.asin(values[1][0])));
-  }
-
-  /**
-   * Gets the Z rotation angle of a transform node
-   *
-   * @return The Z rotation angle of a transform node
-   */
-  public int getZRotationAngle() {
-    return (int) Math.round(Math.toDegrees(Math.asin(values[1][0])));
-  }
-
   public String asFloatArrayForGLSL() {  // col by row
     String s = "{";
     for (int j=0; j<4; ++j) {
