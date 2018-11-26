@@ -324,9 +324,9 @@ public class Anilamp extends JFrame {
     });
 
     // Animation controls
-    random.addActionListener(e -> glEventListener.lamp.isRandom = true);
-    reset.addActionListener(e -> glEventListener.lamp.isReset = true);
-    jump.addActionListener(e -> glEventListener.lamp.isJump = true);
+    random.addActionListener(e -> glEventListener.lamp.clickedRandom = true);
+    reset.addActionListener(e -> glEventListener.lamp.clickedReset = true);
+    jump.addActionListener(e -> glEventListener.lamp.clickedJump = true);
 
     return lampPanel;
   }
