@@ -20,7 +20,8 @@ public class PictureFrame {
   private float frameWidth, frameHeight, holderHeight;
 
   // The X and Z position of the picture frame holder (parent of frame)
-  private float holderX, holderZ;
+  private float holderX;
+  static float holderZ;
 
   // Used to define the height of horizontal bars, and width of vertical bars
   private final float FRAME_DIM = Cube.THICKNESS * 0.15f;

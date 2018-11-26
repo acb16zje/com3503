@@ -155,7 +155,6 @@ public class Mat4 {   // row column formulation
     * The Y rotation of headJoint is the Y of the light bulb
     * The Z rotation of headJoint is the X of the light bulb
     */
-
     float x = (float) Math.asin(values[0][1]);
     float y = (float) Math.asin(values[1][1]);
     float z = (float) Math.asin(values[2][1]);

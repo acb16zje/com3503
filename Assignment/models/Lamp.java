@@ -2,7 +2,6 @@ package models;
 
 import com.jogamp.opengl.*;
 import java.util.*;
-import javax.swing.text.*;
 import lib.*;
 import lib.gmaths.*;
 import main.*;
@@ -15,6 +14,7 @@ import main.*;
 public class Lamp {
 
   private SGNode lampRoot;
+  private TransformNode rootTranslate;
   private TransformNode baseRotateY;
   private TransformNode lowerJointRotateZ;
   private TransformNode upperJointRotateZ;
@@ -24,7 +24,7 @@ public class Lamp {
   private Light lampLight;
 
   private float lampRadius, baseHeight, jointRadius, bodyRadius, lowerBodyHeight, upperBodyHeight;
-  private float lampX;
+  private float lampX, lampY;
 
   private double startTime;
 
@@ -36,32 +36,37 @@ public class Lamp {
 
   public boolean isJump = false;
   private boolean isAnimatingJump = false;
+  private boolean isRotatingToTarget = false;
 
   private final int DEFAULT_BASE_ANGLE_Y = 0;
+  private float initialBaseAngle = DEFAULT_BASE_ANGLE_Y;
+  private float targetBaseAngle;
+  private float initialPosX, targetPosX, targetPosZ;
+  private float initialPosZ = 0;
 
   private final int DEFAULT_LOWER_JOINT_ANGLE_Z = 30;
   private final int MIN_LOWER_JOINT_ANGLE_Z = -30;
   private final int MAX_LOWER_JOINT_ANGLE_Z = 30;
-  private int initialLowerJointAngle = DEFAULT_LOWER_JOINT_ANGLE_Z;
-  private int targetLowerJointAngle;
+  private float initialLowerJointAngle = DEFAULT_LOWER_JOINT_ANGLE_Z;
+  private float targetLowerJointAngle;
 
   private final int DEFAULT_UPPER_JOINT_ANGLE_Z = -90;
   private final int MIN_UPPER_JOINT_ANGLE_Z = -100;
   private final int MAX_UPPER_JOINT_ANGLE_Z = 0;
-  private int initialUpperJointAngle = DEFAULT_UPPER_JOINT_ANGLE_Z;
-  private int targetUpperJointAngle;
+  private float initialUpperJointAngle = DEFAULT_UPPER_JOINT_ANGLE_Z;
+  private float targetUpperJointAngle;
 
   private final int DEFAULT_HEAD_JOINT_ANGLE_Y = 0;
   private final int MIN_HEAD_JOINT_ANGLE_Y = -90;
   private final int MAX_HEAD_JOINT_ANGLE_Y = 90;
-  private int initialHeadJointAngleY = DEFAULT_HEAD_JOINT_ANGLE_Y;
-  private int targetHeadJointAngleY;
+  private float initialHeadJointAngleY = DEFAULT_HEAD_JOINT_ANGLE_Y;
+  private float targetHeadJointAngleY;
 
   private final int DEFAULT_HEAD_JOINT_ANGLE_Z = -10;
   private final int MIN_HEAD_JOINT_ANGLE_Z = -30;
-  private final int MAX_HEAD_JOINT_ANGLE_Z = 80;
-  private int initialHeadJointAngleZ = DEFAULT_HEAD_JOINT_ANGLE_Z;
-  private int targetHeadJointAngleZ;
+  private final int MAX_HEAD_JOINT_ANGLE_Z = 70;
+  private float initialHeadJointAngleZ = DEFAULT_HEAD_JOINT_ANGLE_Z;
+  private float targetHeadJointAngleZ;
 
   private final Random r = new Random();
 
@@ -94,15 +99,18 @@ public class Lamp {
     upperBodyHeight = Table.tableHeight * 0.4f;
 
     lampX = -Table.tableWidth / 2 + 2;
+    lampY = (Table.FRAME_DIM + baseHeight / 2) / 2;
   }
 
   /**
    * Initialises the scene graph
    */
   public void initialise() {
+    initialPosX = lampX;
+
     lampRoot = new NameNode("Lamp root");
-    TransformNode rootTranslate = new TransformNode("Root translate",
-        Mat4Transform.translate(lampX, (Table.FRAME_DIM + baseHeight / 2) / 2, 0));
+    rootTranslate = new TransformNode("Root translate",
+        Mat4Transform.translate(lampX, lampY, 0));
 
     Table.tableTop.addChild(lampRoot);
       lampRoot.addChild(rootTranslate);
@@ -118,7 +126,7 @@ public class Lamp {
    * @param gl OpenGL object, for rendering
    */
   public void render(GL3 gl) {
-    // No further animations available until the current is finished
+    // No further animations available until the current one is finished
     if (isAnimatingRandom || isAnimatingReset || isAnimatingJump) {
       Anilamp.random.setEnabled(false);
       Anilamp.reset.setEnabled(false);
@@ -136,20 +144,30 @@ public class Lamp {
       } else {
         // Animation started
         float elapsedTime = (float) Math.sin(getSeconds() - startTime);
-        randomPose(elapsedTime);
+        changePose(elapsedTime);
       }
     } else if (isReset || isAnimatingReset) {
       if (isReset && !isAnimatingReset) {
         calculateResetPose();
       } else {
         float elapsedTime = (float) Math.sin(getSeconds() - startTime);
-        randomPose(elapsedTime);
+        changePose(elapsedTime);
       }
-    } else {
-      // isAnimatingJump = true;
-      // jump();
+    } else if (isJump || isAnimatingJump) {
+      if (isJump && !isAnimatingJump) {
+        calculateJump();
+      } else {
+        float elapsedTime = (float) Math.sin(getSeconds() - startTime);
+
+        if (isRotatingToTarget) {
+          rotateToTarget(elapsedTime);
+        } else {
+          jump(elapsedTime);
+        }
+      }
     }
 
+    lampRoot.update();
     lampRoot.draw(gl);
   }
 
@@ -158,23 +176,23 @@ public class Lamp {
    */
   private void calculateRandomPose() {
     /* Lower joint */
-    int min = MIN_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle;
-    int max = MAX_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle;
-    targetLowerJointAngle = r.nextInt(max - min) + min;
+    float min = MIN_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle;
+    float max = MAX_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle;
+    targetLowerJointAngle = min + r.nextFloat() * (max - min);
 
     /* Upper joint */
     max = MAX_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
     min = MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
-    targetUpperJointAngle = r.nextInt(max - min) + min;
+    targetUpperJointAngle = min + r.nextFloat() * (max - min);
 
     /* Head joint */
     max = MAX_HEAD_JOINT_ANGLE_Y - initialHeadJointAngleY;
     min = MIN_HEAD_JOINT_ANGLE_Y - initialHeadJointAngleY;
-    targetHeadJointAngleY = r.nextInt(max - min) + min;
+    targetHeadJointAngleY = min + r.nextFloat() * (max - min);
 
     max = MAX_HEAD_JOINT_ANGLE_Z - initialHeadJointAngleZ;
     min = MIN_HEAD_JOINT_ANGLE_Z - initialHeadJointAngleZ;
-    targetHeadJointAngleZ = r.nextInt(max - min) + min;
+    targetHeadJointAngleZ = min + r.nextFloat() * (max - min);
 
     isRandom = false;
     isAnimatingRandom = true;
@@ -196,11 +214,11 @@ public class Lamp {
   }
 
   /**
-   * The lamp will make a random pose
+   * The lamp will change its current pose
    *
    * @param time The elapsed time
    */
-  private void randomPose(float time) {
+  private void changePose(float time) {
     float rotateAngleL = initialLowerJointAngle + targetLowerJointAngle * time; // Lower joint
     float rotateAngleU = initialUpperJointAngle + targetUpperJointAngle * time; // Upper joint
     float rotateAngleHY = initialHeadJointAngleY + targetHeadJointAngleY * time; // Head joint Y
@@ -211,7 +229,7 @@ public class Lamp {
     float finalAngleHY = initialHeadJointAngleY + targetHeadJointAngleY - rotateAngleHY;
     float finalAngleHZ = initialHeadJointAngleZ + targetHeadJointAngleZ - rotateANgleHZ;
 
-    final float THRESHOLD = 0.1f;
+    final float THRESHOLD = 0.01f;
 
     if (Math.abs(finalAngleL) < THRESHOLD && Math.abs(finalAngleU) < THRESHOLD &&
         Math.abs(finalAngleHY) < THRESHOLD && Math.abs(finalAngleHZ) < THRESHOLD) {
@@ -239,16 +257,95 @@ public class Lamp {
       if (Math.abs(finalAngleHZ) > THRESHOLD) {
         headJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateANgleHZ));
       }
+    }
+  }
 
-      lampRoot.update();
+  /**
+   * Performs all the required calculations to make a jump
+   */
+  private void calculateJump() {
+    final float BORDER_X = lampRadius / 1.5f;
+    final float MIN_POS_X = -Table.tableWidth / 2 + BORDER_X;
+    final float MAX_POS_X = Table.tableWidth / 2 - BORDER_X;
+
+    // Prevent intersecting with accessories and wall
+    final float BORDER_Z = Math.abs(PictureFrame.holderZ) + lampRadius / 2;
+    final float MIN_POS_Z = Table.tableDepth / 2 - BORDER_X;
+    final float MAX_POS_Z = -Table.tableDepth / 2 + BORDER_Z;
+
+    targetPosX = MIN_POS_X + r.nextFloat() * (MAX_POS_X - MIN_POS_X);
+    targetPosZ = MIN_POS_Z + r.nextFloat() * (MAX_POS_Z - MIN_POS_Z);
+
+    // Acute angle between the initial position and the target position
+    targetBaseAngle = (float) Math.abs(Math.toDegrees(Math.atan((targetPosZ - initialPosZ) / (targetPosX - initialPosX))));
+
+    // Calculates the actual angle required to rotate to target position
+    if (targetPosX > initialPosX && targetPosZ < initialPosZ) {
+      // First quadrant
+      targetBaseAngle -= initialBaseAngle;
+    } else if (targetPosX < initialPosX && targetPosZ > initialPosZ) {
+      // Second quadrant
+      if (initialBaseAngle >= -90 && initialBaseAngle <= -180) {
+        targetBaseAngle = Math.abs(initialBaseAngle) - 180 - targetBaseAngle;
+      } else {
+        targetBaseAngle = -180 + targetBaseAngle - initialBaseAngle;
+      }
+    } else if (targetPosX > initialPosX && targetPosZ > initialPosZ) {
+      // Fourth quadrant
+      targetBaseAngle = -targetBaseAngle - initialBaseAngle;
+
+    } else if (targetPosX < initialPosX && targetPosZ < initialPosZ) {
+      // Third quadrant
+      targetBaseAngle = 180 - targetBaseAngle - initialBaseAngle;
+    }
+
+    isJump = false;
+    isAnimatingJump = true;
+    isRotatingToTarget = true;
+    startTime = getSeconds();
+  }
+
+  /**
+   * Rotate the lamp to the target location first before making the jump
+   *
+   * @param time The elapsed time
+   */
+  private void rotateToTarget(float time) {
+    float rotateAngleBY = initialBaseAngle + targetBaseAngle * time; // Base Angle Y
+    float finalBaseAngleY = initialBaseAngle + targetBaseAngle - rotateAngleBY;
+
+    final float THRESHOLD = 0.1f;
+
+    if (Math.abs(finalBaseAngleY) < THRESHOLD) {
+      initialBaseAngle += targetBaseAngle;
+      isRotatingToTarget = false;
+      startTime = getSeconds();
+    } else {
+      baseRotateY.setTransform(Mat4Transform.rotateAroundY(rotateAngleBY));
     }
   }
 
   /**
    * The lamp will jump to random position
+   *
+   * @param time The elapsed time
    */
-  private void jump() {
-    System.out.println("jump");
+  private void jump(float time) {
+    float translateBPosX = initialPosX + (targetPosX - initialPosX) * time; // Base Pos X
+    float translateBPosZ = initialPosZ + (targetPosZ - initialPosZ) * time; // Base Pos Z
+
+    float finalBasePosX = targetPosX - translateBPosX;
+    float finalBasePosZ = targetPosZ - translateBPosZ;
+
+    final float THRESHOLD = 0.01f;
+
+    if (Math.abs(finalBasePosX) < THRESHOLD && Math.abs(finalBasePosZ) < THRESHOLD) {
+      initialPosX = targetPosX;
+      initialPosZ = targetPosZ;
+      isAnimatingJump = false;
+    } else {
+      rootTranslate.setTransform(Mat4Transform.translate(translateBPosX, lampY, translateBPosZ));
+    }
   }
 
   /**
@@ -287,11 +384,10 @@ public class Lamp {
    * @param parent Parent node
    */
   private void createLowerBody(SGNode parent) {
-    final float POS_X = -lampRadius / 4f;
     final float POS_Y = baseHeight / 3;
 
     TransformNode lowerJointTranslate = new TransformNode("Lower joint translate",
-        Mat4Transform.translate(POS_X, POS_Y, 0));
+        Mat4Transform.translate(0, POS_Y, 0));
 
     lowerJointRotateZ = new TransformNode("Lower joint rotate",
         Mat4Transform.rotateAroundZ(DEFAULT_LOWER_JOINT_ANGLE_Z));
@@ -467,8 +563,8 @@ public class Lamp {
    */
   private void createTail(SGNode parent) {
     final float WIDTH = 0.05f;
-    final float LOWER_HEIGHT = 0.1f;
-    final float LOWER_DEPTH = 0.2f;
+    final float LOWER_HEIGHT = 0.11f;
+    final float LOWER_DEPTH = 0.22f;
     final float MIDDLE_HEIGHT = LOWER_HEIGHT * 1.4f;
     final float MIDDLE_DEPTH = LOWER_DEPTH * 1.4f;
     final float UPPER_HEIGHT = MIDDLE_HEIGHT * 1.3f;
@@ -502,7 +598,8 @@ public class Lamp {
         Mat4Transform.translate(0, MIDDLE_HEIGHT / 2, -(LOWER_DEPTH - MIDDLE_HEIGHT) / 2));
 
     NameNode middleTailV = new NameNode("Vertical middle tail");
-    m = Mat4Transform.scale(WIDTH, MIDDLE_DEPTH, MIDDLE_HEIGHT);
+    float offset = 0.001f; // minimal offset so texture colour don't overlap each other
+    m = Mat4Transform.scale(WIDTH + offset, MIDDLE_DEPTH + offset, MIDDLE_HEIGHT + offset);
     TransformNode middleTailTransformV = new TransformNode("Vertical middle tail transform", m);
     ModelNode middleTailModelV = new ModelNode("Vertical middle tail model", lowerTail); // Use lowerTail texture
 
@@ -510,7 +607,6 @@ public class Lamp {
         Mat4Transform.translate(0, MIDDLE_HEIGHT / 2, -MIDDLE_HEIGHT / 2));
 
     NameNode middleTailH = new NameNode("Horizontal middle tail");
-    float offset = 0.001f; // minimal offset so texture colour don't overlap each other
     m = Mat4Transform.scale(WIDTH - offset, MIDDLE_HEIGHT - offset, MIDDLE_DEPTH - offset);
     TransformNode middleTailTransformH = new TransformNode("Horizontal middle tail transform", m);
     ModelNode middleTailModelH = new ModelNode("Horizontal middle tail model", cube);
@@ -525,7 +621,7 @@ public class Lamp {
         Mat4Transform.translate(0, UPPER_HEIGHT / 2, -(MIDDLE_DEPTH - UPPER_HEIGHT) / 2));
 
     NameNode upperTailV = new NameNode("Vertical upper tail");
-    m = Mat4Transform.scale(WIDTH + offset, UPPER_DEPTH + offset, UPPER_HEIGHT + offset);
+    m = Mat4Transform.scale(WIDTH, UPPER_DEPTH, UPPER_HEIGHT);
     TransformNode upperTailTransformV = new TransformNode("Vertical upper tail transform", m);
     ModelNode upperTailModelV = new ModelNode("Vertical upper tail model", cube);
 

@@ -119,12 +119,12 @@ public class Anilamp_GLEventListener implements GLEventListener {
     modelWall(gl);
     modelWallpaper(gl);
     modelTable(gl);
-    // modelPictureFrame(gl);
-    // modelCactusPot(gl);
-    // modelPiggyBank(gl);
-    // modelOutsideScene(gl);
+    modelPictureFrame(gl);
+    modelCactusPot(gl);
+    modelPiggyBank(gl);
+    modelOutsideScene(gl);
     modelLamp(gl);
-    // modelWindow(gl);
+    modelWindow(gl);
 
     // Add all models to list for disposal management
     modelList = Arrays.asList(floor, wall, topWallpaper, bottomWallpaper, leftWallpaper,
@@ -142,24 +142,24 @@ public class Anilamp_GLEventListener implements GLEventListener {
     table.initialise();
 
     // 3 Table accessories
-    // pictureFrame = new PictureFrame(frame, holder, picture);
-    // pictureFrame.initialise();
-    // cactusPot = new CactusPot(pot, cactus, flower);
-    // cactusPot.initialise();
-    // piggyBank = new PiggyBank(body, nose, ear, leg, cubeDeco, sphereDeco);
-    // piggyBank.initialise();
+    pictureFrame = new PictureFrame(frame, holder, picture);
+    pictureFrame.initialise();
+    cactusPot = new CactusPot(pot, cactus, flower);
+    cactusPot.initialise();
+    piggyBank = new PiggyBank(body, nose, ear, leg, cubeDeco, sphereDeco);
+    piggyBank.initialise();
     //
-    // // Outside scene
-    // outsideScene = new OutsideScene(ROOM_DIMENSION, grass, garden, leftGarden, rightGarden, sky);
-    // outsideScene.initialise();
+    // Outside scene
+    outsideScene = new OutsideScene(ROOM_DIMENSION, grass, garden, leftGarden, rightGarden, sky);
+    outsideScene.initialise();
 
     // Desk lamp
     lamp = new Lamp(cube, cylinder, sphere, frustumCone, lampLight, lampEar, lowerTail);
     lamp.initialise();
 
     // Window
-    // window = new Window(ROOM_DIMENSION, windowFrame, glass);
-    // window.initialise();
+    window = new Window(ROOM_DIMENSION, windowFrame, glass);
+    window.initialise();
   }
 
   /**
@@ -176,12 +176,12 @@ public class Anilamp_GLEventListener implements GLEventListener {
 
     room.render(gl);
     table.render(gl);
-    // pictureFrame.render(gl);
-    // cactusPot.render(gl);
-    // piggyBank.render(gl);
-    // outsideScene.render(gl);
+    pictureFrame.render(gl);
+    cactusPot.render(gl);
+    piggyBank.render(gl);
+    outsideScene.render(gl);
     lamp.render(gl);
-    // window.render(gl);
+    window.render(gl);
   }
 
   // ***************************************************
