@@ -37,17 +37,18 @@ public class Lamp {
   public boolean clickedJump = false;
   private boolean isAnimatingJump = false;
   private boolean preparingToJump = false;
+  private float jumpSpeed = 1;
   private float jumpHeight;
 
   private final int DEFAULT_BASE_ANGLE_Y = 0;
   private float initialBaseAngle = DEFAULT_BASE_ANGLE_Y;
   private float targetBaseAngle;
-  private float initialPosX, targetPosX, targetPosZ, distance;
+  private float initialPosX, targetPosX, targetPosZ;
   private float initialPosZ = 0;
 
   private final int DEFAULT_LOWER_JOINT_ANGLE_Z = 30;
-  private final int MIN_LOWER_JOINT_ANGLE_Z = -30;
-  private final int MAX_LOWER_JOINT_ANGLE_Z = 30;
+  private final int MIN_LOWER_JOINT_ANGLE_Z = -20;
+  private final int MAX_LOWER_JOINT_ANGLE_Z = 60;
   private float initialLowerJointAngle = DEFAULT_LOWER_JOINT_ANGLE_Z;
   private float targetLowerJointAngle;
 
@@ -58,14 +59,14 @@ public class Lamp {
   private float targetUpperJointAngle;
 
   private final int DEFAULT_HEAD_JOINT_ANGLE_Y = 0;
-  private final int MIN_HEAD_JOINT_ANGLE_Y = -90;
-  private final int MAX_HEAD_JOINT_ANGLE_Y = 90;
+  private final int MIN_HEAD_JOINT_ANGLE_Y = -80;
+  private final int MAX_HEAD_JOINT_ANGLE_Y = 80;
   private float initialHeadJointAngleY = DEFAULT_HEAD_JOINT_ANGLE_Y;
   private float targetHeadJointAngleY;
 
   private final int DEFAULT_HEAD_JOINT_ANGLE_Z = -10;
   private final int MIN_HEAD_JOINT_ANGLE_Z = -30;
-  private final int MAX_HEAD_JOINT_ANGLE_Z = 70;
+  private final int MAX_HEAD_JOINT_ANGLE_Z = 50;
   private float initialHeadJointAngleZ = DEFAULT_HEAD_JOINT_ANGLE_Z;
   private float targetHeadJointAngleZ;
 
@@ -160,11 +161,14 @@ public class Lamp {
       if (clickedJump && !isAnimatingJump) {
         calculateJump();
       } else {
-        float elapsedTime = (float) Math.sin(getSeconds() - startTime);
+        float elapsedTime = (float) (getSeconds() - startTime);
 
         if (preparingToJump) {
+          elapsedTime = (float) Math.sin(elapsedTime);
           changePose(elapsedTime);
         } else {
+          // speed controlled at calculateJump()
+          elapsedTime = (float) Math.sin(elapsedTime * jumpSpeed);
           jump(elapsedTime);
         }
       }
@@ -175,7 +179,7 @@ public class Lamp {
   }
 
   /**
-   * Calculates the rotation angles of the joints
+   * Calculates the random rotation angles of the joints, while maintaining the lamp balance
    */
   private void calculateRandomPose() {
     targetBaseAngle = 0;
@@ -185,9 +189,17 @@ public class Lamp {
     float max = MAX_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle;
     targetLowerJointAngle = min + r.nextFloat() * (max - min);
 
-    /* Upper joint */
-    max = MAX_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
-    min = MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
+    float finalLowerJointAngle = initialLowerJointAngle + targetLowerJointAngle;
+
+    /* Upper joint, try to maintain the balance */
+    if (finalLowerJointAngle > 0) {
+      max = MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
+      min = MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle + finalLowerJointAngle / 2;
+    } else {
+      max = MAX_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
+      min = initialLowerJointAngle + targetLowerJointAngle;
+    }
+
     targetUpperJointAngle = min + r.nextFloat() * (max - min);
 
     /* Head joint */
@@ -238,7 +250,7 @@ public class Lamp {
 
     float deltaX = targetPosX - initialPosX;
     float deltaZ = targetPosZ - initialPosZ;
-    distance = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+    float distance = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
 
     /* Base angle to rotate */
     // Acute angle between the initial position and the target position
@@ -260,10 +272,12 @@ public class Lamp {
     if (targetBaseAngle > 180) targetBaseAngle -= 360;
     if (targetBaseAngle < -180) targetBaseAngle += 360;
 
-    /* Jump height*/
-    // Calculate the height and angle compression
-    final float HEIGHT_CONSTANT = 0.25f;
+    /* Jump height and speed*/
+    final float HEIGHT_CONSTANT = 0.27f;
+    final float SPEED_CONSTANT = 1.12f;
     jumpHeight = HEIGHT_CONSTANT * (distance + 0.5f);
+    jumpSpeed = SPEED_CONSTANT + 1 / jumpHeight;
+    System.out.println("Distance: " + distance + "       Height: " + jumpHeight + "    Speed: " + jumpSpeed);
 
     /* Angle to compress */
     targetLowerJointAngle = MAX_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle;
@@ -295,7 +309,7 @@ public class Lamp {
     float finalAngleHY = initialHeadJointAngleY + targetHeadJointAngleY - rotateAngleHY;
     float finalAngleHZ = initialHeadJointAngleZ + targetHeadJointAngleZ - rotateANgleHZ;
 
-    final float THRESHOLD = 0.01f;
+    final float THRESHOLD = 0.1f;
 
     if (Math.abs(finalBaseAngleY) < THRESHOLD && Math.abs(finalAngleL) < THRESHOLD &&
         Math.abs(finalAngleU) < THRESHOLD && Math.abs(finalAngleHY) < THRESHOLD &&
@@ -334,7 +348,7 @@ public class Lamp {
     float finalBasePosX = targetPosX - translateBPosX;
     float finalBasePosZ = targetPosZ - translateBPosZ;
 
-    final float THRESHOLD = 0.001f;
+    final float THRESHOLD = 0.005f;
 
     if (Math.abs(finalBasePosX) < THRESHOLD && Math.abs(finalBasePosZ) < THRESHOLD) {
       initialPosX = targetPosX;
