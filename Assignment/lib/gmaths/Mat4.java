@@ -24,9 +24,7 @@ public class Mat4 {   // row column formulation
   public Mat4(Mat4 m) {
     this.values = new float[4][4];
     for (int i=0; i<4; ++i) {
-      for (int j=0; j<4; ++j) {
-        this.values[i][j] = m.values[i][j];
-      }
+      System.arraycopy(m.values[i], 0, this.values[i], 0, 4);
     }
   }
   
@@ -163,28 +161,28 @@ public class Mat4 {   // row column formulation
   }
 
   public String asFloatArrayForGLSL() {  // col by row
-    String s = "{";
+    StringBuilder s = new StringBuilder("{");
     for (int j=0; j<4; ++j) {
       for (int i=0; i<4; ++i) {
-        s += String.format("%.2f",values[i][j]);
-        if (!(j==3 && i==3)) s+=",";
+        s.append(String.format("%.2f", values[i][j]));
+        if (!(j==3 && i==3)) s.append(",");
       }
     }
-    return s;
+    return s.toString();
   }
   
   public String toString() {
-    String s = "{";
+    StringBuilder s = new StringBuilder("{");
     for (int i=0; i<4; ++i) {
-      s += (i==0) ? "{" : " {";
+      s.append((i == 0) ? "{" : " {");
       for (int j=0; j<4; ++j) {
-        s += String.format("%.2f",values[i][j]);
-        if (j<3) s += ", ";
+        s.append(String.format("%.2f", values[i][j]));
+        if (j<3) s.append(", ");
       }
-      s += (i==3) ? "}" : "},\n";
+      s.append((i == 3) ? "}" : "},\n");
     } 
-    s += "}";
-    return s;
+    s.append("}");
+    return s.toString();
   }
   
 } // end of Mat4 class

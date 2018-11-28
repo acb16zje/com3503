@@ -52,11 +52,11 @@ public class SGNode {
   }
 
   String getIndentString(int indent) {
-    String s = "" + indent + " ";
+    StringBuilder s = new StringBuilder("" + indent + " ");
     for (int i = 0; i < indent; ++i) {
-      s += "  ";
+      s.append("  ");
     }
-    return s;
+    return s.toString();
   }
 
   public void print(int indent, boolean inFull) {

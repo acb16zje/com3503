@@ -83,7 +83,7 @@ public class Light {
 
   public void setLightColor(float value) { this.lightColor = value; }
 
-  public float getSpotlightIntensity() { return this.spotlightIntensity; }
+  float getSpotlightIntensity() { return this.spotlightIntensity; }
 
   public void setSpotlightIntensity(float value) {
     this.spotlightIntensity = value;

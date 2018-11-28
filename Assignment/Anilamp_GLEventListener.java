@@ -1,5 +1,3 @@
-package main;
-
 import com.jogamp.opengl.*;
 import java.util.*;
 import lib.*;
@@ -13,7 +11,7 @@ import shapes.*;
  *
  * @author Zer Jun Eng
  */
-public class Anilamp_GLEventListener implements GLEventListener {
+class Anilamp_GLEventListener implements GLEventListener {
   Anilamp_GLEventListener(Camera camera) {
     this.camera = camera;
   }
@@ -55,7 +53,6 @@ public class Anilamp_GLEventListener implements GLEventListener {
   public void dispose(GLAutoDrawable drawable) {
     GL3 gl = drawable.getGL().getGL3();
 
-    // Dispose without typing one by one
     for (Light light : lightList) {
       light.dispose(gl);
     }
@@ -68,7 +65,7 @@ public class Anilamp_GLEventListener implements GLEventListener {
   // ***************************************************
   /* THE SCENE */
 
-  private Camera camera;
+  private final Camera camera;
   private Light lampLight;
   private Model floor;                                                         // Floor
   private Model wall;                                                          // Wall
@@ -172,6 +169,18 @@ public class Anilamp_GLEventListener implements GLEventListener {
 
     for (Light light : lightList) {
       light.render(gl);
+    }
+
+    // Animation controls
+    // No further animations available until the current one is finished
+    if (lamp.isAnimatingRandom || lamp.isAnimatingReset || lamp.isAnimatingJump) {
+      Anilamp.random.setEnabled(false);
+      Anilamp.reset.setEnabled(false);
+      Anilamp.jump.setEnabled(false);
+    } else {
+      Anilamp.random.setEnabled(true);
+      Anilamp.reset.setEnabled(true);
+      Anilamp.jump.setEnabled(true);
     }
 
     room.render(gl);
@@ -529,6 +538,6 @@ public class Anilamp_GLEventListener implements GLEventListener {
 
     // Decorations
     lampEar = new Model(camera, lightList, cubeShader, material, sphereMesh, EAR, SPECULAR);
-    lowerTail = new Model(camera, lightList, cubeShader, material, cubeMesh, JOINT, SPECULAR); // Use joint texture
+    lowerTail = new Model(camera, lightList, cubeShader, material, cubeMesh, JOINT, SPECULAR);
   }
 }

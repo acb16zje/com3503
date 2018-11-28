@@ -1,5 +1,3 @@
-package main;
-
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.*;
 import com.jogamp.opengl.util.*;
@@ -18,11 +16,11 @@ import lib.*;
  */
 public class Anilamp extends JFrame {
 
-  private GLCanvas canvas;
-  private Camera camera;
-  private Anilamp_GLEventListener glEventListener;
+  private final GLCanvas canvas;
+  private final Camera camera;
+  private final Anilamp_GLEventListener glEventListener;
 
-  public static JButton random, reset, jump;
+  static JButton random, reset, jump;
 
   /**
    * The main method for Anilamp
@@ -338,7 +336,7 @@ public class Anilamp extends JFrame {
    */
   private class MyKeyboardInput extends KeyAdapter {
 
-    private Camera camera;
+    private final Camera camera;
 
     MyKeyboardInput(Camera camera) {
       this.camera = camera;
@@ -378,7 +376,7 @@ public class Anilamp extends JFrame {
   private class MyMouseInput extends MouseMotionAdapter {
 
     private Point lastpoint;
-    private Camera camera;
+    private final Camera camera;
 
     MyMouseInput(Camera camera) {
       this.camera = camera;

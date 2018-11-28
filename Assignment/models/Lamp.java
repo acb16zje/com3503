@@ -4,7 +4,6 @@ import com.jogamp.opengl.*;
 import java.util.*;
 import lib.*;
 import lib.gmaths.*;
-import main.*;
 
 /**
  * A class for rendering a lamp with spotlight and animation
@@ -15,7 +14,7 @@ public class Lamp {
 
   private SGNode lampRoot;
   private TransformNode rootTranslateX;
-  private TransformNode baseRotateY;
+  private TransformNode baseRotateY, baseRotateZ;
   private TransformNode lowerJointRotateZ;
   private TransformNode upperJointRotateZ;
   private TransformNode headJointRotateY, headJointRotateZ;
@@ -29,46 +28,39 @@ public class Lamp {
   private double startTime;
 
   public boolean clickedRandom = false;
-  private boolean isAnimatingRandom = false;
+  public boolean isAnimatingRandom = false;
 
   public boolean clickedReset = false;
-  private boolean isAnimatingReset = false;
+  public boolean isAnimatingReset = false;
 
   public boolean clickedJump = false;
-  private boolean isAnimatingJump = false;
+  public boolean isAnimatingJump = false;
   private boolean preparingToJump = false;
-  private float jumpSpeed = 1;
-  private float jumpHeight;
+  private float jumpHeight, jumpSpeed = 1;
 
-  private final int DEFAULT_BASE_ANGLE_Y = 0;
-  private float initialBaseAngle = DEFAULT_BASE_ANGLE_Y;
-  private float targetBaseAngle;
-  private float initialPosX, targetPosX, targetPosZ;
-  private float initialPosZ = 0;
+  private final int DEFAULT_BASE_ANGLE_Y = -20;
+  private float initialBaseAngle = DEFAULT_BASE_ANGLE_Y, targetBaseAngle, baseSwingAngle;
+  private float initialPosX, targetPosX, targetPosZ, initialPosZ, distance, maxDistance;
 
-  private final int DEFAULT_LOWER_JOINT_ANGLE_Z = 30;
+  private final int DEFAULT_LOWER_JOINT_ANGLE_Z = 10;
   private final int MIN_LOWER_JOINT_ANGLE_Z = -20;
   private final int MAX_LOWER_JOINT_ANGLE_Z = 60;
-  private float initialLowerJointAngle = DEFAULT_LOWER_JOINT_ANGLE_Z;
-  private float targetLowerJointAngle;
+  private float initialLowerJointAngle = DEFAULT_LOWER_JOINT_ANGLE_Z, targetLowerJointAngle;
 
-  private final int DEFAULT_UPPER_JOINT_ANGLE_Z = -90;
-  private final int MIN_UPPER_JOINT_ANGLE_Z = -100;
+  private final int DEFAULT_UPPER_JOINT_ANGLE_Z = -60;
+  private final int MIN_UPPER_JOINT_ANGLE_Z = -120;
   private final int MAX_UPPER_JOINT_ANGLE_Z = 0;
-  private float initialUpperJointAngle = DEFAULT_UPPER_JOINT_ANGLE_Z;
-  private float targetUpperJointAngle;
+  private float initialUpperJointAngle = DEFAULT_UPPER_JOINT_ANGLE_Z, targetUpperJointAngle;
 
   private final int DEFAULT_HEAD_JOINT_ANGLE_Y = 0;
   private final int MIN_HEAD_JOINT_ANGLE_Y = -80;
   private final int MAX_HEAD_JOINT_ANGLE_Y = 80;
-  private float initialHeadJointAngleY = DEFAULT_HEAD_JOINT_ANGLE_Y;
-  private float targetHeadJointAngleY;
+  private float initialHeadJointAngleY = DEFAULT_HEAD_JOINT_ANGLE_Y, targetHeadJointAngleY;
 
   private final int DEFAULT_HEAD_JOINT_ANGLE_Z = -10;
   private final int MIN_HEAD_JOINT_ANGLE_Z = -30;
   private final int MAX_HEAD_JOINT_ANGLE_Z = 50;
-  private float initialHeadJointAngleZ = DEFAULT_HEAD_JOINT_ANGLE_Z;
-  private float targetHeadJointAngleZ;
+  private float initialHeadJointAngleZ = DEFAULT_HEAD_JOINT_ANGLE_Z, targetHeadJointAngleZ;
 
   private final Random r = new Random();
 
@@ -132,43 +124,30 @@ public class Lamp {
    * @param gl OpenGL object, for rendering
    */
   public void render(GL3 gl) {
-    // No further animations available until the current one is finished
-    if (isAnimatingRandom || isAnimatingReset || isAnimatingJump) {
-      Anilamp.random.setEnabled(false);
-      Anilamp.reset.setEnabled(false);
-      Anilamp.jump.setEnabled(false);
-    } else {
-      Anilamp.random.setEnabled(true);
-      Anilamp.reset.setEnabled(true);
-      Anilamp.jump.setEnabled(true);
-    }
-
     if (clickedRandom || isAnimatingRandom) {
-      if (clickedRandom && !isAnimatingRandom) {
+      if (clickedRandom) {
         calculateRandomPose();
       } else {
         float elapsedTime = (float) Math.sin(getSeconds() - startTime);
         changePose(elapsedTime);
       }
     } else if (clickedReset || isAnimatingReset) {
-      if (clickedReset && !isAnimatingReset) {
+      if (clickedReset) {
         calculateResetPose();
       } else {
         float elapsedTime = (float) Math.sin(getSeconds() - startTime);
         changePose(elapsedTime);
       }
     } else if (clickedJump || isAnimatingJump) {
-      if (clickedJump && !isAnimatingJump) {
+      if (clickedJump) {
+        calculateTarget();
         calculateJump();
       } else {
         float elapsedTime = (float) (getSeconds() - startTime);
 
         if (preparingToJump) {
-          elapsedTime = (float) Math.sin(elapsedTime);
-          changePose(elapsedTime);
+          changePose((float) Math.sin(elapsedTime));
         } else {
-          // speed controlled at calculateJump()
-          elapsedTime = (float) Math.sin(elapsedTime * jumpSpeed);
           jump(elapsedTime);
         }
       }
@@ -178,6 +157,7 @@ public class Lamp {
     lampRoot.draw(gl);
   }
 
+  /*------------------ ANIMATION -----------------------*/
   /**
    * Calculates the random rotation angles of the joints, while maintaining the lamp balance
    */
@@ -191,7 +171,7 @@ public class Lamp {
 
     float finalLowerJointAngle = initialLowerJointAngle + targetLowerJointAngle;
 
-    /* Upper joint, try to maintain the balance */
+    /* Upper joint, try to maintain the balance of the lamp */
     if (finalLowerJointAngle > 0) {
       max = MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
       min = MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle + finalLowerJointAngle / 2;
@@ -232,9 +212,9 @@ public class Lamp {
   }
 
   /**
-   * Calculate the random position, base angle to rotate, jump height, and angle compression
+   * Calculate the random position, and base angle to rotate
    */
-  private void calculateJump() {
+  private void calculateTarget() {
     /* Random position */
     final float BORDER_X = lampRadius / 1.5f;
     final float MIN_POS_X = -Table.tableWidth / 2 + BORDER_X;
@@ -244,13 +224,17 @@ public class Lamp {
     final float BORDER_Z = Math.abs(PictureFrame.holderZ) + lampRadius / 2;
     final float MIN_POS_Z = Table.tableDepth / 2 - BORDER_X;
     final float MAX_POS_Z = -Table.tableDepth / 2 + BORDER_Z;
+    maxDistance = (float) Math.sqrt(Math.pow(MAX_POS_X - MIN_POS_X, 2) + Math.pow(MAX_POS_Z - MIN_POS_Z, 2));
 
-    targetPosX = MIN_POS_X + r.nextFloat() * (MAX_POS_X - MIN_POS_X);
-    targetPosZ = MIN_POS_Z + r.nextFloat() * (MAX_POS_Z - MIN_POS_Z);
-
-    float deltaX = targetPosX - initialPosX;
-    float deltaZ = targetPosZ - initialPosZ;
-    float distance = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+    // Do not make very very small jump
+    float deltaX, deltaZ;
+    do {
+      targetPosX = MIN_POS_X + r.nextFloat() * (MAX_POS_X - MIN_POS_X);
+      targetPosZ = MIN_POS_Z + r.nextFloat() * (MAX_POS_Z - MIN_POS_Z);
+      deltaX = targetPosX - initialPosX;
+      deltaZ = targetPosZ - initialPosZ;
+      distance = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+    } while (distance < 1);
 
     /* Base angle to rotate */
     // Acute angle between the initial position and the target position
@@ -271,19 +255,28 @@ public class Lamp {
     targetBaseAngle %= 360;
     if (targetBaseAngle > 180) targetBaseAngle -= 360;
     if (targetBaseAngle < -180) targetBaseAngle += 360;
+  }
 
-    /* Jump height and speed*/
-    final float HEIGHT_CONSTANT = 0.27f;
-    final float SPEED_CONSTANT = 1.12f;
-    jumpHeight = HEIGHT_CONSTANT * (distance + 0.5f);
-    jumpSpeed = SPEED_CONSTANT + 1 / jumpHeight;
+  /**
+   * Calculate the jump height, jump speed, and compression angle
+   */
+  private void calculateJump() {
+    /* Jump height and speed */
+    final float HEIGHT_CONSTANT = 0.21f;
+    jumpHeight = HEIGHT_CONSTANT * distance + 0.5f;
+
+    final float SPEED_CONSTANT = 2.8f;
+    jumpSpeed = SPEED_CONSTANT / jumpHeight;
     System.out.println("Distance: " + distance + "       Height: " + jumpHeight + "    Speed: " + jumpSpeed);
 
     /* Angle to compress */
-    targetLowerJointAngle = MAX_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle;
-    targetUpperJointAngle = MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle;
+    final float BASE_CONSTANT = 40;
+    baseSwingAngle = BASE_CONSTANT * (float) Math.log(distance);
+
+    final float COMPRESS_CONSTANT = distance / maxDistance;
+    targetLowerJointAngle = (MAX_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle) * COMPRESS_CONSTANT;
+    targetUpperJointAngle = (MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle) * COMPRESS_CONSTANT;
     targetHeadJointAngleY = DEFAULT_HEAD_JOINT_ANGLE_Y - initialHeadJointAngleY;
-    targetHeadJointAngleZ = MAX_HEAD_JOINT_ANGLE_Z - initialHeadJointAngleZ;
 
     clickedJump = false;
     isAnimatingJump = true;
@@ -336,14 +329,34 @@ public class Lamp {
   }
 
   /**
-   * The lamp will jump to random position
+   * The lamp will jump to random position, height and speed are affected by the distance
    *
    * @param time The elapsed time
    */
   private void jump(float time) {
+    time = (float) Math.sin(time * jumpSpeed); // Speed is affected by height and distance
+
     float translateBPosX = initialPosX + (targetPosX - initialPosX) * time; // Base Pos X
-    float translateBPosY = bezierCurve(jumpHeight, time);
+    float translateBPosY = bezierCurve(0, jumpHeight, jumpHeight, 0, time); // Base Pos Y
     float translateBPosZ = initialPosZ + (targetPosZ - initialPosZ) * time; // Base Pos Z
+
+    // Fine
+    float rotateAngleBZ = bezierCurve(0, -baseSwingAngle / 1.2f, baseSwingAngle, 0, time); // Base swing
+    float rotateAngleL = bezierCurve(
+        initialLowerJointAngle,
+        -initialLowerJointAngle / 2,
+        -initialLowerJointAngle / 2,
+        initialLowerJointAngle,
+        time); // Lower joint compress
+
+    float rotateAngleU = bezierCurve(
+        initialUpperJointAngle,
+        0f,
+        -0f,
+        initialUpperJointAngle,
+        time); // Upper joint compress
+
+    System.out.println(rotateAngleU);
 
     float finalBasePosX = targetPosX - translateBPosX;
     float finalBasePosZ = targetPosZ - translateBPosZ;
@@ -357,23 +370,32 @@ public class Lamp {
       isAnimatingJump = false;
     } else {
       rootTranslateX.setTransform(Mat4Transform.translate(translateBPosX, translateBPosY, translateBPosZ));
+      baseRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleBZ));
+      lowerJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleL));
+      upperJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleU));
     }
   }
 
   /**
    * Bezier cubic curve calculation
    *
-   * @param height The P2, height
+   * @param p0 The starting point
+   * @param p1 Guide point P1
+   * @param p2 Guide point P2
+   * @param p3 The end point
    * @param t The time, 0 < t < 1
    * @return The value at a the given t
    */
-  private float bezierCurve(float height, float t) {
-    double p1Part = height * 3 * t * Math.pow((1 - t), 2);
-    double p2Part = height * 3 * Math.pow(t, 2) * (1 - t);
+  private float bezierCurve(float p0, float p1, float p2, float p3, float t) {
+    double p0Part = p0 * Math.pow((1 - t), 3);
+    double p1Part = p1 * 3 * t * Math.pow((1 - t), 2);
+    double p2Part = p2 * 3 * Math.pow(t, 2) * (1 - t);
+    double p3Part = p3 * Math.pow(t, 3);
 
-    return (float) (p1Part + p2Part);
+    return (float) (p0Part + p1Part + p2Part + p3Part);
   }
 
+  /*------------------ SCENE GRAPH -----------------------*/
   /**
    * Renders the cylinder base of the lamp
    *
@@ -384,8 +406,11 @@ public class Lamp {
     float outerBaseHeight = baseHeight / 3.5f;
     float outerBasePosY = -baseHeight / 4 + outerBaseHeight / 4;
 
-    baseRotateY = new TransformNode("Head joint rotate Y",
+    baseRotateY = new TransformNode("Base rotate Y",
         Mat4Transform.rotateAroundY(DEFAULT_BASE_ANGLE_Y));
+
+    // For jumping use
+    baseRotateZ = new TransformNode("Base rotate Z", Mat4Transform.rotateAroundZ(0));
 
     NameNode innerBase = new NameNode("Inner base");
     Mat4 m = Mat4Transform.scale(lampRadius, baseHeight, lampRadius);
@@ -399,9 +424,10 @@ public class Lamp {
     ModelNode outerBaseModel = new ModelNode("Outer base model", cylinder);
 
     parent.addChild(baseRotateY);
-    baseRotateY.addAllChildren(innerBase, innerBaseTransform, innerBaseModel);
-      createLowerBody(innerBase);
-    baseRotateY.addAllChildren(outerBase, outerBaseTransform, outerBaseModel);
+      baseRotateY.addChild(baseRotateZ);
+        baseRotateZ.addAllChildren(innerBase, innerBaseTransform, innerBaseModel);
+          createLowerBody(innerBase);
+        baseRotateZ.addAllChildren(outerBase, outerBaseTransform, outerBaseModel);
   }
 
   /**
