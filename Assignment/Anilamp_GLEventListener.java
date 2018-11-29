@@ -9,7 +9,7 @@ import shapes.*;
  * I declare that this code is my own work.
  * OpenGL event listener class
  *
- * @author Zer Jun Eng
+ * @author Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 class Anilamp_GLEventListener implements GLEventListener {
   Anilamp_GLEventListener(Camera camera) {

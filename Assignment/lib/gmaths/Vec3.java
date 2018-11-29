@@ -1,5 +1,11 @@
 package lib.gmaths;
 
+/**
+ * A class for a 3D vector.
+ * This includes two components: x, y, and z.
+ *
+ * @author    Dr Steve Maddock
+ */
 public final class Vec3 {
   public float x;
   public float y;

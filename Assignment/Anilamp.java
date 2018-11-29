@@ -9,10 +9,10 @@ import lib.*;
 
 /**
  * I declare that this code is my own work. UI are generated using Eclipse Window Builder and
- * modified by myself.
+ * modified by myself. MyKeyboardInput and MyMouseInput was adapted from M04.java
  * Main class for the program
  *
- * @author Zer Jun Eng
+ * @author Zer Jun Eng (zjeng1@sheffield.ac.uk) and Dr. Steve Maddock
  */
 public class Anilamp extends JFrame {
 
@@ -324,7 +324,10 @@ public class Anilamp extends JFrame {
     // Animation controls
     random.addActionListener(e -> glEventListener.lamp.clickedRandom = true);
     reset.addActionListener(e -> glEventListener.lamp.clickedReset = true);
-    jump.addActionListener(e -> glEventListener.lamp.clickedJump = true);
+    jump.addActionListener(e -> {
+      glEventListener.lamp.clickedReset = true;
+      glEventListener.lamp.clickedJump = true;
+    });
 
     return lampPanel;
   }

@@ -73,7 +73,7 @@ public class Mesh {
     gl.glBindVertexArray(0);
   }
 
-  public void dispose(GL3 gl) {
+  void dispose(GL3 gl) {
     gl.glDeleteBuffers(1, vertexBufferId, 0);
     gl.glDeleteVertexArrays(1, vertexArrayId, 0);
     gl.glDeleteBuffers(1, elementBufferId, 0);

@@ -4,7 +4,7 @@ package shapes;
  * I declare that this code is my own work
  * A class for drawing a frustum cone, createVertices() is adapted and modified from Sphere.java
  *
- * @author Zer Jun Eng
+ * @author Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public class FrustumCone {
 

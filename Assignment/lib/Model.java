@@ -9,7 +9,7 @@ import lib.gmaths.*;
  * Constructors and renders are modified
  * A new method is added for daytime / nighttime transformation
  *
- * @author Dr. Steve Maddock and Zer Jun Eng
+ * @author Dr. Steve Maddock and Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public class Model {
 

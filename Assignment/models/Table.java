@@ -9,7 +9,7 @@ import shapes.*;
  * I declare that this code is my own work
  * A class for rendering the table
  *
- * @author Zer Jun Eng
+ * @author Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public class Table {
 

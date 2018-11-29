@@ -7,7 +7,6 @@ import lib.gmaths.*;
  *
  * @author Dr. Steve Maddock
  */
-
 public class Camera {
 
   public enum CameraType {X, Z, NZ, DESK}
@@ -90,7 +89,7 @@ public class Camera {
     pitch = (float) Math.asin(v.y);
   }
 
-  public Mat4 getViewMatrix() {
+  Mat4 getViewMatrix() {
     target = Vec3.add(position, front);
     return Mat4Transform.lookAt(position, target, up);
   }
@@ -99,7 +98,7 @@ public class Camera {
     perspective = m;
   }
 
-  public Mat4 getPerspectiveMatrix() {
+  Mat4 getPerspectiveMatrix() {
     return perspective;
   }
 

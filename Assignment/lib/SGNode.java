@@ -8,7 +8,7 @@ import lib.gmaths.*;
  * SGNode class adapted from tutorial 7
  * addAllChildren() is created to simplify the scene graph creation process
  *
- * @author Dr. Steve Maddock and Zer Jun Eng
+ * @author Dr. Steve Maddock and Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public class SGNode {
 

@@ -12,7 +12,7 @@ import shapes.*;
  * A new render method has been added to allow Light in scene graph
  * setDirection() and getDirection() have been added for spotlight
  *
- * @author Dr. Steve Maddock and Zer Jun Eng
+ * @author Dr. Steve Maddock and Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public class Light {
 
@@ -58,22 +58,22 @@ public class Light {
   }
 
   /**
-   * Sets the direction of the spotlight
-   *
-   * @param v 3D vector
-   */
-  public void setDirection(Vec3 v) {
-    direction.x = v.x;
-    direction.y = v.y;
-    direction.z = v.z;
-  }
-
-  /**
    * Gets the direction of the spotlight
    *
    * @return The direction of the spotlight
    */
   Vec3 getDirection() { return direction; }
+
+  /**
+   * Sets the direction of the spotlight
+   *
+   * @param v 3D vector
+   */
+  void setDirection(Vec3 v) {
+    direction.x = v.x;
+    direction.y = v.y;
+    direction.z = v.z;
+  }
 
   public void setMaterial(Material m) { material = m; }
 
@@ -89,7 +89,7 @@ public class Light {
     this.spotlightIntensity = value;
   }
 
-  public void setCamera(Camera camera) {
+  private void setCamera(Camera camera) {
     this.camera = camera;
   }
 
@@ -141,11 +141,8 @@ public class Light {
   // anticlockwise/counterclockwise ordering
 
   private static float[] vertices = Sphere.vertices.clone();
-
   private static int[] indices = Sphere.indices.clone();
 
-  private int vertexStride = 8;
-  private int vertexXYZFloats = 3;
 
   // ***************************************************
   /* THE LIGHT BUFFERS
@@ -164,8 +161,8 @@ public class Light {
 
     gl.glBufferData(GL.GL_ARRAY_BUFFER, Float.BYTES * vertices.length, fb, GL.GL_STATIC_DRAW);
 
-    int stride = vertexStride;
-    int numXYZFloats = vertexXYZFloats;
+    int stride = 8;
+    int numXYZFloats = 3;
     int offset = 0;
     gl.glVertexAttribPointer(0, numXYZFloats, GL.GL_FLOAT, false, stride * Float.BYTES, offset);
     gl.glEnableVertexAttribArray(0);

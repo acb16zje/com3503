@@ -4,7 +4,7 @@ package shapes;
  * I declare that this code is my own work
  * A class to draw cylinder, adapted and modified from Sphere.java
  *
- * @author Zer Jun Eng
+ * @author Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public final class Cylinder {
 

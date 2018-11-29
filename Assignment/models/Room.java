@@ -9,7 +9,7 @@ import shapes.*;
  * I declare that this code is my own work.
  * A class for rendering a floor, a wall with a hole, and a wallpaper with a hole
  *
- * @author Zer Jun Eng
+ * @author Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public class Room {
 

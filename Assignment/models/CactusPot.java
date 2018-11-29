@@ -8,7 +8,7 @@ import lib.gmaths.*;
  * I declare that this code is my own work.
  * A class for rendering a cactus pot on the left side of the picture frame
  *
- * @author Zer Jun Eng
+ * @author Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public class CactusPot {
 

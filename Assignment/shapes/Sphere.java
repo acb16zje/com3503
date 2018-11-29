@@ -45,8 +45,8 @@ public final class Sphere {
 
     //debugging code:
     //for (int i=0; i<vertices.length; i+=step) {
-    //     //  System.out.println(vertices[i]+", "+vertices[i+1]+", "+vertices[i+2]);
-    //     //}
+    //  System.out.println(vertices[i]+", "+vertices[i+1]+", "+vertices[i+2]);
+    //}
   }
 
   private static int[] createIndices() {

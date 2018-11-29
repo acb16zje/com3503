@@ -6,7 +6,7 @@ import com.jogamp.opengl.*;
  * I declare that this code is my own work
  * A class for spotlight
  *
- * @author Zer Jun Eng
+ * @author Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public class Spotlight extends Light {
 

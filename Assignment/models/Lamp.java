@@ -8,7 +8,7 @@ import lib.gmaths.*;
 /**
  * A class for rendering a lamp with spotlight and animation
  *
- * @author Zer Jun Eng
+ * @author Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public class Lamp {
 
@@ -89,8 +89,8 @@ public class Lamp {
     baseHeight = Table.tableHeight * 0.06f;
     jointRadius = lampRadius * 0.2f;
     bodyRadius = jointRadius / 2;
-    lowerBodyHeight = Table.tableHeight * 0.45f;
-    upperBodyHeight = Table.tableHeight * 0.4f;
+    lowerBodyHeight = Table.tableHeight * 0.4f;
+    upperBodyHeight = Table.tableHeight * 0.37f;
 
     lampX = -Table.tableWidth / 2 + 2;
     lampY = (Table.FRAME_DIM + baseHeight / 2) / 2;
@@ -267,7 +267,6 @@ public class Lamp {
 
     final float SPEED_CONSTANT = 2.8f;
     jumpSpeed = SPEED_CONSTANT / jumpHeight;
-    System.out.println("Distance: " + distance + "       Height: " + jumpHeight + "    Speed: " + jumpSpeed);
 
     /* Angle to compress */
     final float BASE_CONSTANT = 40;
@@ -277,6 +276,7 @@ public class Lamp {
     targetLowerJointAngle = (MAX_LOWER_JOINT_ANGLE_Z - initialLowerJointAngle) * COMPRESS_CONSTANT;
     targetUpperJointAngle = (MIN_UPPER_JOINT_ANGLE_Z - initialUpperJointAngle) * COMPRESS_CONSTANT;
     targetHeadJointAngleY = DEFAULT_HEAD_JOINT_ANGLE_Y - initialHeadJointAngleY;
+    targetHeadJointAngleZ = (MAX_HEAD_JOINT_ANGLE_Z - initialHeadJointAngleZ) / 2;
 
     clickedJump = false;
     isAnimatingJump = true;
@@ -337,26 +337,14 @@ public class Lamp {
     time = (float) Math.sin(time * jumpSpeed); // Speed is affected by height and distance
 
     float translateBPosX = initialPosX + (targetPosX - initialPosX) * time; // Base Pos X
-    float translateBPosY = bezierCurve(0, jumpHeight, jumpHeight, 0, time); // Base Pos Y
+    float translateBPosY = bezierCurve(jumpHeight, jumpHeight, time); // Base Pos Y
     float translateBPosZ = initialPosZ + (targetPosZ - initialPosZ) * time; // Base Pos Z
 
-    // Fine
-    float rotateAngleBZ = bezierCurve(0, -baseSwingAngle / 1.2f, baseSwingAngle, 0, time); // Base swing
-    float rotateAngleL = bezierCurve(
-        initialLowerJointAngle,
-        -initialLowerJointAngle / 2,
-        -initialLowerJointAngle / 2,
-        initialLowerJointAngle,
-        time); // Lower joint compress
+    // Fine tuning the jumping animation
+    float rotateAngleBZ = bezierCurve(-baseSwingAngle / 1.2f, baseSwingAngle, time); // Base swing
 
-    float rotateAngleU = bezierCurve(
-        initialUpperJointAngle,
-        0f,
-        -0f,
-        initialUpperJointAngle,
-        time); // Upper joint compress
-
-    System.out.println(rotateAngleU);
+    final float STRETCH = (initialLowerJointAngle - DEFAULT_LOWER_JOINT_ANGLE_Z) * 3.5f;
+    float rotateAngleU = initialUpperJointAngle + bezierCurve(STRETCH, -STRETCH / 2, time); // Upper joint stretch and compress
 
     float finalBasePosX = targetPosX - translateBPosX;
     float finalBasePosZ = targetPosZ - translateBPosZ;
@@ -371,7 +359,6 @@ public class Lamp {
     } else {
       rootTranslateX.setTransform(Mat4Transform.translate(translateBPosX, translateBPosY, translateBPosZ));
       baseRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleBZ));
-      lowerJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleL));
       upperJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleU));
     }
   }
@@ -379,20 +366,16 @@ public class Lamp {
   /**
    * Bezier cubic curve calculation
    *
-   * @param p0 The starting point
    * @param p1 Guide point P1
    * @param p2 Guide point P2
-   * @param p3 The end point
    * @param t The time, 0 < t < 1
    * @return The value at a the given t
    */
-  private float bezierCurve(float p0, float p1, float p2, float p3, float t) {
-    double p0Part = p0 * Math.pow((1 - t), 3);
+  private float bezierCurve(float p1, float p2, float t) {
     double p1Part = p1 * 3 * t * Math.pow((1 - t), 2);
     double p2Part = p2 * 3 * Math.pow(t, 2) * (1 - t);
-    double p3Part = p3 * Math.pow(t, 3);
 
-    return (float) (p0Part + p1Part + p2Part + p3Part);
+    return (float) (p1Part + p2Part);
   }
 
   /*------------------ SCENE GRAPH -----------------------*/

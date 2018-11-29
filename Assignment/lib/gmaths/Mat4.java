@@ -1,18 +1,20 @@
 package lib.gmaths;
 
 /**
- * A matrix class
+ * A matrix class, provided by Dr Steve Maddock.
+ * Added getTranslationVec() and getRotationVec() for the position and the
+ * direction of the spotlight
  *
- * @author Dr. Steve Maddock and Zer Jun Eng
+ * @author Dr. Steve Maddock and Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public class Mat4 {   // row column formulation
 
   private float[][] values;
-  
+
   public Mat4() {
     this(0);
   }
-  
+
   public Mat4(float f) {
     values = new float[4][4];
     makeZero();
@@ -20,18 +22,18 @@ public class Mat4 {   // row column formulation
       values[i][i] = f;
     }
   }
-  
+
   public Mat4(Mat4 m) {
     this.values = new float[4][4];
     for (int i=0; i<4; ++i) {
       System.arraycopy(m.values[i], 0, this.values[i], 0, 4);
     }
   }
-  
+
   public void set(int r, int c, float f) {
     values[r][c] = f;
   }
-  
+
   private void makeZero() {
     for (int i=0; i<4; ++i) {
       for (int j=0; j<4; ++j) {
@@ -39,7 +41,7 @@ public class Mat4 {   // row column formulation
       }
     }
   }
-  
+
   public void transpose() {
     for (int i=0; i<4; ++i) {
       for (int j=i; j<4; ++j) {
@@ -49,7 +51,7 @@ public class Mat4 {   // row column formulation
       }
     }
   }
-    
+
   public static Mat4 transpose(Mat4 m) {
     Mat4 a = new Mat4(m);
     for (int i=0; i<4; ++i) {
@@ -115,9 +117,9 @@ public class Mat4 {   // row column formulation
     b.values[3][2] = (-m.values[3][0] * s3 + m.values[3][1] * s1 - m.values[3][2] * s0) * invdet;
     b.values[3][3] = ( m.values[2][0] * s3 - m.values[2][1] * s1 + m.values[2][2] * s0) * invdet;
 
-    return b; 
+    return b;
   }
-  
+
   public float[] toFloatArrayForGLSL() {  // col by row
     float[] f = new float[16];
     for (int j=0; j<4; ++j) {
@@ -170,7 +172,7 @@ public class Mat4 {   // row column formulation
     }
     return s.toString();
   }
-  
+
   public String toString() {
     StringBuilder s = new StringBuilder("{");
     for (int i=0; i<4; ++i) {
@@ -180,9 +182,9 @@ public class Mat4 {   // row column formulation
         if (j<3) s.append(", ");
       }
       s.append((i == 3) ? "}" : "},\n");
-    } 
+    }
     s.append("}");
     return s.toString();
   }
-  
+
 } // end of Mat4 class

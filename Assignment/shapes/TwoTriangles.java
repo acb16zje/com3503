@@ -4,7 +4,7 @@ package shapes;
  * TwoTriangles class adapted from tutorial 7
  * I declare that the code below line 27 is my own work
  *
- * @author Dr. Steve Maddock and Zer Jun Eng
+ * @author Dr. Steve Maddock and Zer Jun Eng (zjeng1@sheffield.ac.uk)
  */
 public final class TwoTriangles {
 
