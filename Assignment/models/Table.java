@@ -17,13 +17,25 @@ public class Table {
   static SGNode tableRoot;
   static NameNode tableTop;
 
-  private Model tableFrame, drawerGaps, drawerHandle;
+  private final Model tableFrame;
+  private final Model drawerGaps;
+  private final Model drawerHandle;
 
   static float tableWidth, tableHeight, tableDepth;
-  private float roomWidth, roomHeight, roomDepth;
-  private float drawerWidth, drawerHeight, drawerDepth, topDrawerHeight, bottomDrawerHeight;
-  private float handleWidth, handleHeight, handleDepth, supportHeight;
-  private float gapsWidth, gapsDepth;
+  private final float roomWidth;
+  private final float roomHeight;
+  private final float roomDepth;
+  private final float drawerWidth;
+  private final float drawerHeight;
+  private final float drawerDepth;
+  private final float topDrawerHeight;
+  private final float bottomDrawerHeight;
+  private final float handleWidth;
+  private final float handleHeight;
+  private final float handleDepth;
+  private final float supportHeight;
+  private final float gapsWidth;
+  private final float gapsDepth;
 
   // Dimension ratio of table with respect to room dimension
   private static final Vec3 RATIO = new Vec3(0.679f, 0.39f, 0.286f);

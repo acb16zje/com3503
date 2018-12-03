@@ -16,13 +16,6 @@ public class TransformNode extends SGNode {
     transform = new Mat4(t);
   }
 
-  /**
-   * Gets the transform matrix of the transform node
-   *
-   * @return The transform matrix
-   */
-  public Mat4 getTransform() { return transform; }
-
   public void setTransform(Mat4 m) {
     transform = new Mat4(m);
   }

@@ -15,10 +15,17 @@ public class OutsideScene {
 
   private SGNode sceneRoot;
 
-  private Model grass, garden, leftGarden, rightGarden, sky;
+  private final Model grass;
+  private final Model garden;
+  private final Model leftGarden;
+  private final Model rightGarden;
+  private final Model sky;
 
-  private double startTime;
-  private float roomWidth, roomHeight, roomDepth, grassDepth;
+  private final double startTime;
+  private final float roomWidth;
+  private final float roomHeight;
+  private final float roomDepth;
+  private final float grassDepth;
 
   /**
    * Outside scene constructor

@@ -13,19 +13,15 @@ public class Camera {
 
   public enum Movement {NO_MOVEMENT, LEFT, RIGHT, UP, DOWN, FORWARD, BACK}
 
-  private static final float DEFAULT_RADIUS = 25;
   public static final Vec3 ROOM_X = new Vec3(0, 10, 25);
-  public static final Vec3 ROOM_Z = new Vec3(25, 10, 0);
-  public static final Vec3 ROOM_NZ = new Vec3(-25, 10, 0);
-  public static final Vec3 DESK_X = new Vec3(0, 12, 3);
+  private static final Vec3 ROOM_Z = new Vec3(25, 10, 0);
+  private static final Vec3 ROOM_NZ = new Vec3(-25, 10, 0);
+  private static final Vec3 DESK_X = new Vec3(0, 12, 3);
   public static final Vec3 DEFAULT_TARGET = new Vec3(0, 8, 0);
-  public static final Vec3 DESK_TARGET = new Vec3(0, 11, 0);
+  private static final Vec3 DESK_TARGET = new Vec3(0, 11, 0);
   public static final Vec3 DEFAULT_UP = new Vec3(0, 11, 0);
 
-  public final float YAW = -90f;
-  public final float PITCH = 0f;
-  public final float KEYBOARD_SPEED = 0.2f;
-  public final float MOUSE_SPEED = 1.0f;
+  private final float KEYBOARD_SPEED = 0.2f;
 
   private Vec3 position;
   private Vec3 target;
@@ -57,14 +53,6 @@ public class Camera {
 
   public Vec3 getPosition() {
     return new Vec3(position);
-  }
-
-  public void setPosition(Vec3 p) {
-    setupCamera(p, target, up);
-  }
-
-  public void setTarget(Vec3 t) {
-    setupCamera(position, t, up);
   }
 
   public void setCamera(CameraType c) {

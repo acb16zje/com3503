@@ -9,7 +9,7 @@ import com.jogamp.opengl.*;
  */
 public class ModelNode extends SGNode {
 
-  protected Model model;
+  private final Model model;
 
   public ModelNode(String name, Model m) {
     super(name);

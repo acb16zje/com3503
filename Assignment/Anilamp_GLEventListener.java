@@ -160,7 +160,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Render all scenes
+   * Render all scenes.
    *
    * @param gl OpenGL object, for rendering
    */
@@ -200,7 +200,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   private Shader cubeShader, twoTrianglesShader;
 
   /**
-   * Creates constant meshes, shaders
+   * Creates constant meshes, shaders.
    *
    * @param gl OpenGL object
    */
@@ -223,7 +223,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   boolean spotlightIsOn = true;
 
   /**
-   * Sets the intensity of the world lights
+   * Sets the intensity of the world lights.
    *
    * @param intensity The intensity spinner value
    */
@@ -240,7 +240,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Sets the spotlight on or off
+   * Sets the spotlight on or off.
    */
   void setSpotlightOnOrOff() {
     if (spotlightIsOn) {
@@ -258,7 +258,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   /* MODELS */
 
   /**
-   * Creates the model of floor
+   * Creates the model of floor.
    *
    * @param gl OpenGL object, for modelling
    */
@@ -274,7 +274,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Creates the model of wall
+   * Creates the model of wall.
    *
    * @param gl OpenGL object, for modelling
    */
@@ -290,7 +290,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Creates the model of wallpaper
+   * Creates the model of wallpaper.
    *
    * @param gl OpenGL object, for modelling
    */
@@ -345,7 +345,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Creates the model of window
+   * Creates the model of window.
    *
    * @param gl OpenGL object, for modelling
    */
@@ -368,7 +368,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Creates the model of table
+   * Creates the model of table.
    *
    * @param gl OpenGL object, for modelling
    */
@@ -389,7 +389,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Creates a picture frame
+   * Creates a picture frame.
    *
    * @param gl OpenGL object, for modelling
    */
@@ -411,7 +411,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Creates a cactus plant pot
+   * Creates a cactus plant pot.
    *
    * @param gl OpenGL object, for modelling
    */
@@ -433,7 +433,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Creates a piggy bank
+   * Creates a piggy bank.
    *
    * @param gl OpenGL object, for modelling
    */
@@ -457,7 +457,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Creates the outside scene
+   * Creates the outside scene.
    *
    * @param gl OpenGL object, for modelling
    */
@@ -514,7 +514,7 @@ class Anilamp_GLEventListener implements GLEventListener {
   }
 
   /**
-   * Creates the model of lamp
+   * Creates the model of lamp.
    *
    * @param gl OpenGL object, for modelling
    */

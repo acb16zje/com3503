@@ -14,16 +14,30 @@ public class PiggyBank {
 
   private SGNode piggyRoot;
 
-  private Model body, nose, ear, leg, cubeDeco, sphereDeco;
+  private final Model body;
+  private final Model nose;
+  private final Model ear;
+  private final Model leg;
+  private final Model cubeDeco;
+  private final Model sphereDeco;
 
-  private float bodyWidth, bodyHeight, bodyDepth;
-  private float eyeRadius, holeWidth, holeDepth;
-  private float legHeight, legScale;
-  private float noseScale, noseDecoHeight, noseDecoDepth;
-  private float earWidth, earHeight, earDepth;
+  private final float bodyWidth;
+  private final float bodyHeight;
+  private final float bodyDepth;
+  private final float eyeRadius;
+  private final float holeWidth;
+  private final float holeDepth;
+  private final float legHeight;
+  private final float legScale;
+  private final float noseScale;
+  private final float noseDecoHeight;
+  private final float noseDecoDepth;
+  private final float earWidth;
+  private final float earHeight;
+  private final float earDepth;
 
   // The Z position of the piggy bank
-  private float piggyZ;
+  private final float piggyZ;
 
   /**
    * Piggy bank constructor

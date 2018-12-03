@@ -27,15 +27,11 @@ public final class Vec3 {
     this.z = v.z;
   }
 
-  public float length() {
-    return magnitude();
-  }
-    
-  public float magnitude() {
+  private float magnitude() {
     return magnitude(this);
   }
   
-  public static float magnitude(Vec3 v) {
+  private static float magnitude(Vec3 v) {
     return (float)Math.sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
   }
   
@@ -45,12 +41,7 @@ public final class Vec3 {
     y /= mag;
     z /= mag;
   }
-  
-  public static Vec3 normalize(Vec3 v) {
-    float mag = magnitude(v);   // fails if mag = 0
-    return new Vec3(v.x/mag, v.y/mag, v.z/mag);
-  }
-  
+
   public void add(Vec3 v) {
     x += v.x;
     y += v.y;
@@ -60,31 +51,11 @@ public final class Vec3 {
   public static Vec3 add(Vec3 a, Vec3 b) {
     return new Vec3(a.x+b.x, a.y+b.y, a.z+b.z);
   }
-    
-  public void subtract(Vec3 v) {
-    x -= v.x;
-    y -= v.y;
-    z -= v.z;
-  }
-  
+
   public static Vec3 subtract(Vec3 a, Vec3 b) {
     return new Vec3(a.x-b.x, a.y-b.y, a.z-b.z);
-  } 
-  
-  public float dotProduct(Vec3 v) {
-    return dotProduct(this, v);
   }
-  
-  public static float dotProduct(Vec3 a, Vec3 b) {
-    return a.x*b.x + a.y*b.y + a.z*b.z;
-  }
-  
-  public void multiply(float f) {
-    x*=f;
-    y*=f;
-    z*=f;
-  }
-  
+
   public static Vec3 multiply(Vec3 v, float f) {
     return new Vec3(v.x*f, v.y*f, v.z*f);
   }

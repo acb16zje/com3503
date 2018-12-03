@@ -14,19 +14,32 @@ public class Lamp {
 
   private SGNode lampRoot;
   private TransformNode rootTranslateX;
-  private TransformNode baseRotateY, baseRotateZ;
+  private TransformNode baseRotateY;
+  private TransformNode baseRotateZ;
   private TransformNode lowerJointRotateZ;
   private TransformNode upperJointRotateZ;
   private TransformNode headJointRotateY, headJointRotateZ;
 
-  private Model cube, cylinder, sphere, frustumCone, lampEar, lowerTail;
-  private Light lampLight;
+  private final Model cube;
+  private final Model cylinder;
+  private final Model sphere;
+  private final Model frustumCone;
+  private final Model lampEar;
+  private final Model lowerTail;
+  private final Light lampLight;
 
-  private float lampRadius, baseHeight, jointRadius, bodyRadius, lowerBodyHeight, upperBodyHeight;
-  private float lampX, lampY;
+  private final float lampRadius;
+  private final float baseHeight;
+  private final float jointRadius;
+  private final float bodyRadius;
+  private final float lowerBodyHeight;
+  private final float upperBodyHeight;
+  private final float lampX;
+  private final float lampY;
 
   private double startTime;
 
+  // Animation controls
   public boolean clickedRandom = false;
   public boolean isAnimatingRandom = false;
 
@@ -36,31 +49,48 @@ public class Lamp {
   public boolean clickedJump = false;
   public boolean isAnimatingJump = false;
   private boolean preparingToJump = false;
-  private float jumpHeight, jumpSpeed = 1;
+  private float jumpHeight;
+  private float jumpSpeed = 1;
 
+  // Angle and position
   private final int DEFAULT_BASE_ANGLE_Y = -20;
-  private float initialBaseAngle = DEFAULT_BASE_ANGLE_Y, targetBaseAngle, baseSwingAngle;
-  private float initialPosX, targetPosX, targetPosZ, initialPosZ, distance, maxDistance;
+  private float initialBaseAngle = DEFAULT_BASE_ANGLE_Y;
+  private float targetBaseAngle;
+  private float baseSwingAngle;
+  private float initialPosX;
+  private float targetPosX;
+  private float targetPosZ;
+  private float initialPosZ;
+  private float distance;
+  private float maxDistance;
 
+  // Lower joint
   private final int DEFAULT_LOWER_JOINT_ANGLE_Z = 10;
   private final int MIN_LOWER_JOINT_ANGLE_Z = -20;
   private final int MAX_LOWER_JOINT_ANGLE_Z = 60;
-  private float initialLowerJointAngle = DEFAULT_LOWER_JOINT_ANGLE_Z, targetLowerJointAngle;
+  private float initialLowerJointAngle = DEFAULT_LOWER_JOINT_ANGLE_Z;
+  private float targetLowerJointAngle;
 
+  // Upper joint
   private final int DEFAULT_UPPER_JOINT_ANGLE_Z = -60;
   private final int MIN_UPPER_JOINT_ANGLE_Z = -120;
   private final int MAX_UPPER_JOINT_ANGLE_Z = 0;
-  private float initialUpperJointAngle = DEFAULT_UPPER_JOINT_ANGLE_Z, targetUpperJointAngle;
+  private float initialUpperJointAngle = DEFAULT_UPPER_JOINT_ANGLE_Z;
+  private float targetUpperJointAngle;
 
+  // Head joint Y
   private final int DEFAULT_HEAD_JOINT_ANGLE_Y = 0;
   private final int MIN_HEAD_JOINT_ANGLE_Y = -80;
   private final int MAX_HEAD_JOINT_ANGLE_Y = 80;
-  private float initialHeadJointAngleY = DEFAULT_HEAD_JOINT_ANGLE_Y, targetHeadJointAngleY;
+  private float initialHeadJointAngleY = DEFAULT_HEAD_JOINT_ANGLE_Y;
+  private float targetHeadJointAngleY;
 
+  // Head joint Z
   private final int DEFAULT_HEAD_JOINT_ANGLE_Z = -10;
   private final int MIN_HEAD_JOINT_ANGLE_Z = -30;
   private final int MAX_HEAD_JOINT_ANGLE_Z = 50;
-  private float initialHeadJointAngleZ = DEFAULT_HEAD_JOINT_ANGLE_Z, targetHeadJointAngleZ;
+  private float initialHeadJointAngleZ = DEFAULT_HEAD_JOINT_ANGLE_Z;
+  private float targetHeadJointAngleZ;
 
   private final Random r = new Random();
 

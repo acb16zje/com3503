@@ -15,12 +15,18 @@ public class Window {
 
   private SGNode windowRoot;
 
-  private Model windowFrame, glass;
+  private final Model windowFrame;
+  private final Model glass;
 
-  private float roomWidth, roomHeight, roomDepth;
-  private float windowWidth, windowHeight;
-  private float glassWidth, glassHeight, glassDepth;
-  private Mat4 glassScale;
+  private final float roomWidth;
+  private final float roomHeight;
+  private final float roomDepth;
+  private final float windowWidth;
+  private final float windowHeight;
+  private final float glassWidth;
+  private final float glassHeight;
+  private final float glassDepth;
+  private final Mat4 glassScale;
   private final float FRAME_DIM = Cube.THICKNESS / 2;
 
   // Dimension ratio of window with respect to room dimension

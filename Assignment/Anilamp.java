@@ -23,14 +23,16 @@ public class Anilamp extends JFrame {
   static JButton random, reset, jump;
 
   /**
-   * The main method for Anilamp
+   * The main method for Anilamp.
    *
    * @param args Command line arguments  (not used)
    */
-  public static void main(String[] args) { new Anilamp(); }
+  public static void main(String[] args) {
+    new Anilamp();
+  }
 
   /**
-   * Constructor for the Anilamp frame
+   * Constructor for the Anilamp frame.
    */
   private Anilamp() {
     final Container contentPane = getContentPane();
@@ -56,7 +58,7 @@ public class Anilamp extends JFrame {
   }
 
   /**
-   * Sets the frame properties
+   * Sets the frame properties.
    */
   private void setFrameProperties() {
     final int WIDTH = 1422;
@@ -76,7 +78,7 @@ public class Anilamp extends JFrame {
   }
 
   /**
-   * Creates a panel containing control buttons
+   * Creates a panel containing control buttons.
    *
    * @return A JPanel containing the control buttons
    */
@@ -91,7 +93,7 @@ public class Anilamp extends JFrame {
   }
 
   /**
-   * Creates a subpanel for camera control
+   * Creates a subpanel for camera control.
    *
    * @return Camera subpanel
    */
@@ -172,7 +174,7 @@ public class Anilamp extends JFrame {
   }
 
   /**
-   * Creates a subpanel for light control
+   * Creates a subpanel for light control.
    *
    * @return Light subpanel
    */
@@ -249,7 +251,7 @@ public class Anilamp extends JFrame {
   }
 
   /**
-   * Creates subpanel for lamp controls
+   * Creates subpanel for lamp controls.
    *
    * @return Lamp subpanel
    */
@@ -386,7 +388,7 @@ public class Anilamp extends JFrame {
     }
 
     /**
-     * mouse is used to control camera position
+     * mouse is used to control camera position.
      *
      * @param e instance of MouseEvent
      */
@@ -402,7 +404,7 @@ public class Anilamp extends JFrame {
     }
 
     /**
-     * mouse is used to control camera position
+     * mouse is used to control camera position.
      *
      * @param e instance of MouseEvent
      */

@@ -13,15 +13,15 @@ import lib.gmaths.*;
  */
 public class Model {
 
-  private Mesh mesh;
+  private final Mesh mesh;
   private float offsetX = 0, offsetY = 0;
-  private int[] textureId1;
-  private int[] textureId2;
-  private Material material;
-  private Shader shader;
-  private Mat4 modelMatrix;
-  private Camera camera;
-  private List<Light> lightList;
+  private final int[] textureId1;
+  private final int[] textureId2;
+  private final Material material;
+  private final Shader shader;
+  private final Mat4 modelMatrix;
+  private final Camera camera;
+  private final List<Light> lightList;
 
   public Model(Camera camera, List<Light> lightList, Shader shader, Material material, Mesh mesh,
       int[] textureId1, int[] textureId2) {
@@ -38,10 +38,6 @@ public class Model {
   public Model(Camera camera, List<Light> lightList, Shader shader, Material material, Mesh mesh,
       int[] textureId1) {
     this(camera, lightList, shader, material, mesh, textureId1, null);
-  }
-
-  public void setModelMatrix(Mat4 m) {
-    modelMatrix = m;
   }
 
   /**
@@ -124,10 +120,6 @@ public class Model {
       gl.glBindTexture(GL.GL_TEXTURE_2D, textureId2[0]);
     }
     mesh.render(gl);
-  }
-
-  public void render(GL3 gl) {
-    render(gl, modelMatrix);
   }
 
   public void dispose(GL3 gl) {

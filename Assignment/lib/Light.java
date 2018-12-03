@@ -16,10 +16,10 @@ import shapes.*;
  */
 public class Light {
 
-  private Material material;
-  private Vec3 position;
-  private Vec3 direction = new Vec3();
-  private Shader shader;
+  private final Material material;
+  private final Vec3 position;
+  private final Vec3 direction = new Vec3();
+  private final Shader shader;
   private Camera camera;
   private float lightColor = 1;
   private float spotlightIntensity = 1;
@@ -74,8 +74,6 @@ public class Light {
     direction.y = v.y;
     direction.z = v.z;
   }
-
-  public void setMaterial(Material m) { material = m; }
 
   public Material getMaterial() {
     return material;
@@ -140,17 +138,17 @@ public class Light {
    */
   // anticlockwise/counterclockwise ordering
 
-  private static float[] vertices = Sphere.vertices.clone();
-  private static int[] indices = Sphere.indices.clone();
+  private static final float[] vertices = Sphere.vertices.clone();
+  private static final int[] indices = Sphere.indices.clone();
 
 
   // ***************************************************
   /* THE LIGHT BUFFERS
    */
 
-  private int[] vertexBufferId = new int[1];
-  private int[] vertexArrayId = new int[1];
-  private int[] elementBufferId = new int[1];
+  private final int[] vertexBufferId = new int[1];
+  private final int[] vertexArrayId = new int[1];
+  private final int[] elementBufferId = new int[1];
 
   private void fillBuffers(GL3 gl) {
     gl.glGenVertexArrays(1, vertexArrayId, 0);

@@ -19,7 +19,7 @@ public final class TextureLibrary {
   }
 
 
-  public static int[] loadTexture(GL3 gl, String filename,
+  private static int[] loadTexture(GL3 gl, String filename,
       int wrappingS, int wrappingT, int filterS, int filterT) {
     int[] textureId = new int[1];
     try {

@@ -10,7 +10,7 @@ import com.jogamp.opengl.*;
  */
 public class LightNode extends SGNode {
 
-  protected Light light;
+  private final Light light;
 
   /**
    * LightNode constructor, for spotlight

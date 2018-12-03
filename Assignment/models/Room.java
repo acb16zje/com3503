@@ -15,13 +15,20 @@ public class Room {
 
   private SGNode roomRoot;
 
-  private Model floor, wall;                                                   // Cube models
+  private final Model floor;
+  private final Model wall;                                                   // Cube models
   private Model topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper;  // TwoTriangles
 
-  private float roomWidth, roomHeight, roomDepth;
-  private float windowWidth, windowMaxYHeight;
-  private float leftWallWidth, leftWallHeight;
-  private float bottomWallWidth, bottomWallHeight, topWallHeight;
+  private final float roomWidth;
+  private final float roomHeight;
+  private final float roomDepth;
+  private final float windowWidth;
+  private final float windowMaxYHeight;
+  private final float leftWallWidth;
+  private final float leftWallHeight;
+  private final float bottomWallWidth;
+  private final float bottomWallHeight;
+  private final float topWallHeight;
 
   /**
    * Room constructor

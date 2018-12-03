@@ -11,15 +11,15 @@ import java.nio.*;
  */
 public class Mesh {
 
-  private float[] vertices;
-  private int[] indices;
-  private int vertexStride = 8;
-  private int vertexXYZFloats = 3;
-  private int vertexNormalFloats = 3;
-  private int vertexTexFloats = 2;
-  private int[] vertexBufferId = new int[1];
-  private int[] vertexArrayId = new int[1];
-  private int[] elementBufferId = new int[1];
+  private final float[] vertices;
+  private final int[] indices;
+  private final int vertexStride = 8;
+  private final int vertexXYZFloats = 3;
+  private final int vertexNormalFloats = 3;
+  private final int vertexTexFloats = 2;
+  private final int[] vertexBufferId = new int[1];
+  private final int[] vertexArrayId = new int[1];
+  private final int[] elementBufferId = new int[1];
 
   public Mesh(GL3 gl, float[] vertices, int[] indices) {
     this.vertices = vertices;
@@ -60,9 +60,8 @@ public class Mesh {
     gl.glEnableVertexAttribArray(1);// Enable the vertex attribute array at location 1
 
     // now do the texture coordinates  in vertex attribute 2
-    int numTexFloats = vertexTexFloats;
     offset = (numXYZFloats + numNormalFloats) * Float.BYTES;
-    gl.glVertexAttribPointer(2, numTexFloats, GL.GL_FLOAT, false, stride * Float.BYTES, offset);
+    gl.glVertexAttribPointer(2, vertexTexFloats, GL.GL_FLOAT, false, stride * Float.BYTES, offset);
     gl.glEnableVertexAttribArray(2);
 
     gl.glGenBuffers(1, elementBufferId, 0);

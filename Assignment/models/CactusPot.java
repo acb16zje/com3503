@@ -14,10 +14,15 @@ public class CactusPot {
 
   private SGNode potRoot;
 
-  private Model pot, cactus, flower;
+  private final Model pot;
+  private final Model cactus;
+  private final Model flower;
 
-  private float potWidth, potHeight, potDepth;
-  private float potX, potZ;                        // The X and Z position of the cactus plant pot
+  private final float potWidth;
+  private final float potHeight;
+  private final float potDepth;
+  private final float potX;
+  private final float potZ;   // The X and Z position of the cactus plant pot
 
   private final float CACTUS_BODY_WIDTH = 0.65f;
   private final float CACTUS_BODY_HEIGHT = 0.8f;

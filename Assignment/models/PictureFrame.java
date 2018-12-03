@@ -15,12 +15,16 @@ public class PictureFrame {
 
   private SGNode frameRoot;
 
-  private Model frame, holder, picture;
+  private final Model frame;
+  private final Model holder;
+  private final Model picture;
 
-  private float frameWidth, frameHeight, holderHeight;
+  private final float frameWidth;
+  private final float frameHeight;
+  private final float holderHeight;
 
   // The X and Z position of the picture frame holder (parent of frame)
-  private float holderX;
+  private final float holderX;
   static float holderZ;
 
   // Used to define the height of horizontal bars, and width of vertical bars

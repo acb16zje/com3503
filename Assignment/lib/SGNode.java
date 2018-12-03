@@ -12,11 +12,11 @@ import lib.gmaths.*;
  */
 public class SGNode {
 
-  String name;
-  ArrayList<SGNode> children;
+  final String name;
+  final ArrayList<SGNode> children;
   Mat4 worldTransform;
 
-  public SGNode(String name) {
+  SGNode(String name) {
     children = new ArrayList<>();
     this.name = name;
     worldTransform = new Mat4(1);
@@ -44,7 +44,7 @@ public class SGNode {
     update(worldTransform);
   }
 
-  protected void update(Mat4 t) {
+  void update(Mat4 t) {
     worldTransform = t;
     for (SGNode aChildren : children) {
       aChildren.update(t);
@@ -59,7 +59,7 @@ public class SGNode {
     return s.toString();
   }
 
-  public void print(int indent, boolean inFull) {
+  void print(int indent, boolean inFull) {
     System.out.println(getIndentString(indent) + "Name: " + name);
     if (inFull) {
       System.out.println("worldTransform");

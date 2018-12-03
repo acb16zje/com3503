@@ -43,16 +43,6 @@ public final class Mat4Transform {   // row column formulation
   /**
    * Creates a 4x4 scale matrix
    *
-   * @param v The scale amount (x,y,z)
-   * @return The resulting 4x4 scale matrix, as a Mat4
-   */
-  public static Mat4 scale(Vec3 v) {
-    return scale(v.x, v.y, v.z);
-  }
-
-  /**
-   * Creates a 4x4 scale matrix
-   *
    * @param sx The scale amount for x
    * @param sy The scale amount for y
    * @param sz The scale amount for z
@@ -134,7 +124,7 @@ public final class Mat4Transform {   // row column formulation
    * @param far The distance of the far clip plane. Default is 100f.
    * @return The resulting perspective matrix, as a Mat4
    */
-  public static Mat4 perspective(float fov, float aspect, float near, float far) {
+  private static Mat4 perspective(float fov, float aspect, float near, float far) {
     float field = (float) Math.tan(Math.toRadians(fov * 0.5f));
     float sx = 1 / (field * aspect);
     float sy = 1 / field;
