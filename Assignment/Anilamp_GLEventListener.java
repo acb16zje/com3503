@@ -26,12 +26,13 @@ class Anilamp_GLEventListener implements GLEventListener {
     gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gl.glClearDepth(1.0f);
     gl.glEnable(GL.GL_DEPTH_TEST);
-    gl.glDepthFunc(GL.GL_LESS);
+    gl.glDepthFunc(GL.GL_LEQUAL);
     gl.glFrontFace(GL.GL_CCW);    // default is 'CCW'
     gl.glEnable(GL.GL_CULL_FACE); // default is 'not enabled'
     gl.glCullFace(GL.GL_BACK);    // default is 'back', assuming CCW
-    gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
     gl.glEnable(GL.GL_BLEND);
+    gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+
     initialise(gl);
   }
 
@@ -74,10 +75,9 @@ class Anilamp_GLEventListener implements GLEventListener {
   private Model frame, holder, picture;                                        // Picture frame
   private Model pot, cactus, flower;                                           // Cactus plant pot
   private Model body, nose, ear, leg, cubeDeco, sphereDeco;                    // Piggy bank
-  private Model grass, garden, leftGarden, rightGarden, sky;                   // Outside scene
   private Model cube, cylinder, sphere, frustumCone;                           // Lamp
   private Model lampEar, lowerTail;                                            // Lamp decorations
-  private Model windowFrame, glass;                                            // Window frame
+  private Model windowFrame, glass, outsideScene;                         // Window and scene
 
   private List<Light> lightList;
   private List<Model> modelList;
@@ -88,7 +88,6 @@ class Anilamp_GLEventListener implements GLEventListener {
   private PictureFrame pictureFrame;
   private CactusPot cactusPot;
   private PiggyBank piggyBank;
-  private OutsideScene outsideScene;
   Lamp lamp;
 
   // Room dimension (width, height, depth)
@@ -100,10 +99,10 @@ class Anilamp_GLEventListener implements GLEventListener {
 
     // Create world lights
     Light innerWorldLight = new Light(gl, camera);
-    innerWorldLight.setPosition(0, ROOM_DIMENSION.y - Cube.THICKNESS, 0);
+    innerWorldLight.setPosition(0, ROOM_DIMENSION.y, 0);
 
     Light outerWorldLight = new Light(gl, camera);
-    outerWorldLight.setPosition(0, ROOM_DIMENSION.y - Cube.THICKNESS, -ROOM_DIMENSION.z * 1.5f);
+    outerWorldLight.setPosition(0, ROOM_DIMENSION.y, -ROOM_DIMENSION.z);
 
     // Create lamp light (spotlight)
     lampLight = new Spotlight(gl, camera);
@@ -115,24 +114,27 @@ class Anilamp_GLEventListener implements GLEventListener {
     modelFloor(gl);
     modelWall(gl);
     modelWallpaper(gl);
+    modelWindow(gl);
     modelTable(gl);
     modelPictureFrame(gl);
     modelCactusPot(gl);
     modelPiggyBank(gl);
-    modelOutsideScene(gl);
     modelLamp(gl);
-    modelWindow(gl);
 
     // Add all models to list for disposal management
     modelList = Arrays.asList(floor, wall, topWallpaper, bottomWallpaper, leftWallpaper,
         rightWallpaper, tableFrame, drawerGaps, drawerHandle, frame, holder, picture, pot, cactus,
-        flower, body, nose, ear, leg, cubeDeco, sphereDeco, grass, garden, leftGarden, rightGarden,
-        sky, cube, cylinder, sphere, frustumCone, lampEar, lowerTail, windowFrame, glass);
+        flower, body, nose, ear, leg, cubeDeco, sphereDeco, cube, cylinder, sphere, frustumCone,
+        lampEar, lowerTail, windowFrame, glass, outsideScene);
 
     // Room
     room = new Room(ROOM_DIMENSION, floor, wall);
     room.new Wallpaper(topWallpaper, bottomWallpaper, leftWallpaper, rightWallpaper);
     room.initialise();
+
+    // Window
+    window = new Window(ROOM_DIMENSION, windowFrame, glass, outsideScene);
+    window.initialise();
 
     // Table
     table = new Table(ROOM_DIMENSION, tableFrame, drawerGaps, drawerHandle);
@@ -145,18 +147,10 @@ class Anilamp_GLEventListener implements GLEventListener {
     cactusPot.initialise();
     piggyBank = new PiggyBank(body, nose, ear, leg, cubeDeco, sphereDeco);
     piggyBank.initialise();
-    //
-    // Outside scene
-    outsideScene = new OutsideScene(ROOM_DIMENSION, grass, garden, leftGarden, rightGarden, sky);
-    outsideScene.initialise();
 
     // Desk lamp
     lamp = new Lamp(cube, cylinder, sphere, frustumCone, lampLight, lampEar, lowerTail);
     lamp.initialise();
-
-    // Window
-    window = new Window(ROOM_DIMENSION, windowFrame, glass);
-    window.initialise();
   }
 
   /**
@@ -188,7 +182,6 @@ class Anilamp_GLEventListener implements GLEventListener {
     pictureFrame.render(gl);
     cactusPot.render(gl);
     piggyBank.render(gl);
-    outsideScene.render(gl);
     lamp.render(gl);
     window.render(gl);
   }
@@ -354,17 +347,21 @@ class Anilamp_GLEventListener implements GLEventListener {
     final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/window_frame_specular.jpg");
     final int[] GLASS_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/glass.jpg");
     final int[] GLASS_SPECULAR = TextureLibrary.loadTexture(gl, "textures/glass_specular.jpg");
+    final int[] SCENE = TextureLibrary.loadTexture(gl, "textures/fuji.jpg");
+    final int[] SNOW = TextureLibrary.loadTexture(gl, "textures/snow.jpg");
 
     Material material = new Material(
-        new Vec3(0, 0, 0),
-        new Vec3(0, 0, 0),
+        new Vec3(1, 1, 1),
+        new Vec3(1, 1, 1),
         new Vec3(0.3f, 0.3f, 0.3f), 30f);
     windowFrame = new Model(camera, lightList, cubeShader, material, cubeMesh, DIFFUSE, SPECULAR);
 
     // Transparency glass
-    Shader shader = new Shader(gl, "shaders/vs_cube.txt",
-        "shaders/fs_glass.txt");
+    Shader shader = new Shader(gl, "shaders/vs_cube.txt", "shaders/fs_glass.txt");
     glass = new Model(camera, lightList, shader, material, cubeMesh, GLASS_DIFFUSE, GLASS_SPECULAR);
+
+    shader = new Shader(gl, "shaders/vs_scene.txt", "shaders/fs_scene.txt");
+    outsideScene = new Model(camera, lightList, shader, material, twoTrianglesMesh, SCENE, SNOW);
   }
 
   /**
@@ -398,8 +395,7 @@ class Anilamp_GLEventListener implements GLEventListener {
     final int[] SPECULAR = TextureLibrary.loadTexture(gl, "textures/frame_specular.jpg");
     final int[] PICTURE = TextureLibrary.loadTexture(gl, "textures/dog.jpg");
     final int[] HOLDER_DIFFUSE = TextureLibrary.loadTexture(gl, "textures/window_frame.jpg");
-    final int[] HOLDER_SPECULAR = TextureLibrary.loadTexture(gl,
-        "textures/window_frame_specular.jpg");
+    final int[] HOLDER_SPECULAR = TextureLibrary.loadTexture(gl, "textures/window_frame_specular.jpg");
 
     Material material = new Material(
         new Vec3(1, 1, 1),
@@ -454,63 +450,6 @@ class Anilamp_GLEventListener implements GLEventListener {
     // Black decorations
     cubeDeco = new Model(camera, lightList, cubeShader, material, cubeMesh, DECO);
     sphereDeco = new Model(camera, lightList, cubeShader, material, sphereMesh, DECO);
-  }
-
-  /**
-   * Creates the outside scene.
-   *
-   * @param gl OpenGL object, for modelling
-   */
-  private void modelOutsideScene(GL3 gl) {
-    final int[] GARDEN = TextureLibrary.loadTexture(gl, "textures/garden.jpg");
-    final int[] SKY = TextureLibrary.loadTexture(gl, "textures/sky.jpg");
-
-    float[] vertices = TwoTriangles.vertices.clone();
-    int[] indices = TwoTriangles.indices.clone();
-
-    // Texture coordinates for outside scene
-    final float[] bottomTexCoords = {
-        (1 - Window.RATIO.x) / 2, 0.08f,                     // top left
-        (1 - Window.RATIO.x) / 2, 0,                         // bottom left
-        (1 - Window.RATIO.x) / 2 + Window.RATIO.x, 0,        // bottom right
-        (1 - Window.RATIO.x) / 2 + Window.RATIO.x, 0.08f     // top right
-    };
-
-    final float[] centreTexCoords = {
-        (1 - Window.RATIO.x) / 2, 1,                         // top right
-        (1 - Window.RATIO.x) / 2, 0,                         // bottom right
-        (1 - Window.RATIO.x) / 2 + Window.RATIO.x, 0,        // top left
-        (1 - Window.RATIO.x) / 2 + Window.RATIO.x, 1         // bottom left
-    };
-
-    final float[] leftTexCoords = {
-        (1 - Window.RATIO.x) / 2, 1,                         // top left
-        0, 1,                                                // bottom left
-        0, 0,                                                // bottom right
-        (1 - Window.RATIO.x) / 2, 0                          // top right
-    };
-
-    final float[] rightTexCoords = {
-        (1 - Window.RATIO.x) / 2 + Window.RATIO.x, 0,        // top left
-        1, 0,                                                // bottom left
-        1, 1,                                                // bottom right
-        (1 - Window.RATIO.x) / 2 + Window.RATIO.x, 1         // top right
-    };
-
-    Mesh bottomMesh = new Mesh(gl, TwoTriangles.setTexCoords(vertices, bottomTexCoords), indices);
-    Mesh centreMesh = new Mesh(gl, TwoTriangles.setTexCoords(vertices, centreTexCoords), indices);
-    Mesh leftMesh = new Mesh(gl, TwoTriangles.setTexCoords(vertices, leftTexCoords), indices);
-    Mesh rightMesh = new Mesh(gl, TwoTriangles.setTexCoords(vertices, rightTexCoords), indices);
-
-    Material material = new Material(
-        new Vec3(1, 1, 1),
-        new Vec3(1, 1, 1),
-        new Vec3(0, 0, 0), 32f);
-    grass = new Model(camera, lightList, twoTrianglesShader, material, bottomMesh, GARDEN);
-    garden = new Model(camera, lightList, twoTrianglesShader, material, centreMesh, GARDEN);
-    leftGarden = new Model(camera, lightList, twoTrianglesShader, material, leftMesh, GARDEN);
-    rightGarden = new Model(camera, lightList, twoTrianglesShader, material, rightMesh, GARDEN);
-    sky = new Model(camera, lightList, twoTrianglesShader, material, twoTrianglesMesh, SKY);
   }
 
   /**

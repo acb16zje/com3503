@@ -1,4 +1,7 @@
-NOTE: Make sure you are using the same version of JDK (javac) and JRE (java)
+NOTE
+=====
+1. Make sure you are using the same version of JDK (javac) and JRE (java)
+2. It is recommended to run using NVIDIA GPU (or better)
 
 How to run
 ====================

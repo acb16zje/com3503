@@ -1,2 +1,2 @@
-javac main/Anilamp.java
-java main/Anilamp
+javac Anilamp.java
+java Anilamp

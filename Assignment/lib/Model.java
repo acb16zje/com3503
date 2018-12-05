@@ -14,7 +14,8 @@ import lib.gmaths.*;
 public class Model {
 
   private final Mesh mesh;
-  private float offsetX = 0, offsetY = 0;
+  private float offsetX = 0;
+  private float offsetY = 0;
   private final int[] textureId1;
   private final int[] textureId2;
   private final Material material;

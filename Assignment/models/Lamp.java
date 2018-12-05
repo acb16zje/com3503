@@ -264,7 +264,7 @@ public class Lamp {
       deltaX = targetPosX - initialPosX;
       deltaZ = targetPosZ - initialPosZ;
       distance = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
-    } while (distance < 1);
+    } while (distance < 2);
 
     /* Base angle to rotate */
     // Acute angle between the initial position and the target position
@@ -299,7 +299,7 @@ public class Lamp {
     jumpSpeed = SPEED_CONSTANT / jumpHeight;
 
     /* Angle to compress */
-    final float BASE_CONSTANT = 40;
+    final float BASE_CONSTANT = 45;
     baseSwingAngle = BASE_CONSTANT * (float) Math.log(distance);
 
     final float COMPRESS_CONSTANT = distance / maxDistance;
@@ -374,6 +374,7 @@ public class Lamp {
     float rotateAngleBZ = bezierCurve(-baseSwingAngle / 1.2f, baseSwingAngle, time); // Base swing
 
     final float STRETCH = (initialLowerJointAngle - DEFAULT_LOWER_JOINT_ANGLE_Z) * 3.5f;
+    float rotateAngleL = initialLowerJointAngle - bezierCurve(STRETCH / 4, -STRETCH / 8, time);
     float rotateAngleU = initialUpperJointAngle + bezierCurve(STRETCH, -STRETCH / 2, time); // Upper joint stretch and compress
 
     float finalBasePosX = targetPosX - translateBPosX;
@@ -389,6 +390,7 @@ public class Lamp {
     } else {
       rootTranslateX.setTransform(Mat4Transform.translate(translateBPosX, translateBPosY, translateBPosZ));
       baseRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleBZ));
+      lowerJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleL));
       upperJointRotateZ.setTransform(Mat4Transform.rotateAroundZ(rotateAngleU));
     }
   }

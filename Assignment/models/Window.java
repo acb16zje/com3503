@@ -17,17 +17,18 @@ public class Window {
 
   private final Model windowFrame;
   private final Model glass;
+  private final Model outsideScene;
 
-  private final float roomWidth;
+  private final double startTime;
+
   private final float roomHeight;
   private final float roomDepth;
   private final float windowWidth;
   private final float windowHeight;
   private final float glassWidth;
   private final float glassHeight;
-  private final float glassDepth;
   private final Mat4 glassScale;
-  private final float FRAME_DIM = Cube.THICKNESS / 2;
+  private final float FRAME_DIM = Cube.THICKNESS / 2.5f;
 
   // Dimension ratio of window with respect to room dimension
   public static final Vec2 RATIO = new Vec2(0.45f, 0.39f);
@@ -40,20 +41,22 @@ public class Window {
    * @param windowFrame Cube window frame model
    * @param glass Cube glass model
    */
-  public Window(Vec3 roomDimension, Model windowFrame, Model glass) {
-    this.roomWidth = roomDimension.x;
+  public Window(Vec3 roomDimension, Model windowFrame, Model glass, Model outsideScene) {
+    float roomWidth = roomDimension.x;
     this.roomHeight = roomDimension.y;
     this.roomDepth = roomDimension.z;
     this.windowFrame = windowFrame;
     this.glass = glass;
+    this.outsideScene = outsideScene;
 
     windowWidth = roomWidth * RATIO.x;
     windowHeight = roomHeight * RATIO.y - 2 * FRAME_DIM; // 2 * FRAME_DIM for top and bot bar
 
     glassWidth = windowWidth / 2 - FRAME_DIM;
     glassHeight = (windowHeight - FRAME_DIM) / 2;
-    glassDepth = FRAME_DIM / 8;
+    float glassDepth = FRAME_DIM / 8;
     glassScale = Mat4Transform.scale(glassWidth, glassHeight, glassDepth);
+    startTime = getSeconds();
   }
 
   /**
@@ -78,6 +81,14 @@ public class Window {
    * @param gl OpenGL object, for rendering
    */
   public void render(GL3 gl) {
+    double elapsedTime = getSeconds() - startTime;
+    double wavelength = elapsedTime * 0.5;
+    double t = wavelength * 0.1;
+    float cosine = (float) ((Math.cos(wavelength) + 1) * 0.5);
+    float offset = (float) (t - Math.floor(t));
+
+    outsideScene.setDayNightCycle(cosine);
+    outsideScene.setMovingTexture(offset, offset * 2);
     windowRoot.draw(gl);
   }
 
@@ -88,34 +99,35 @@ public class Window {
    */
   private void createHorizontalBar(SGNode parent) {
     final Mat4 H_MAT = Mat4Transform.scale(windowWidth, FRAME_DIM, FRAME_DIM); // Horizontal mat
+    final float H_BAR_POS_Y = (windowHeight + FRAME_DIM) / 2;
+
+    // Mid horizontal bar
+    TransformNode midHTranslate = new TransformNode("Mid horizontal bars translate",
+        Mat4Transform.translate(0, windowHeight / 2 + FRAME_DIM, 0));
+    NameNode midH = new NameNode("Mid horizontal bar");
+    TransformNode midHTransform = new TransformNode("midH Transform", H_MAT);
+    ModelNode midHModel = new ModelNode("midH Model", windowFrame);
 
     // Bottom horizontal bar
     NameNode botH = new NameNode("Bottom horizontal bar");
-    Mat4 m = Mat4.multiply(Mat4Transform.translate(0, FRAME_DIM / 2, 0), H_MAT);
+    Mat4 m = Mat4.multiply(Mat4Transform.translate(0, -H_BAR_POS_Y, 0), H_MAT);
     TransformNode botHTransform = new TransformNode("botH Transform", m);
     ModelNode botHModel = new ModelNode("botH Model", windowFrame);
 
-    // Mid horizontal bar
-    NameNode midH = new NameNode("Mid horizontal bar");
-    m = Mat4.multiply(Mat4Transform.translate(0, RATIO.y * roomHeight / 2, 0), H_MAT);
-    TransformNode midHTransform = new TransformNode("midH Transform", m);
-    ModelNode midHModel = new ModelNode("midH Model", windowFrame);
-
     // Top horizontal bar
     NameNode topH = new NameNode("Top horizontal bar");
-    m = Mat4.multiply(
-        Mat4Transform.translate(0, RATIO.y * roomHeight - FRAME_DIM / 2, 0), H_MAT);
+    m = Mat4.multiply(Mat4Transform.translate(0, H_BAR_POS_Y, 0), H_MAT);
     TransformNode topHTransform = new TransformNode("topH Transform", m);
     ModelNode topHModel = new ModelNode("topH Model", windowFrame);
 
-    parent.addAllChildren(botH, botHTransform, botHModel);
-      createVerticalBar(botH);               // 3 vertical bars as children
-    parent.addAllChildren(midH, midHTransform, midHModel);
-    parent.addAllChildren(topH, topHTransform, topHModel);
-
-    // Glasses have to be added at last for transparency to fully work with window frames
-    createBottomGlass(parent);               // 2 bottom glasses as children
-    createTopGlass(parent);                  // 2 top glasses as children
+    // Glasses have to be added at last otherwise transparency will override other models
+    parent.addChild(midHTranslate);
+      midHTranslate.addAllChildren(botH, botHTransform, botHModel);
+      midHTranslate.addAllChildren(topH, topHTransform, topHModel);
+      midHTranslate.addAllChildren(midH, midHTransform, midHModel);
+        createVerticalBar(midH);                // 3 vertical bars as children
+        createOutsideScene(midH);
+        createGlasses(midH);                    // 4 glasses as children
   }
 
   /**
@@ -126,10 +138,6 @@ public class Window {
   private void createVerticalBar(SGNode parent) {
     final Mat4 V_MAT = Mat4Transform.scale(FRAME_DIM, windowHeight, FRAME_DIM);  // Vertical mat
     final float V_BAR_POS_X = (windowWidth - FRAME_DIM) / 2;
-    final float V_BAR_POS_Y = FRAME_DIM + windowHeight / 2;
-
-    TransformNode verticalTranslate = new TransformNode("Vertical translate",
-        Mat4Transform.translate(0, V_BAR_POS_Y, 0));
 
     // Left vertical bar - child of bottom horizontal bar
     NameNode leftV = new NameNode("Left vertical bar");
@@ -149,55 +157,68 @@ public class Window {
     TransformNode rightVTransform = new TransformNode("rightV Transform", m);
     ModelNode rightVModel = new ModelNode("rightV Model", windowFrame);
 
-    parent.addChild(verticalTranslate);
-      verticalTranslate.addAllChildren(leftV, leftVTransform, leftVModel);
-      verticalTranslate.addAllChildren(midV, midVTransform, midVModel);
-      verticalTranslate.addAllChildren(rightV, rightVTransform, rightVModel);
+    parent.addAllChildren(leftV, leftVTransform, leftVModel);
+    parent.addAllChildren(midV, midVTransform, midVModel);
+    parent.addAllChildren(rightV, rightVTransform, rightVModel);
   }
 
   /**
-   * Creates the bottom left and bottom right glass
+   * Creates the bottom left, bottom right, top left, and top right glasses
    *
    * @param parent Parent node
    */
-  private void createBottomGlass(SGNode parent) {
+  private void createGlasses(SGNode parent) {
     final float POS_X = -glassWidth / 2;
-    final float POS_Y = glassHeight / 2 + FRAME_DIM;
+    final float POS_Y = glassHeight / 2 + FRAME_DIM / 2;
 
-    NameNode leftGlass = new NameNode("Bottom left glass");
-    Mat4 m = Mat4.multiply(Mat4Transform.translate(POS_X, POS_Y, 0), glassScale);
-    TransformNode leftGlassTransform = new TransformNode("Bottom left glass transform", m);
-    ModelNode leftGlassModel = new ModelNode("Bottom left glass model", glass);
+    NameNode botLeftGlass = new NameNode("Bottom left glass");
+    Mat4 m = Mat4.multiply(Mat4Transform.translate(POS_X, -POS_Y, 0), glassScale);
+    TransformNode botLeftGlassTransform = new TransformNode("Bottom left glass transform", m);
+    ModelNode botLeftGlassModel = new ModelNode("Bottom left glass model", glass);
 
-    NameNode rightGlass = new NameNode("Bottom right glass");
+    NameNode botRightGlass = new NameNode("Bottom right glass");
+    m = Mat4.multiply(Mat4Transform.translate(-POS_X, -POS_Y, 0), glassScale);
+    TransformNode botRightGlassTransform = new TransformNode("Bottom right glasss transform", m);
+    ModelNode botRightGlassModel = new ModelNode("Bottom right glass model", glass);
+
+    NameNode topLeftGlass = new NameNode("Top left glass");
+    m = Mat4.multiply(Mat4Transform.translate(POS_X, POS_Y, 0), glassScale);
+    TransformNode topLeftGlassTransform = new TransformNode("Top left glass transform", m);
+    ModelNode topLeftGlassModel = new ModelNode("Top left glass model", glass);
+
+    NameNode topRightGlass = new NameNode("Top right glass");
     m = Mat4.multiply(Mat4Transform.translate(-POS_X, POS_Y, 0), glassScale);
-    TransformNode rightGlassTransform = new TransformNode("Bottom right glasss transform", m);
-    ModelNode rightGlassModel = new ModelNode("Bottom right glass model", glass);
+    TransformNode topRightGlassTransform = new TransformNode("Top right glasss transform", m);
+    ModelNode topRightGlassModel = new ModelNode("Top right glass model", glass);
 
-    parent.addAllChildren(leftGlass, leftGlassTransform, leftGlassModel);
-    parent.addAllChildren(rightGlass, rightGlassTransform, rightGlassModel);
+    parent.addAllChildren(botLeftGlass, botLeftGlassTransform, botLeftGlassModel);
+    parent.addAllChildren(botRightGlass, botRightGlassTransform, botRightGlassModel);
+    parent.addAllChildren(topLeftGlass, topLeftGlassTransform, topLeftGlassModel);
+    parent.addAllChildren(topRightGlass, topRightGlassTransform, topRightGlassModel);
   }
 
   /**
-   * Creates the top left and top right glass
+   * Outside scene: fuji mountain with snow
    *
    * @param parent Parent node
    */
-  private void createTopGlass(SGNode parent) {
-    final float POS_X = -glassWidth / 2;
-    final float POS_Y = glassHeight * 2 - FRAME_DIM - 0.05f; // 0.05 offset for floating point error
+  private void createOutsideScene(SGNode parent) {
+    NameNode scene = new NameNode("Outside scene");
+    Mat4 m = Mat4Transform.scale(windowWidth, 1, windowHeight + 2 * FRAME_DIM);
+    m = Mat4.multiply(Mat4Transform.rotateAroundX(90), m);
+    m = Mat4.multiply(Mat4Transform.translate(0, 0, -FRAME_DIM), m);
+    TransformNode sceneTransform = new TransformNode("Outside scene transform", m);
+    ModelNode sceneModel = new ModelNode("Outside scene model", outsideScene);
 
-    NameNode leftGlass = new NameNode("Top left glass");
-    Mat4 m = Mat4.multiply(Mat4Transform.translate(POS_X, POS_Y, 0), glassScale);
-    TransformNode leftGlassTransform = new TransformNode("Top left glass transform", m);
-    ModelNode leftGlassModel = new ModelNode("Top left glass model", glass);
+    parent.addAllChildren(scene, sceneTransform, sceneModel);
+  }
 
-    NameNode rightGlass = new NameNode("Top right glass");
-    m = Mat4.multiply(Mat4Transform.translate(-POS_X, POS_Y, 0), glassScale);
-    TransformNode rightGlassTransform = new TransformNode("Top right glasss transform", m);
-    ModelNode rightGlassModel = new ModelNode("Top right glass model", glass);
-
-    parent.addAllChildren(leftGlass, leftGlassTransform, leftGlassModel);
-    parent.addAllChildren(rightGlass, rightGlassTransform, rightGlassModel);
+  /**
+   * Get the elapsed time in seconds
+   *
+   * @return The elapsed time in seconds
+   */
+  private double getSeconds() {
+    return System.currentTimeMillis() / 1000.0;
   }
 }

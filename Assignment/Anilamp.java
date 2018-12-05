@@ -39,6 +39,7 @@ public class Anilamp extends JFrame {
 
     // Canvas on center
     GLCapabilities glcapabilities = new GLCapabilities(GLProfile.get(GLProfile.GL3));
+    glcapabilities.setDepthBits(24); // Prevent Z-fighting
     canvas = new GLCanvas(glcapabilities);
     camera = new Camera(Camera.ROOM_X, Camera.DEFAULT_TARGET, Camera.DEFAULT_UP);
     glEventListener = new Anilamp_GLEventListener(camera);
