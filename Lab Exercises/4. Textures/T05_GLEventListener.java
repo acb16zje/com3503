@@ -83,9 +83,9 @@ public class T05_GLEventListener implements GLEventListener {
     shader = new Shader(gl, "vs_T05.txt", "fs_T05.txt");
     fillBuffers(gl);
     textureId1 = TextureLibrary.loadTexture(gl, "paintstrokes/wattBook.jpg");
-    textureId2 = TextureLibrary.loadTexture(gl, "aragaki.jpg");
-    textureId3 = TextureLibrary.loadTexture(gl, "gakki_wallpaper_3.jpg");
-    textureId4 = TextureLibrary.loadTexture(gl, "gakki_wallpaper_4.jpg");
+    textureId2 = TextureLibrary.loadTexture(gl, "wattBook.jpg");
+    textureId3 = TextureLibrary.loadTexture(gl, "chequerboard.jpg");
+    textureId4 = TextureLibrary.loadTexture(gl, "cloud.jpg");
     gl.glActiveTexture(GL.GL_TEXTURE0);
     gl.glBindTexture(GL.GL_TEXTURE_2D, textureId1[0]);
     gl.glActiveTexture(GL.GL_TEXTURE1);

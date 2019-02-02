@@ -80,9 +80,9 @@ public class T02_GLEventListener implements GLEventListener {
   public void initialise(GL3 gl) {
     shader = new Shader(gl, "vs_T02.txt", "fs_T02.txt");
     fillBuffers(gl);
-    textureId1 = TextureLibrary.loadTexture(gl, "gakki_wallpaper_3.jpg");
-    textureId2 = TextureLibrary.loadTexture(gl, "gakki_wallpaper_3.jpg");
-    textureId3 = TextureLibrary.loadTexture(gl, "gakki_wallpaper_4.jpg");
+    textureId1 = TextureLibrary.loadTexture(gl, "chequerboard.jpg");
+    textureId2 = TextureLibrary.loadTexture(gl, "chequerboard.jpg");
+    textureId3 = TextureLibrary.loadTexture(gl, "cloud.jpg");
   }
 
   public void render(GL3 gl) {
